@@ -33,7 +33,7 @@ src/
 ├── types/                # Shared API and domain contracts
 └── utils/                # Pure, framework-independent helpers
 prisma/
-└── schema.prisma         # Database foundation; domain models arrive by migration
+└── schema.prisma         # Complete MVP domain schema and Auth.js persistence
 android/                  # Generated Capacitor Android project
 ios/                      # Generated Capacitor iOS project
 ```
@@ -75,9 +75,21 @@ not import UI code.
   `CAPACITOR_SERVER_URL`; this avoids pretending a server-rendered,
   authenticated Next.js app is a static export.
 - **Database:** Prisma migrations are the only schema change mechanism. The
-  complete MVP schema is intentionally deferred until the corresponding
-  feature is implemented; audit fields and soft-delete policies must be
-  decided per critical entity before migration.
+  MVP schema uses UUID primary keys, camelCase Prisma fields, explicit
+  foreign keys, UTC timestamps and Prisma enums for finite states. Critical
+  aggregates expose `deletedAt`; immutable points, role assignments and audit
+  records preserve operational history.
+- **Database normalization:** Application roles and operational staff roles are
+  finite enums, while `UserRole`, `TeamMember`, `ShiftAssignment`,
+  `UserMission`, `UserBadge` and `EventAttendance` model contextual
+  assignments. `CheckIn` references only `ShiftAssignment` to avoid duplicating
+  `shiftId` and `userId`.
+- **MVP coverage:** The schema includes Auth.js persistence, competitions,
+  teams, matches and events, staff scheduling/check-in, missions, badges,
+  LP/SP transactions, in-app notifications, FCM device tokens and news
+  articles. PostgreSQL `CHECK` constraints for score, minute, reward and
+  interval validation belong in the generated migration because Prisma schema
+  does not express them portably.
 
 ## Environment and commands
 

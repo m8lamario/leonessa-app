@@ -7,4 +7,605 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Domain models are introduced by feature migrations, not by the foundation setup.
+// Naming convention: Prisma fields use camelCase, models use PascalCase,
+// database names are generated from the Prisma names, and all IDs are UUIDs.
+// Timestamps are stored in UTC. Critical aggregates use deletedAt instead of
+// physical deletion; transaction and audit records are immutable.
+
+enum UserRoleType {
+  USER
+  PLAYER
+  STAFF
+  SCHOOL_REP
+  ORGANIZER
+  ADMIN
+}
+
+enum TeamMemberRole {
+  PLAYER
+  COACH
+  MANAGER
+  SOCIAL_MANAGER
+}
+
+enum CompetitionStatus {
+  DRAFT
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  CANCELLED
+}
+
+enum MatchEventType {
+  GOAL
+  ASSIST
+  YELLOW_CARD
+  RED_CARD
+  MVP
+}
+
+enum StaffRoleType {
+  ACCOGLIENZA
+  SICUREZZA
+  SOCIAL
+  RACCATTAPALLE
+  LOGISTICA
+  SPOGLIATOI
+  STATISTICHE
+  FOTOGRAFO
+  VIDEOMAKER
+  INTERVISTATORE
+}
+
+enum ShiftStatus {
+  ASSIGNED
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+}
+
+enum CheckInMethod {
+  QR
+  MANUAL
+}
+
+enum MissionStatus {
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETED
+  CLAIMED
+}
+
+enum PointType {
+  LP
+  SP
+}
+
+enum PointSourceType {
+  MANUAL
+  MISSION
+  SHIFT
+  MATCH
+  EVENT
+}
+
+enum NotificationType {
+  SYSTEM
+  COMPETITION
+  MATCH
+  STAFF
+  GAMIFICATION
+  ANNOUNCEMENT
+}
+
+enum NewsType {
+  ARTICLE
+  ANNOUNCEMENT
+  MATCH_REPORT
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  ASSIGN_ROLE
+  REVOKE_ROLE
+  CHECK_IN
+  PUBLISH
+  AWARD_POINTS
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  surname       String?
+  image         String?
+  bio           String?
+  instagram     String?
+  className     String?
+  schoolId      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  school              School?            @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  roles               UserRole[]
+  assignedRoles       UserRole[]         @relation("UserRoleAssigner")
+  accounts            Account[]
+  sessions            Session[]
+  teamMemberships     TeamMember[]
+  createdCompetitions Competition[]      @relation("CompetitionCreator")
+  createdShifts       Shift[]            @relation("ShiftCreator")
+  shiftAssignments    ShiftAssignment[]
+  recordedCheckIns    CheckIn[]          @relation("CheckInRecorder")
+  pointTransactions   PointTransaction[]
+  missions            UserMission[]
+  badges              UserBadge[]
+  notifications       Notification[]
+  pushDevices         PushDevice[]
+  eventAttendances    EventAttendance[]
+  authoredNews        NewsArticle[]
+  auditLogs           AuditLog[]         @relation("AuditActor")
+
+  @@index([schoolId])
+  @@index([deletedAt])
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @map("refresh_token")
+  access_token      String? @map("access_token")
+  expires_at        Int?    @map("expires_at")
+  token_type        String? @map("token_type")
+  scope             String?
+  id_token          String? @map("id_token")
+  session_state     String? @map("session_state")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model UserRole {
+  id           String       @id @default(uuid())
+  userId       String
+  role         UserRoleType
+  assignedById String?
+  assignedAt   DateTime     @default(now())
+  revokedAt    DateTime?
+
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy User? @relation("UserRoleAssigner", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@index([userId, role, revokedAt])
+  @@index([assignedById])
+}
+
+model School {
+  id             String    @id @default(uuid())
+  name           String    @unique
+  shortName      String    @unique
+  logoUrl        String?
+  primaryColor   String?
+  secondaryColor String?
+  description    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  users User[]
+  teams Team[]
+
+  @@index([deletedAt])
+}
+
+model Competition {
+  id          String            @id @default(uuid())
+  name        String
+  slug        String            @unique
+  season      String
+  status      CompetitionStatus @default(DRAFT)
+  startDate   DateTime
+  endDate     DateTime
+  createdById String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  createdBy         User?              @relation("CompetitionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  teams             Team[]
+  matches           Match[]
+  shifts            Shift[]
+  missions          Mission[]
+  badges            Badge[]
+  pointTransactions PointTransaction[]
+  events            Event[]
+  newsArticles      NewsArticle[]
+
+  @@index([status, startDate])
+  @@index([season])
+  @@index([createdById])
+  @@index([deletedAt])
+}
+
+model Team {
+  id            String    @id @default(uuid())
+  competitionId String
+  schoolId      String
+  name          String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition  @relation(fields: [competitionId], references: [id], onDelete: Restrict)
+  school      School       @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  members     TeamMember[]
+  homeMatches Match[]      @relation("HomeTeam")
+  awayMatches Match[]      @relation("AwayTeam")
+
+  @@unique([competitionId, name])
+  @@index([schoolId])
+  @@index([competitionId, deletedAt])
+}
+
+model TeamMember {
+  id           String         @id @default(uuid())
+  teamId       String
+  userId       String
+  role         TeamMemberRole @default(PLAYER)
+  jerseyNumber Int?
+  joinedAt     DateTime       @default(now())
+  leftAt       DateTime?
+
+  team          Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  playerEvents  MatchEvent[] @relation("MatchEventTeamMember")
+  relatedEvents MatchEvent[] @relation("MatchEventRelatedTeamMember")
+
+  @@unique([teamId, userId])
+  @@unique([teamId, jerseyNumber])
+  @@index([userId])
+  @@index([teamId, leftAt])
+}
+
+model Match {
+  id            String      @id @default(uuid())
+  competitionId String
+  homeTeamId    String
+  awayTeamId    String
+  venue         String?
+  startAt       DateTime
+  status        MatchStatus @default(SCHEDULED)
+  homeScore     Int         @default(0)
+  awayScore     Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition  @relation(fields: [competitionId], references: [id], onDelete: Restrict)
+  homeTeam    Team         @relation("HomeTeam", fields: [homeTeamId], references: [id], onDelete: Restrict)
+  awayTeam    Team         @relation("AwayTeam", fields: [awayTeamId], references: [id], onDelete: Restrict)
+  events      MatchEvent[]
+  // PostgreSQL migration must add CHECK (home_team_id <> away_team_id)
+  // and CHECK (home_score >= 0 AND away_score >= 0).
+
+  @@index([competitionId, startAt])
+  @@index([homeTeamId])
+  @@index([awayTeamId])
+  @@index([status, startAt])
+  @@index([deletedAt])
+}
+
+model MatchEvent {
+  id              String         @id @default(uuid())
+  matchId         String
+  type            MatchEventType
+  minute          Int
+  playerId        String?
+  relatedPlayerId String?
+  createdAt       DateTime       @default(now())
+
+  match         Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player        TeamMember? @relation("MatchEventTeamMember", fields: [playerId], references: [id], onDelete: SetNull)
+  relatedPlayer TeamMember? @relation("MatchEventRelatedTeamMember", fields: [relatedPlayerId], references: [id], onDelete: SetNull)
+  // PostgreSQL migration must add CHECK (minute >= 0).
+
+  @@index([matchId, minute])
+  @@index([playerId])
+  @@index([relatedPlayerId])
+}
+
+model Shift {
+  id            String        @id @default(uuid())
+  competitionId String
+  title         String
+  staffRole     StaffRoleType
+  startAt       DateTime
+  endAt         DateTime
+  rewardPoints  Int           @default(0)
+  rewardType    PointType     @default(SP)
+  createdById   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition       @relation(fields: [competitionId], references: [id], onDelete: Restrict)
+  createdBy   User?             @relation("ShiftCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  assignments ShiftAssignment[]
+  // PostgreSQL migration must add CHECK (end_at > start_at AND reward_points >= 0).
+
+  @@index([competitionId, startAt])
+  @@index([staffRole, startAt])
+  @@index([createdById])
+  @@index([deletedAt])
+}
+
+model ShiftAssignment {
+  id          String      @id @default(uuid())
+  shiftId     String
+  userId      String
+  status      ShiftStatus @default(ASSIGNED)
+  confirmedAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  shift   Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  checkIn CheckIn?
+
+  @@unique([shiftId, userId])
+  @@index([userId, status])
+  @@index([shiftId, status])
+}
+
+model CheckIn {
+  id           String        @id @default(uuid())
+  assignmentId String        @unique
+  method       CheckInMethod
+  checkedInAt  DateTime      @default(now())
+  checkedOutAt DateTime?
+  recordedById String?
+
+  assignment ShiftAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  recordedBy User?           @relation("CheckInRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([checkedInAt])
+  @@index([recordedById])
+}
+
+model Mission {
+  id            String    @id @default(uuid())
+  competitionId String?
+  title         String
+  description   String
+  rewardPoints  Int
+  rewardType    PointType @default(LP)
+  active        Boolean   @default(true)
+  startsAt      DateTime?
+  endsAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition?  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  users       UserMission[]
+  // PostgreSQL migration must add CHECK (reward_points >= 0).
+
+  @@index([competitionId, active])
+  @@index([active, startsAt, endsAt])
+  @@index([deletedAt])
+}
+
+model UserMission {
+  id          String        @id @default(uuid())
+  userId      String
+  missionId   String
+  status      MissionStatus @default(AVAILABLE)
+  progress    Int           @default(0)
+  completedAt DateTime?
+  claimedAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, missionId])
+  @@index([userId, status])
+  @@index([missionId, status])
+}
+
+model Badge {
+  id            String    @id @default(uuid())
+  competitionId String?
+  name          String
+  slug          String    @unique
+  description   String
+  iconUrl       String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition? @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  users       UserBadge[]
+
+  @@index([competitionId, active])
+  @@index([deletedAt])
+}
+
+model UserBadge {
+  id       String   @id @default(uuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([badgeId])
+  @@index([userId, earnedAt])
+}
+
+model PointTransaction {
+  id             String          @id @default(uuid())
+  userId         String
+  competitionId  String?
+  amount         Int
+  type           PointType
+  sourceType     PointSourceType
+  sourceId       String?
+  reason         String
+  idempotencyKey String?         @unique
+  createdAt      DateTime        @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  competition Competition? @relation(fields: [competitionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type, createdAt])
+  @@index([competitionId, type, createdAt])
+  @@index([sourceType, sourceId])
+}
+
+model Event {
+  id            String    @id @default(uuid())
+  competitionId String
+  title         String
+  description   String?
+  startAt       DateTime
+  endAt         DateTime?
+  location      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition       @relation(fields: [competitionId], references: [id], onDelete: Restrict)
+  attendance  EventAttendance[]
+
+  @@index([competitionId, startAt])
+  @@index([deletedAt])
+}
+
+model EventAttendance {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  checkedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId, checkedAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  linkUrl   String?
+  readAt    DateTime?
+  sentAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@index([type, createdAt])
+}
+
+model PushDevice {
+  id         String    @id @default(uuid())
+  userId     String
+  token      String    @unique
+  platform   String
+  lastSeenAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+}
+
+model NewsArticle {
+  id            String     @id @default(uuid())
+  competitionId String?
+  authorId      String?
+  title         String
+  slug          String     @unique
+  excerpt       String?
+  content       String
+  type          NewsType   @default(ARTICLE)
+  status        NewsStatus @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition? @relation(fields: [competitionId], references: [id], onDelete: SetNull)
+  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([competitionId, status, publishedAt])
+  @@index([authorId])
+  @@index([deletedAt])
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  actorId    String?
+  action     AuditAction
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+}
