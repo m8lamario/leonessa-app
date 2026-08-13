@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
 import styles from "../auth.module.css";
+import { AuthModeSwitch } from "./auth-mode-switch";
 
 export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }) {
   const router = useRouter();
@@ -37,7 +37,8 @@ export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }
 
   return (
     <>
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <AuthModeSwitch activeMode="login" />
+      <form className={`${styles.form} ${styles.loginForm}`} onSubmit={handleSubmit}>
         <label>
           Email
           <input name="email" type="email" autoComplete="email" required />
@@ -58,9 +59,6 @@ export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }
       >
         Continua con Google
       </button>
-      <p className={styles.footerText}>
-        Non hai ancora un account? <Link href="/register">Registrati</Link>
-      </p>
     </>
   );
 }

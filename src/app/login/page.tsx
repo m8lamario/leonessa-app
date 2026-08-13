@@ -15,11 +15,7 @@ export default async function LoginPage({
   const params = await searchParams;
 
   return (
-    <AuthCard
-      eyebrow="La tua competizione"
-      title="Bentornato in Leonessa"
-      description="Accedi per seguire la Cup e vivere ogni momento della competizione."
-    >
+    <AuthCard title="Accedi">
       <LoginForm callbackUrl={params.callbackUrl ?? "/profile"} />
     </AuthCard>
   );

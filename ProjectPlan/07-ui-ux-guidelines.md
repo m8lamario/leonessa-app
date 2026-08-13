@@ -92,7 +92,166 @@ Questa è LA piattaforma ufficiale della Leonessa Cup.
 
 \---
 
+# 2.1 Identità Territoriale e Sportiva
 
+## Obiettivo
+
+Leonessa Platform non deve apparire come una dashboard SaaS o un semplice software gestionale.
+
+L'app deve comunicare immediatamente:
+
+- Brescia
+- Leonessa Cup
+- Competizione
+- Appartenenza
+- Comunità studentesca
+- Evento sportivo
+
+L'utente deve percepire di entrare nell'ecosistema ufficiale della Leonessa Cup.
+
+---
+
+## Principio Fondamentale
+
+Quando un utente apre l'app deve pensare:
+
+"Sto entrando nella Leonessa Cup."
+
+e non:
+
+"Sto utilizzando un software."
+
+---
+
+## Personalità Visiva
+
+La piattaforma deve essere percepita come:
+
+- Competitiva
+- Giovane
+- Premium
+- Territoriale
+- Coinvolgente
+- Sportiva
+- Moderna
+- Ambiziosa
+
+---
+
+## La V Bresciana
+
+### Concetto
+
+L'identità calcistica bresciana è fortemente associata alla storica "V" bianca.
+
+Leonessa Platform può ispirarsi a questo linguaggio grafico senza utilizzarlo come logo.
+
+### Regole
+
+NON utilizzare la V come lettera decorativa.
+
+NON sostituire il logo ufficiale.
+
+NON creare loghi alternativi.
+
+UTILIZZARE la V come principio geometrico.
+
+### Applicazioni Consentite
+
+- tagli diagonali nelle card
+- separatori di sezione
+- pattern di sfondo
+- shape decorative
+- hero background
+- animazioni di ingresso
+- loading screen
+- indicatori di progressione
+
+### Obiettivo
+
+Creare un linguaggio grafico immediatamente riconoscibile e legato al territorio bresciano.
+
+L'utente non deve necessariamente notare la V, ma percepirla inconsciamente attraverso il design.
+
+---
+
+## Atmosfera Sportiva
+
+### Obiettivo
+
+Trasmettere l'energia di un evento sportivo reale.
+
+### Elementi Consentiti
+
+- glow blu ispirato all'illuminazione degli stadi
+- profondità visiva
+- contrasti netti
+- pattern ispirati alle gradinate
+- elementi grafici dinamici
+
+### Elementi da Evitare
+
+- stile corporate
+- dashboard aziendale
+- estetica fintech
+- cyberpunk
+- effetti gaming aggressivi
+- design generici da startup
+
+---
+
+## Utilizzo della Leonessa
+
+### Principio
+
+Il logo non deve essere l'unico elemento identitario.
+
+### Elementi Derivati Consentiti
+
+- silhouette della leonessa
+- criniera stilizzata
+- pattern derivati dalle curve del simbolo
+- elementi decorativi a bassissima opacità
+
+### Regola
+
+Questi elementi devono essere percepiti e non necessariamente notati.
+
+Devono rafforzare il brand senza distrarre l'utente.
+
+---
+
+## Hero Sections
+
+Le schermate principali devono trasmettere:
+
+- orgoglio
+- competizione
+- appartenenza
+- identità cittadina
+
+### Esempi di Copy
+
+22 scuole. Una sola città.
+
+La competizione delle scuole di Brescia.
+
+Ogni partita conta.
+
+La tua scuola. La tua città. La tua Cup.
+
+---
+
+## Test di Riconoscibilità
+
+Nascondendo il logo Leonessa Cup, la schermata deve continuare a trasmettere:
+
+- competizione
+- appartenenza
+- Brescia
+- evento sportivo
+
+Se la schermata perde completamente la propria identità senza il logo, il design deve essere rivisto.
 
 \# 3. Logo
 
@@ -1358,32 +1517,35 @@ L'app deve parlare come una community.
 
 
 
-\# 21. Design Inspirations
+# 21. Design Inspirations
 
+## Product Inspirations
 
+- OneFootball
+- Sofascore
+- FotMob
+- Formula 1 App
+- Duolingo (gamification)
+- Discord (community)
 
-Riferimenti consigliati:
+## Visual Inspirations
 
+- Nike Football
+- UEFA Champions League
+- Serie A
+- Brescia Calcio
+- Identità sportive territoriali
+- Eventi sportivi studenteschi
 
+## Esperienza Obiettivo
 
-\- Nike
+L'app deve essere percepita come:
 
-\- OneFootball
+"La Champions League delle scuole di Brescia"
 
-\- Sofascore
+e non come:
 
-\- FotMob
-
-\- Duolingo (gamification)
-
-\- Discord (community)
-
-\- Formula 1 App
-
-
-
-\---
-
+"Un gestionale scolastico".
 
 
 \# 22. KPI UX
@@ -1410,7 +1572,23 @@ Monitorare:
 
 \---
 
+# 22.1 Regola Anti-SaaS
 
+Ogni schermata deve evitare l'aspetto di:
+
+- CRM
+- Gestionale
+- Dashboard aziendale
+- Startup fintech
+
+L'identità Leonessa deve essere riconoscibile anche senza logo.
+
+Le forme, la composizione, l'atmosfera e il linguaggio visivo devono comunicare:
+
+- competizione
+- appartenenza
+- Brescia
+- sport
 
 \# 23. Regola Fondamentale
 

@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
 import styles from "../auth.module.css";
+import { AuthModeSwitch } from "./auth-mode-switch";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -49,6 +49,7 @@ export function RegisterForm() {
 
   return (
     <>
+      <AuthModeSwitch activeMode="register" />
       <form className={styles.form} onSubmit={handleSubmit}>
         <label>
           Nome
@@ -77,9 +78,6 @@ export function RegisterForm() {
           {pending ? "Creazione account..." : "Registrati"}
         </button>
       </form>
-      <p className={styles.footerText}>
-        Hai già un account? <Link href="/login">Accedi</Link>
-      </p>
     </>
   );
 }

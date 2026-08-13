@@ -3,17 +3,22 @@
   --color-primary-hover: #162983;
   --color-primary-light: #305cff;
   --color-background: #071034;
+  --color-background-deep: #030817;
   --color-surface: #131e52;
+  --color-surface-raised: #18265f;
   --color-text: #ffffff;
   --color-text-secondary: #c6ccda;
   --color-text-muted: #8d95a6;
+  --color-line: rgb(198 204 218 / 16%);
+  --color-glow: rgb(48 92 255 / 24%);
   --color-success: #16a34a;
   --color-warning: #f59e0b;
   --color-danger: #dc2626;
   --space-unit: 8px;
   --radius-sm: 8px;
   --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-lg: 20px;
+  --shadow-stadium: 0 24px 80px rgb(0 0 0 / 35%), 0 0 60px rgb(48 92 255 / 10%);
 }
 
 * {
@@ -23,14 +28,50 @@
 html,
 body {
   min-height: 100%;
+  background: var(--color-background-deep);
 }
 
 body {
   margin: 0;
-  background: var(--color-background);
+  background:
+    radial-gradient(ellipse at 50% -20%, rgb(48 92 255 / 20%), transparent 48%),
+    linear-gradient(145deg, transparent 0 48%, rgb(48 92 255 / 3%) 48.2% 48.4%, transparent 48.6%),
+    var(--color-background);
   color: var(--color-text);
   font-family: "Poppins", sans-serif;
   text-rendering: optimizeLegibility;
+}
+
+body::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 31px,
+    rgb(255 255 255 / 2%) 31px 32px
+  );
+  content: "";
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -9,11 +9,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <AuthCard
-      eyebrow="Entra nella community"
-      title="Crea il tuo account"
-      description="Registrati in pochi secondi. Potrai completare scuola e ruolo al primo accesso."
-    >
+    <AuthCard title="Registrati">
       <RegisterForm />
     </AuthCard>
   );

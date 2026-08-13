@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import styles from "../auth.module.css";
 
@@ -10,9 +11,9 @@ export function AuthCard({
   description,
   children,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
-  description: string;
+  description?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -23,10 +24,21 @@ export function AuthCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className={styles.brand}>LEONESSA</div>
-        <p className={styles.eyebrow}>{eyebrow}</p>
+        <div className={styles.brandLockup}>
+          <div className={styles.logoContainer}>
+            <Image
+              className={styles.logoImage}
+              src="/logo/logo leonessa bianco.png"
+              alt="Logo Leonessa Cup"
+              width={1986}
+              height={2744}
+              priority
+            />
+          </div>
+        </div>
+        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
         <h1>{title}</h1>
-        <p className={styles.description}>{description}</p>
+        {description && <p className={styles.description}>{description}</p>}
         {children}
       </motion.section>
     </main>
