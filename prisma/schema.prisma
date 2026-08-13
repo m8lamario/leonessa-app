@@ -136,6 +136,7 @@ model User {
   name          String?
   surname       String?
   image         String?
+  passwordHash  String?
   bio           String?
   instagram     String?
   className     String?
@@ -210,6 +211,7 @@ model UserRole {
   id           String       @id @default(uuid())
   userId       String
   role         UserRoleType
+  isPrimary    Boolean      @default(false)
   assignedById String?
   assignedAt   DateTime     @default(now())
   revokedAt    DateTime?

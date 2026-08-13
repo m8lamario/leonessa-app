@@ -9,7 +9,7 @@ product source of truth; this repository contains infrastructure only.
 - CSS Modules-ready styling and Framer Motion
 - Next.js Route Handlers as the API boundary
 - Prisma 6 and PostgreSQL
-- Auth.js (`next-auth`) with JWT sessions
+- Auth.js (`next-auth`) with Prisma Adapter and JWT sessions
 - Capacitor 7 for Android and iOS
 - Firebase Cloud Messaging through the Capacitor push plugin
 - Vercel deployment with a managed PostgreSQL database
@@ -68,6 +68,14 @@ not import UI code.
 - **Security:** authentication is not authorization. Every protected use case
   must verify the session, role and resource scope on the server. Rate limiting
   is required for authentication, registration and public API surfaces.
+- **Authentication:** Google OAuth and email/password credentials use Auth.js.
+  Passwords are stored only as bcrypt hashes, while the Prisma Adapter
+  persists users and OAuth accounts. JWT callbacks carry a minimal session
+  projection; role guards always re-check active roles in Prisma.
+- **Onboarding:** new users receive the `USER` role, then complete profile,
+  school and primary-role selection through a server-validated transaction.
+  Additional roles remain supported through `UserRole`; `isPrimary` marks only
+  the onboarding-selected role.
 - **API:** resource-oriented Route Handlers are the public contract for web and
   mobile. Server Actions are reserved for same-origin mutations that do not
   need to be consumed by Capacitor clients.

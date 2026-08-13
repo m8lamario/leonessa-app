@@ -1,0 +1,151 @@
+.page {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 24px 16px;
+  background:
+    radial-gradient(circle at top right, rgb(48 92 255 / 18%), transparent 34%),
+    var(--color-background);
+}
+
+.card {
+  width: min(100%, 460px);
+  padding: 32px 24px;
+  border: 1px solid rgb(198 204 218 / 15%);
+  border-radius: var(--radius-lg);
+  background: rgb(19 30 82 / 92%);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 24%);
+}
+
+.brand {
+  color: var(--color-primary-light);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.eyebrow {
+  margin: 32px 0 8px;
+  color: var(--color-primary-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 8vw, 2.25rem);
+  line-height: 1.1;
+}
+
+.description {
+  margin: 12px 0 24px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.form label {
+  display: grid;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.form input,
+.form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgb(198 204 218 / 24%);
+  border-radius: var(--radius-sm);
+  background: rgb(7 16 52 / 72%);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 48px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primaryButton {
+  border: 0;
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+.primaryButton:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondaryButton {
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.error {
+  margin: 0;
+  color: #ff9e9e;
+  font-size: 0.875rem;
+}
+
+.footerText {
+  margin: 24px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.footerText a {
+  color: var(--color-primary-light);
+  font-weight: 700;
+}
+
+.optional {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.profileContent {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 560px);
+}
+
+.profilePanel {
+  padding: 24px;
+  border: 1px solid rgb(198 204 218 / 15%);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.role {
+  color: var(--color-primary-light);
+  font-weight: 700;
+}
