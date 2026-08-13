@@ -34,25 +34,31 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(ellipse at 50% -20%, rgb(48 92 255 / 20%), transparent 48%),
-    linear-gradient(145deg, transparent 0 48%, rgb(48 92 255 / 3%) 48.2% 48.4%, transparent 48.6%),
-    var(--color-background);
+    radial-gradient(ellipse at 50% -20%, #305cff33, transparent 48%), var(--color-background);
   color: var(--color-text);
   font-family: "Poppins", sans-serif;
   text-rendering: optimizeLegibility;
 }
 
-body::before {
-  position: fixed;
+.pattern {
+  position: absolute;
   z-index: 0;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    135deg,
-    transparent 0 31px,
-    rgb(255 255 255 / 2%) 31px 32px
-  );
-  content: "";
+  opacity: 0.08;
+}
+
+.pattern path {
+  stroke: rgb(255 255 255 / 10%);
+  stroke-width: 5;
+  fill: none;
+}
+
+.pattern .patternGlow {
+  stroke: url("#lineGlow");
+  stroke-width: 2;
 }
 
 body > * {

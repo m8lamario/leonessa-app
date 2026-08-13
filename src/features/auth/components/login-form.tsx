@@ -57,7 +57,7 @@ export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }
         type="button"
         onClick={() => signIn("google", { callbackUrl })}
       >
-        Continua con Google
+        Google
       </button>
     </>
   );
