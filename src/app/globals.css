@@ -1,0 +1,44 @@
+:root {
+  --color-primary: #0d1b60;
+  --color-primary-hover: #162983;
+  --color-primary-light: #305cff;
+  --color-background: #071034;
+  --color-surface: #131e52;
+  --color-text: #ffffff;
+  --color-text-secondary: #c6ccda;
+  --color-text-muted: #8d95a6;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+  --space-unit: 8px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: "Poppins", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

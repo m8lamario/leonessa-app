@@ -1,0 +1,8 @@
+.next
+node_modules
+android
+ios
+public
+package-lock.json
+ProjectPlan
+.claude

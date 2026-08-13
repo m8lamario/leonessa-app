@@ -1,26 +1,47 @@
 {
-  "name": "untitled",
+  "name": "leonessa-platform",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios",
+    "cap:sync": "cap sync",
+    "dev": "next dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
     "start": "next start",
-    "lint": "eslint"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/core": "^7.6.8",
+    "@capacitor/push-notifications": "^7.0.7",
+    "@prisma/client": "^6.19.3",
+    "@tanstack/react-query": "^5.101.4",
+    "framer-motion": "^13.1.0",
     "next": "16.3.0",
+    "next-auth": "^4.24.15",
+    "pino": "^10.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@capacitor/android": "^7.6.8",
+    "@capacitor/cli": "^7.6.8",
+    "@capacitor/ios": "^7.6.8",
+    "@types/node": "^20.19.43",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
-    "tailwindcss": "^4",
+    "prettier": "^3.9.6",
+    "prettier-plugin-packagejson": "^3.0.2",
+    "prisma": "^6.19.3",
     "typescript": "^5"
   }
 }

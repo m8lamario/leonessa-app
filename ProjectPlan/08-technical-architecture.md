@@ -158,7 +158,7 @@ Scalare quando necessario
 
 ```text
 
-Next.js 15
+Next.js 16
 
 ```
 
