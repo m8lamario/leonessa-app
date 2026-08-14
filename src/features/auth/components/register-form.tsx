@@ -47,7 +47,7 @@ export function RegisterForm({
       return;
     }
 
-    router.push("/profile");
+    router.push("/");
     router.refresh();
   }
 

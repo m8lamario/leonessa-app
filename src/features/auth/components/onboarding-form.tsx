@@ -38,7 +38,7 @@ export function OnboardingForm({
       return;
     }
 
-    router.push("/profile");
+    router.push("/");
     router.refresh();
   }
 

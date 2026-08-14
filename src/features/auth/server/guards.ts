@@ -27,6 +27,7 @@ export async function requireUser() {
       roles: {
         where: { revokedAt: null },
       },
+      school: true,
     },
   });
 

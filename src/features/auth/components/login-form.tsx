@@ -7,7 +7,7 @@ import { FormEvent, useState } from "react";
 import styles from "../auth.module.css";
 import { AuthModeSwitch } from "./auth-mode-switch";
 
-export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }) {
+export function LoginForm({ callbackUrl = "/" }: { callbackUrl?: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -30,7 +30,8 @@ export function LoginForm({ callbackUrl = "/profile" }: { callbackUrl?: string }
       return;
     }
 
-    const destination = callbackUrl === "/onboarding" ? "/onboarding" : "/profile";
+    const destination =
+      callbackUrl === "/onboarding" || callbackUrl === "/profile" ? callbackUrl : "/";
     router.push(destination);
     router.refresh();
   }
