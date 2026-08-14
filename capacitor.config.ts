@@ -1,13 +1,20 @@
+import { existsSync } from "node:fs";
+import { loadEnvFile } from "node:process";
 import type { CapacitorConfig } from "@capacitor/cli";
+
+for (const envFile of [".env.local", ".env"]) {
+  if (existsSync(envFile)) {
+    loadEnvFile(envFile);
+  }
+}
 
 const config: CapacitorConfig = {
   appId: "it.leonessa.platform",
   appName: "Leonessa",
   // The app is server-rendered; the native shell uses CAPACITOR_SERVER_URL.
   webDir: "public",
-  bundledWebRuntime: false,
   server: {
-    androidScheme: "https",
+    androidScheme: "http",
     url: process.env.CAPACITOR_SERVER_URL,
     cleartext: process.env.NODE_ENV !== "production",
   },

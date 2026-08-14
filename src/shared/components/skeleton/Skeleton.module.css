@@ -1,0 +1,139 @@
+.base {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--skeleton-radius, var(--radius-sm));
+  background: linear-gradient(
+    105deg,
+    rgb(35 57 133 / 56%) 0%,
+    rgb(65 98 206 / 62%) 35%,
+    rgb(255 255 255 / 34%) 50%,
+    rgb(65 98 206 / 62%) 65%,
+    rgb(35 57 133 / 56%) 100%
+  );
+  background-size: 240% 100%;
+  animation: shimmer 1.7s ease-in-out infinite;
+}
+
+.text {
+  width: 100%;
+  height: 1em;
+  --skeleton-radius: 0.35em;
+}
+
+.card {
+  min-height: 8rem;
+  --skeleton-radius: var(--radius-md);
+}
+
+.avatar,
+.circle {
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.circle {
+  width: 2rem;
+  height: 2rem;
+}
+
+.cardContainer {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: rgb(19 30 82 / 60%);
+}
+
+.cardMedia {
+  aspect-ratio: 1.65;
+  width: 100%;
+  min-height: 6rem;
+}
+
+.cardContent {
+  display: grid;
+  gap: 8px;
+}
+
+.cardTitle {
+  width: 68%;
+  height: 1.35rem;
+}
+
+.cardLine:last-child {
+  width: 82%;
+}
+
+.list {
+  display: grid;
+  gap: 4px;
+}
+
+.listItem {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.listCopy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 7px;
+}
+
+.listTitle {
+  width: 48%;
+  height: 0.9rem;
+}
+
+.listSubtitle {
+  width: 72%;
+  height: 0.7rem;
+}
+
+.listMeta {
+  width: 3.25rem;
+  height: 1.2rem;
+}
+
+.fadeIn {
+  animation: fadeIn 250ms ease-out both;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .base,
+  .fadeIn {
+    animation: none;
+  }
+}

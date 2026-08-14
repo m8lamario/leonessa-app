@@ -16,7 +16,7 @@ export default async function LoginPage({
 
   return (
     <AuthCard title="Accedi">
-      <LoginForm callbackUrl={params.callbackUrl ?? "/"} />
+      <LoginForm callbackUrl={params.callbackUrl ?? "/dashboard"} />
     </AuthCard>
   );
 }

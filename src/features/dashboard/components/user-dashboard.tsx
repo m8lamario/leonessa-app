@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
+import { Skeleton, SkeletonAvatar, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
+import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import { dashboardMock } from "../mock/dashboard.mock";
 import styles from "../dashboard.module.css";
 
@@ -18,16 +21,96 @@ const revealTransition = {
   ease: "easeOut" as const,
 };
 
+const MOCK_LOADING_DELAY = 400;
+
+function DashboardSkeleton() {
+  return (
+    <main aria-busy="true" className={styles.dashboard}>
+      <header className={styles.hero}>
+        <div className={styles.heroTopline}>
+          <Skeleton height="0.7rem" width="7rem" />
+          <SkeletonAvatar size="42px" />
+        </div>
+        <div style={{ display: "grid", gap: "8px", marginTop: "28px" }}>
+          <Skeleton height="0.9rem" width="42%" />
+          <Skeleton height="3.8rem" width="68%" />
+          <Skeleton height="0.9rem" width="54%" />
+        </div>
+        <div className={styles.heroStats} style={{ marginTop: "22px" }}>
+          <div>
+            <Skeleton height="0.7rem" width="62%" />
+            <Skeleton height="2rem" width="44%" />
+          </div>
+          <div>
+            <Skeleton height="0.7rem" width="62%" />
+            <Skeleton height="2rem" width="58%" />
+          </div>
+        </div>
+        <div style={{ display: "grid", gap: "8px", padding: "18px 0" }}>
+          <Skeleton height="0.75rem" width="32%" />
+          <Skeleton height="1.5rem" width="78%" />
+          <Skeleton height="0.75rem" width="48%" />
+        </div>
+        <div className={styles.heroActions}>
+          <Skeleton height="46px" width="100%" />
+          <Skeleton height="46px" width="100%" />
+        </div>
+      </header>
+
+      <div className={styles.content}>
+        <section className={styles.section}>
+          <Skeleton height="0.75rem" width="28%" />
+          <Skeleton height="2.2rem" style={{ marginTop: "8px" }} width="55%" />
+          <SkeletonCard lines={2} showMedia />
+        </section>
+        <section className={styles.section}>
+          <Skeleton height="0.75rem" width="24%" />
+          <Skeleton
+            height="2.2rem"
+            style={{ marginTop: "8px", marginBottom: "16px" }}
+            width="38%"
+          />
+          <div className={styles.missionList}>
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
+            <SkeletonCard lines={3} />
+          </div>
+        </section>
+        <section className={styles.section}>
+          <Skeleton height="0.75rem" width="30%" />
+          <Skeleton
+            height="2.2rem"
+            style={{ marginTop: "8px", marginBottom: "16px" }}
+            width="58%"
+          />
+          <SkeletonList avatarSize="31px" items={5} />
+        </section>
+      </div>
+    </main>
+  );
+}
+
 export function UserDashboard({
   userName,
   userInitials,
   schoolName,
   schoolShortName,
 }: UserDashboardProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const { featuredMatch, missions, news, events, profile, school, schoolRanking } = dashboardMock;
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setIsLoading(false), MOCK_LOADING_DELAY);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
+
   return (
-    <main className={styles.dashboard}>
+    <main className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
       <motion.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
@@ -292,7 +375,7 @@ export function UserDashboard({
       </div>
 
       <nav className={styles.bottomNavigation} aria-label="Navigazione principale">
-        <Link className={styles.navActive} href="/" aria-current="page">
+        <Link className={styles.navActive} href="/dashboard" aria-current="page">
           <span aria-hidden="true">H</span>
           Home
         </Link>
