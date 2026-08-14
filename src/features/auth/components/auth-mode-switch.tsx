@@ -10,14 +10,14 @@ export function AuthModeSwitch({ activeMode }: { activeMode: "login" | "register
         href="/login"
         aria-current={activeMode === "login" ? "page" : undefined}
       >
-        Accedi
+        <span>Accedi</span>
       </Link>
       <Link
         className={`${styles.modePanel} ${activeMode === "register" ? styles.modePanelActive : ""}`}
         href="/register"
         aria-current={activeMode === "register" ? "page" : undefined}
       >
-        Registrati
+        <span>Registrati</span>
       </Link>
     </nav>
   );
