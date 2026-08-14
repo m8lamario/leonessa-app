@@ -3,17 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import type { OnboardingRole } from "@/types/auth";
-
 import styles from "../auth.module.css";
-
-const roleLabels: Record<OnboardingRole, string> = {
-  USER: "Spettatore",
-  PLAYER: "Giocatore",
-  STAFF: "Staff",
-  SCHOOL_REP: "Rappresentante di scuola",
-  ORGANIZER: "Organizzatore",
-};
 
 export function OnboardingForm({
   initialName,
@@ -71,19 +61,6 @@ export function OnboardingForm({
           {schools.map((school) => (
             <option key={school.id} value={school.id}>
               {school.name} ({school.shortName})
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Ruolo principale
-        <select name="primaryRole" defaultValue="" required>
-          <option value="" disabled>
-            Scegli come partecipi
-          </option>
-          {Object.entries(roleLabels).map(([role, label]) => (
-            <option key={role} value={role}>
-              {label}
             </option>
           ))}
         </select>

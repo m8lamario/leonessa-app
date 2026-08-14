@@ -7,7 +7,11 @@ import { FormEvent, useState } from "react";
 import styles from "../auth.module.css";
 import { AuthModeSwitch } from "./auth-mode-switch";
 
-export function RegisterForm() {
+export function RegisterForm({
+  schools,
+}: {
+  schools: Array<{ id: string; name: string; shortName: string }>;
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -43,7 +47,7 @@ export function RegisterForm() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push("/profile");
     router.refresh();
   }
 
@@ -72,6 +76,23 @@ export function RegisterForm() {
             minLength={8}
             required
           />
+        </label>
+        <label>
+          Scuola
+          <select name="schoolId" defaultValue="" required>
+            <option value="" disabled>
+              Seleziona la tua scuola
+            </option>
+            {schools.map((school) => (
+              <option key={school.id} value={school.id}>
+                {school.name} ({school.shortName})
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Instagram <span className={styles.optional}>(facoltativo)</span>
+          <input name="instagram" placeholder="@username" />
         </label>
         {error && <p className={styles.error}>{error}</p>}
         <button className={styles.primaryButton} disabled={pending} type="submit">

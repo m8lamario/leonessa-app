@@ -34,7 +34,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, surname, email, password } = result.data;
+  const { name, surname, email, password, schoolId, instagram } = result.data;
+  const school = await prisma.school.findFirst({
+    where: { id: schoolId, deletedAt: null },
+    select: { id: true },
+  });
+
+  if (!school) {
+    return NextResponse.json(
+      { code: "BAD_REQUEST", message: "La scuola selezionata non è disponibile." },
+      { status: 400 },
+    );
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
 
   try {
@@ -44,10 +56,12 @@ export async function POST(request: Request) {
         surname,
         email: email.toLowerCase(),
         passwordHash,
+        schoolId,
+        instagram: instagram || null,
         roles: {
           create: {
             role: "USER",
-            isPrimary: false,
+            isPrimary: true,
           },
         },
       },

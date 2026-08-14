@@ -40,11 +40,7 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <AuthCard
-      eyebrow="Primo accesso"
-      title="Completa il tuo profilo"
-      description="Scegli la scuola e il ruolo con cui vuoi vivere la Leonessa Cup."
-    >
+    <AuthCard title="Completa il tuo profilo">
       <OnboardingForm
         initialName={user.name ?? ""}
         initialSurname={user.surname ?? ""}

@@ -72,10 +72,10 @@ not import UI code.
   Passwords are stored only as bcrypt hashes, while the Prisma Adapter
   persists users and OAuth accounts. JWT callbacks carry a minimal session
   projection; role guards always re-check active roles in Prisma.
-- **Onboarding:** new users receive the `USER` role, then complete profile,
-  school and primary-role selection through a server-validated transaction.
-  Additional roles remain supported through `UserRole`; `isPrimary` marks only
-  the onboarding-selected role.
+- **Onboarding:** registrations collect profile data, school and optional
+  Instagram while every account receives the primary `USER` role. OAuth users
+  complete the same profile data through a server-validated onboarding flow;
+  additional roles remain supported through `UserRole` and future workflows.
 - **API:** resource-oriented Route Handlers are the public contract for web and
   mobile. Server Actions are reserved for same-origin mutations that do not
   need to be consumed by Capacitor clients.
@@ -109,8 +109,12 @@ npm run dev
 npm run lint
 npm run typecheck
 npm run prisma:validate
+npm run prisma:seed
 npm run build
 ```
+
+`npm run prisma:seed` inserisce quattro scuole di prova tramite upsert
+idempotenti. Richiede un `DATABASE_URL` configurato e il database già migrato.
 
 ## Delivery
 

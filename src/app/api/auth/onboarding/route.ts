@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, surname, schoolId, primaryRole, instagram } = result.data;
+  const { name, surname, schoolId, instagram } = result.data;
   const school = await prisma.school.findFirst({
     where: { id: schoolId, deletedAt: null },
     select: { id: true },
@@ -59,21 +59,21 @@ export async function POST(request: Request) {
       data: { isPrimary: false },
     });
 
-    const existingRole = await transaction.userRole.findFirst({
-      where: { userId: user.id, role: primaryRole, revokedAt: null },
+    const existingUserRole = await transaction.userRole.findFirst({
+      where: { userId: user.id, role: "USER", revokedAt: null },
       select: { id: true },
     });
 
-    if (existingRole) {
+    if (existingUserRole) {
       await transaction.userRole.update({
-        where: { id: existingRole.id },
+        where: { id: existingUserRole.id },
         data: { isPrimary: true },
       });
     } else {
       await transaction.userRole.create({
         data: {
           userId: user.id,
-          role: primaryRole,
+          role: "USER",
           isPrimary: true,
         },
       });

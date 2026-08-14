@@ -14,6 +14,14 @@
   --color-success: #16a34a;
   --color-warning: #f59e0b;
   --color-danger: #dc2626;
+  --font-family-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-family-display: var(--font-bebas-neue), Impact, sans-serif;
+  --type-display-size: clamp(3rem, 12vw, 6rem);
+  --type-h1-size: clamp(2.5rem, 8vw, 4rem);
+  --type-h2-size: clamp(1.75rem, 5vw, 2.5rem);
+  --type-h3-size: clamp(1.35rem, 4vw, 1.75rem);
+  --type-body-size: 1rem;
+  --type-caption-size: 0.875rem;
   --space-unit: 8px;
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -36,8 +44,46 @@ body {
   background:
     radial-gradient(ellipse at 50% -20%, #305cff33, transparent 48%), var(--color-background);
   color: var(--color-text);
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-family-body);
+  font-size: var(--type-body-size);
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.typeDisplay,
+.typeHeading,
+.typeStat {
+  font-family: var(--font-family-display);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: var(--type-h1-size);
+}
+
+h2 {
+  font-size: var(--type-h2-size);
+}
+
+h3 {
+  font-size: var(--type-h3-size);
+}
+
+.typeDisplay {
+  font-size: var(--type-display-size);
+  line-height: 0.9;
+}
+
+.typeHeading {
+  line-height: 0.95;
+}
+
+.typeStat {
+  font-variant-numeric: tabular-nums;
+  line-height: 0.9;
 }
 
 .pattern {

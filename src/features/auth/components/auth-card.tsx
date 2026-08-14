@@ -5,17 +5,7 @@ import Image from "next/image";
 
 import styles from "../auth.module.css";
 
-export function AuthCard({
-  eyebrow,
-  title,
-  description,
-  children,
-}: {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+export function AuthCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <main className={styles.page}>
       <motion.section
@@ -36,9 +26,7 @@ export function AuthCard({
             />
           </div>
         </div>
-        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
         <h1>{title}</h1>
-        {description && <p className={styles.description}>{description}</p>}
         {children}
       </motion.section>
     </main>

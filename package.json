@@ -12,6 +12,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
+    "prisma:seed": "prisma db seed",
     "prisma:validate": "prisma validate",
     "start": "next start",
     "typecheck": "tsc --noEmit"
@@ -45,5 +46,8 @@
     "prettier-plugin-packagejson": "^3.0.2",
     "prisma": "^6.19.3",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
   }
 }

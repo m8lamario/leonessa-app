@@ -242,13 +242,15 @@ Completo.
 
 
 
-Scelta:
+Per gli utenti che non hanno ancora completato il profilo:
 
 
 
 \- scuola
 
-\- ruolo principale
+\- nome e cognome
+
+\- Instagram facoltativo
 
 
 
@@ -1193,4 +1195,3 @@ o coinvolgimento?
 Se la risposta non è chiaramente "sì",
 
 la feature non va sviluppata.
-

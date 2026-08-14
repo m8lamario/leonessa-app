@@ -527,11 +527,11 @@ Supportato ma non prioritario.
 
 
 
-\## Font Principale
+\## Typography System
 
 
 
-\### Poppins
+\### Font roles
 
 
 
@@ -539,14 +539,29 @@ Utilizzo:
 
 
 
-\- Titoli
+\- Bebas Neue: Hero, heading, statistiche evidenziate, numeri e KPI importanti.
 
-\- Bottoni
+\- Inter: testo normale, descrizioni, form, navigazione e UI generale.
 
-\- Navigazione
+\- La tipografia display non deve essere usata per paragrafi o controlli operativi.
 
-\- Interfaccia
+\- La tipografia body deve restare leggibile, con peso e contrasto sufficienti.
 
+### Design tokens
+
+```css
+--font-family-display: "Bebas Neue", Impact, sans-serif;
+--font-family-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+--type-display-size: clamp(3rem, 12vw, 6rem);
+--type-h1-size: clamp(2.5rem, 8vw, 4rem);
+--type-h2-size: clamp(1.75rem, 5vw, 2.5rem);
+--type-h3-size: clamp(1.35rem, 4vw, 1.75rem);
+--type-body-size: 1rem;
+--type-caption-size: 0.875rem;
+```
+
+I token display usano peso `400`, perché Bebas Neue è una famiglia
+condensata pensata per mantenere impatto anche senza pesi aggiuntivi.
 
 
 \---
@@ -559,8 +574,7 @@ Utilizzo:
 
 ```css
 
-sans-serif
-
+"Inter", "Helvetica Neue", Arial, sans-serif
 ```
 
 
@@ -573,15 +587,15 @@ sans-serif
 
 
 
-\## Display
+\## Display (Bebas Neue)
 
 
 
 ```css
 
-48px
+var(--type-display-size)
 
-700
+400
 
 ```
 
@@ -601,67 +615,13 @@ Utilizzo:
 
 
 
-\## H1
+\## H1 (Bebas Neue)
 
 
 
 ```css
 
-32px
-
-700
-
-```
-
-
-
-\---
-
-
-
-\## H2
-
-
-
-```css
-
-24px
-
-600
-
-```
-
-
-
-\---
-
-
-
-\## H3
-
-
-
-```css
-
-20px
-
-600
-
-```
-
-
-
-\---
-
-
-
-\## Body
-
-
-
-```css
-
-16px
+var(--type-h1-size)
 
 400
 
@@ -673,13 +633,67 @@ Utilizzo:
 
 
 
-\## Caption
+\## H2 (Bebas Neue)
 
 
 
 ```css
 
-14px
+var(--type-h2-size)
+
+400
+
+```
+
+
+
+\---
+
+
+
+\## H3 (Bebas Neue)
+
+
+
+```css
+
+var(--type-h3-size)
+
+400
+
+```
+
+
+
+\---
+
+
+
+\## Body (Inter)
+
+
+
+```css
+
+var(--type-body-size)
+
+400
+
+```
+
+
+
+\---
+
+
+
+\## Caption (Inter)
+
+
+
+```css
+
+var(--type-caption-size)
 
 400
 
@@ -1611,4 +1625,3 @@ Se la risposta è no, va riprogettata.
 
 
 \---
-

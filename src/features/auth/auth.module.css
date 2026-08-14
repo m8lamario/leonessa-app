@@ -56,15 +56,6 @@
   transform-origin: top left;
 }
 
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--color-primary-light);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .card h1 {
   margin: 0 0 28px;
   max-width: 390px;
@@ -72,17 +63,6 @@
   letter-spacing: -0.045em;
   line-height: 1.02;
   text-align: center;
-}
-
-.eyebrow + h1 {
-  margin-top: 0;
-}
-
-.description {
-  margin: 12px 0 24px;
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
 }
 
 .form {

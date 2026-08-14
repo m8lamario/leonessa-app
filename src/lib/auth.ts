@@ -62,6 +62,17 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  events: {
+    async createUser({ user }) {
+      await prisma.userRole.create({
+        data: {
+          userId: user.id,
+          role: "USER",
+          isPrimary: true,
+        },
+      });
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) {
