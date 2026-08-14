@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 import { Skeleton, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
+import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import { createRankingMock } from "../mock/ranking.mock";
 import type {
@@ -278,7 +280,12 @@ export function RankingDashboard({
             className={activeTab === tab.id ? styles.tabActive : undefined}
             id={`ranking-tab-${tab.id}`}
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              if (activeTab !== tab.id) {
+                setActiveTab(tab.id);
+                void hapticSelection();
+              }
+            }}
             role="tab"
             type="button"
           >
@@ -293,170 +300,193 @@ export function RankingDashboard({
         id={`ranking-panel-${activeTab}`}
         role="tabpanel"
       >
-        {activeTab === "leaderboards" && (
-          <>
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>Partecipazione</p>
-                <h2>Classifiche</h2>
-              </div>
-            </div>
-            <div className={styles.segmentedControl} aria-label="Tipo classifica">
-              <button
-                aria-pressed={activeLeaderboard === "users"}
-                className={activeLeaderboard === "users" ? styles.segmentActive : undefined}
-                onClick={() => setActiveLeaderboard("users")}
-                type="button"
-              >
-                Utenti
-              </button>
-              <button
-                aria-pressed={activeLeaderboard === "schools"}
-                className={activeLeaderboard === "schools" ? styles.segmentActive : undefined}
-                onClick={() => setActiveLeaderboard("schools")}
-                type="button"
-              >
-                Scuole
-              </button>
-            </div>
-            {activeLeaderboard === "users" ? (
-              <UserLeaderboard entries={ranking.userRanking} currentUser={ranking.currentUser} />
-            ) : (
-              <SchoolLeaderboard
-                entries={ranking.schoolRanking}
-                currentSchool={ranking.currentSchool}
-              />
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            {activeTab === "leaderboards" && (
+              <>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>Partecipazione</p>
+                    <h2>Classifiche</h2>
+                  </div>
+                </div>
+                <div className={styles.segmentedControl} aria-label="Tipo classifica">
+                  <button
+                    aria-pressed={activeLeaderboard === "users"}
+                    className={activeLeaderboard === "users" ? styles.segmentActive : undefined}
+                    onClick={() => {
+                      if (activeLeaderboard !== "users") {
+                        setActiveLeaderboard("users");
+                        void hapticSelection();
+                      }
+                    }}
+                    type="button"
+                  >
+                    Utenti
+                  </button>
+                  <button
+                    aria-pressed={activeLeaderboard === "schools"}
+                    className={activeLeaderboard === "schools" ? styles.segmentActive : undefined}
+                    onClick={() => {
+                      if (activeLeaderboard !== "schools") {
+                        setActiveLeaderboard("schools");
+                        void hapticSelection();
+                      }
+                    }}
+                    type="button"
+                  >
+                    Scuole
+                  </button>
+                </div>
+                {activeLeaderboard === "users" ? (
+                  <UserLeaderboard
+                    entries={ranking.userRanking}
+                    currentUser={ranking.currentUser}
+                  />
+                ) : (
+                  <SchoolLeaderboard
+                    entries={ranking.schoolRanking}
+                    currentSchool={ranking.currentSchool}
+                  />
+                )}
+              </>
             )}
-          </>
-        )}
 
-        {activeTab === "missions" && (
-          <div className={styles.sectionStack}>
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>Guadagna LP</p>
-                <h2>Missioni attive</h2>
+            {activeTab === "missions" && (
+              <div className={styles.sectionStack}>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>Guadagna LP</p>
+                    <h2>Missioni attive</h2>
+                  </div>
+                </div>
+                <div className={styles.cardList}>
+                  {ranking.activeMissions.map((mission) => (
+                    <MissionCard key={mission.id} mission={mission} />
+                  ))}
+                </div>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>Il tuo percorso</p>
+                    <h2>Completate</h2>
+                  </div>
+                </div>
+                <div className={styles.cardList}>
+                  {ranking.completedMissions.map((mission) => (
+                    <MissionCard completed key={mission.id} mission={mission} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className={styles.cardList}>
-              {ranking.activeMissions.map((mission) => (
-                <MissionCard key={mission.id} mission={mission} />
-              ))}
-            </div>
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>Il tuo percorso</p>
-                <h2>Completate</h2>
-              </div>
-            </div>
-            <div className={styles.cardList}>
-              {ranking.completedMissions.map((mission) => (
-                <MissionCard completed key={mission.id} mission={mission} />
-              ))}
-            </div>
-          </div>
-        )}
+            )}
 
-        {activeTab === "badges" && (
-          <div className={styles.sectionStack}>
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>I tuoi traguardi</p>
-                <h2>Badge ottenuti</h2>
+            {activeTab === "badges" && (
+              <div className={styles.sectionStack}>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>I tuoi traguardi</p>
+                    <h2>Badge ottenuti</h2>
+                  </div>
+                </div>
+                <div className={styles.cardList}>
+                  {ranking.earnedBadges.map((badge) => (
+                    <BadgeCard earned badge={badge} key={badge.id} />
+                  ))}
+                </div>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>Prossimi obiettivi</p>
+                    <h2>Da sbloccare</h2>
+                  </div>
+                </div>
+                <div className={styles.cardList}>
+                  {ranking.lockedBadges.map((badge) => (
+                    <BadgeCard badge={badge} key={badge.id} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className={styles.cardList}>
-              {ranking.earnedBadges.map((badge) => (
-                <BadgeCard earned badge={badge} key={badge.id} />
-              ))}
-            </div>
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>Prossimi obiettivi</p>
-                <h2>Da sbloccare</h2>
-              </div>
-            </div>
-            <div className={styles.cardList}>
-              {ranking.lockedBadges.map((badge) => (
-                <BadgeCard badge={badge} key={badge.id} />
-              ))}
-            </div>
-          </div>
-        )}
+            )}
 
-        {activeTab === "progression" && (
-          <div className={styles.sectionStack}>
-            <article className={styles.levelCard}>
-              <p className={styles.kicker}>Il tuo livello</p>
-              <div>
-                <strong>Livello {ranking.currentUser.level}</strong>
-                <span>{formatPoints(ranking.currentUser.lp)} LP</span>
-              </div>
-              <ProgressBar
-                label="Progresso verso il prossimo livello"
-                progress={ranking.currentUser.lp - 1000}
-                target={nextLevelLP - 1000}
-              />
-              <p>
-                Ancora {formatPoints(lpToNextLevel)} LP per raggiungere il livello{" "}
-                {ranking.currentUser.level + 1}.
-              </p>
-            </article>
+            {activeTab === "progression" && (
+              <div className={styles.sectionStack}>
+                <article className={styles.levelCard}>
+                  <p className={styles.kicker}>Il tuo livello</p>
+                  <div>
+                    <strong>Livello {ranking.currentUser.level}</strong>
+                    <span>{formatPoints(ranking.currentUser.lp)} LP</span>
+                  </div>
+                  <ProgressBar
+                    label="Progresso verso il prossimo livello"
+                    progress={ranking.currentUser.lp - 1000}
+                    target={nextLevelLP - 1000}
+                  />
+                  <p>
+                    Ancora {formatPoints(lpToNextLevel)} LP per raggiungere il livello{" "}
+                    {ranking.currentUser.level + 1}.
+                  </p>
+                </article>
 
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>Attivita recente</p>
-                <h2>Storico LP</h2>
-              </div>
-            </div>
-            <ol className={styles.historyList}>
-              {ranking.history.map((entry) => (
-                <li key={entry.id}>
-                  <strong>+{entry.amount} LP</strong>
-                  <span>{entry.reason}</span>
-                  <time>{entry.date}</time>
-                </li>
-              ))}
-            </ol>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>Attivita recente</p>
+                    <h2>Storico LP</h2>
+                  </div>
+                </div>
+                <ol className={styles.historyList}>
+                  {ranking.history.map((entry) => (
+                    <li key={entry.id}>
+                      <strong>+{entry.amount} LP</strong>
+                      <span>{entry.reason}</span>
+                      <time>{entry.date}</time>
+                    </li>
+                  ))}
+                </ol>
 
-            <div className={styles.sectionHeading}>
-              <div>
-                <p className={styles.kicker}>In numeri</p>
-                <h2>Statistiche</h2>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.kicker}>In numeri</p>
+                    <h2>Statistiche</h2>
+                  </div>
+                </div>
+                <dl className={styles.statsGrid}>
+                  <div>
+                    <dt>LP guadagnati</dt>
+                    <dd>{formatPoints(ranking.stats.lpEarned)}</dd>
+                  </div>
+                  <div>
+                    <dt>Missioni</dt>
+                    <dd>{ranking.stats.missionsCompleted}</dd>
+                  </div>
+                  <div>
+                    <dt>Badge</dt>
+                    <dd>{ranking.stats.badgesEarned}</dd>
+                  </div>
+                  <div>
+                    <dt>Eventi</dt>
+                    <dd>{ranking.stats.eventsAttended}</dd>
+                  </div>
+                  <div>
+                    <dt>Referral</dt>
+                    <dd>{ranking.stats.referralsCompleted}</dd>
+                  </div>
+                </dl>
               </div>
-            </div>
-            <dl className={styles.statsGrid}>
-              <div>
-                <dt>LP guadagnati</dt>
-                <dd>{formatPoints(ranking.stats.lpEarned)}</dd>
-              </div>
-              <div>
-                <dt>Missioni</dt>
-                <dd>{ranking.stats.missionsCompleted}</dd>
-              </div>
-              <div>
-                <dt>Badge</dt>
-                <dd>{ranking.stats.badgesEarned}</dd>
-              </div>
-              <div>
-                <dt>Eventi</dt>
-                <dd>{ranking.stats.eventsAttended}</dd>
-              </div>
-              <div>
-                <dt>Referral</dt>
-                <dd>{ranking.stats.referralsCompleted}</dd>
-              </div>
-            </dl>
-          </div>
-        )}
+            )}
+          </motion.div>
+        </AnimatePresence>
       </section>
 
       <nav className={styles.bottomNavigation} aria-label="Navigazione principale">
-        <Link href="/">
+        <Link href="/" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">H</span>
           Home
         </Link>
-        <Link href="/">
+        <Link href="/" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">C</span>
           Cup
         </Link>
@@ -464,7 +494,7 @@ export function RankingDashboard({
           <span aria-hidden="true">R</span>
           Ranking
         </a>
-        <Link href="/profile">
+        <Link href="/profile" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">P</span>
           Profilo
         </Link>

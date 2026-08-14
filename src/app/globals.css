@@ -1,3 +1,5 @@
+@import "../styles/tokens/spacing.css";
+
 :root {
   --color-primary: #0d1b60;
   --color-primary-hover: #162983;

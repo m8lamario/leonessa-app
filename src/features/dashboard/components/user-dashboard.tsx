@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 import { Skeleton, SkeletonAvatar, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
+import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import { dashboardMock } from "../mock/dashboard.mock";
 import styles from "../dashboard.module.css";
@@ -17,7 +18,7 @@ type UserDashboardProps = {
 };
 
 const revealTransition = {
-  duration: 0.35,
+  duration: 0.24,
   ease: "easeOut" as const,
 };
 
@@ -379,15 +380,15 @@ export function UserDashboard({
           <span aria-hidden="true">H</span>
           Home
         </Link>
-        <a href="#featured-match">
+        <a href="#featured-match" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">C</span>
           Cup
         </a>
-        <a href="/ranking">
+        <a href="/ranking" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">R</span>
           Ranking
         </a>
-        <Link href="/profile">
+        <Link href="/profile" onClick={() => void hapticSelection()}>
           <span aria-hidden="true">P</span>
           Profilo
         </Link>

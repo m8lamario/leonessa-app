@@ -2,10 +2,11 @@
   width: min(100%, 720px);
   min-height: 100svh;
   margin: 0 auto;
-  padding: 16px 16px 108px;
+  padding: var(--page-top-spacing) var(--space-md) var(--content-bottom-spacer);
 }
 
 .hero {
+  margin-top: var(--space-md);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -540,7 +541,7 @@
   position: fixed;
   z-index: 2;
   right: max(8px, calc((100vw - 720px) / 2 + 8px));
-  bottom: 8px;
+  bottom: var(--bottom-nav-offset);
   left: max(8px, calc((100vw - 720px) / 2 + 8px));
   display: grid;
   grid-template-columns: repeat(4, 1fr);

@@ -1,0 +1,16 @@
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --page-top-spacing: calc(var(--space-lg) + var(--safe-area-top));
+  --content-bottom-spacer: calc(120px + var(--safe-area-bottom));
+  --bottom-nav-offset: calc(var(--space-sm) + var(--safe-area-bottom));
+  --motion-page-duration: 240ms;
+  --motion-card-duration: 200ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
