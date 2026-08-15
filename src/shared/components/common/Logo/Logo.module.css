@@ -9,12 +9,29 @@
   text-transform: uppercase;
 }
 
-.logo span {
+.mark {
+  width: 32px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.copy {
   display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border-radius: 9px;
-  background: var(--color-primary-light);
-  font-size: 1.05rem;
+  gap: 2px;
+}
+
+.copy strong {
+  font-family: var(--font-family-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.copy small {
+  color: var(--color-text-muted);
+  font-family: var(--font-family-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
 }

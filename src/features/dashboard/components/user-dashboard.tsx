@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Bell } from "lucide-react";
 import { useState } from "react";
 
-import { PageContainer } from "@/shared/components";
+import { Logo, PageContainer } from "@/shared/components";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import type { DashboardData } from "../types";
 import styles from "../dashboard.module.css";
@@ -13,7 +14,6 @@ type UserDashboardProps = {
   userName: string;
   userInitials: string;
   schoolName: string;
-  schoolShortName: string;
   data: DashboardData;
 };
 
@@ -22,13 +22,7 @@ const revealTransition = {
   ease: "easeOut" as const,
 };
 
-export function UserDashboard({
-  userName,
-  userInitials,
-  schoolName,
-  schoolShortName,
-  data,
-}: UserDashboardProps) {
+export function UserDashboard({ userName, userInitials, schoolName, data }: UserDashboardProps) {
   const [showFullRanking, setShowFullRanking] = useState(false);
   const { featuredMatch, missions, news, events, profile, school, schoolRanking } = data;
   const visibleSchoolRanking = showFullRanking ? schoolRanking : schoolRanking.slice(0, 5);
@@ -36,20 +30,34 @@ export function UserDashboard({
   return (
     <PageContainer className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
       <motion.header
+        className={styles.brandHeader}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={revealTransition}
+      >
+        <Logo />
+        <div className={styles.brandActions}>
+          <a
+            aria-label="Visualizza aggiornamenti"
+            className={styles.notificationLink}
+            href="#news-title"
+          >
+            <Bell aria-hidden="true" size={21} strokeWidth={2} />
+          </a>
+          <Link className={styles.avatar} href="/profile" aria-label="Apri il tuo profilo">
+            {userInitials}
+          </Link>
+        </div>
+      </motion.header>
+      <motion.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={revealTransition}
       >
-        <div className={styles.heroTopline}>
-          <p className={styles.kicker}>Leonessa Cup</p>
-          <Link className={styles.avatar} href="/profile" aria-label="Apri il tuo profilo">
-            {userInitials}
-          </Link>
-        </div>
         <p className={styles.greeting}>Bentornato, {userName}</p>
-        <h1>{schoolShortName}</h1>
-        <p className={styles.schoolName}>{schoolName}</p>
+        <h1>{schoolName}</h1>
+        <p className={styles.schoolName}>La tua scuola</p>
         <div className={styles.heroStats}>
           <div className={styles.accountPoints}>
             <span>I tuoi LP</span>

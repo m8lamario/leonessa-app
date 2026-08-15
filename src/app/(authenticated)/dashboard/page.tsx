@@ -25,7 +25,6 @@ export default async function DashboardPage() {
       userName={userName || "Tifoso"}
       userInitials={userInitials || "LC"}
       schoolName={user.school?.name ?? "La tua scuola"}
-      schoolShortName={user.school?.shortName ?? "LC"}
       data={dashboardData}
     />
   );
