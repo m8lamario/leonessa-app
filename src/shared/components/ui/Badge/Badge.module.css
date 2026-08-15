@@ -1,0 +1,36 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.default {
+  border-color: rgb(48 92 255 / 42%);
+  background: rgb(48 92 255 / 12%);
+  color: var(--color-primary-light);
+}
+
+.success {
+  border-color: rgb(22 163 74 / 40%);
+  background: rgb(22 163 74 / 12%);
+  color: #72dd9b;
+}
+
+.warning {
+  border-color: rgb(245 158 11 / 40%);
+  background: rgb(245 158 11 / 12%);
+  color: #ffd178;
+}
+
+.danger {
+  border-color: rgb(220 38 38 / 40%);
+  background: rgb(220 38 38 / 12%);
+  color: #ffadad;
+}

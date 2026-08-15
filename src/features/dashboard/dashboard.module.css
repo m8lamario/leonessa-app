@@ -1,8 +1,5 @@
 .dashboard {
-  width: min(100%, 720px);
-  min-height: 100svh;
-  margin: 0 auto;
-  padding: var(--page-top-spacing) var(--space-md) var(--content-bottom-spacer);
+  min-width: 0;
 }
 
 .hero {
@@ -574,50 +571,7 @@
   gap: 2px;
 }
 
-.bottomNavigation {
-  position: fixed;
-  z-index: 2;
-  right: max(8px, calc((100vw - 720px) / 2 + 8px));
-  bottom: var(--bottom-nav-offset);
-  left: max(8px, calc((100vw - 720px) / 2 + 8px));
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 7px;
-  border: 1px solid rgb(198 204 218 / 18%);
-  border-radius: 18px;
-  background: rgb(5 13 44 / 92%);
-  box-shadow: 0 10px 32px rgb(0 0 0 / 34%);
-  backdrop-filter: blur(18px);
-}
-
-.bottomNavigation a {
-  display: grid;
-  min-height: 50px;
-  place-items: center;
-  gap: 3px;
-  border-radius: 12px;
-  color: var(--color-text-muted);
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.bottomNavigation a span {
-  font-family: var(--font-family-display);
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.bottomNavigation .navActive {
-  background: var(--color-primary);
-  color: var(--color-text);
-}
-
 @media (min-width: 600px) {
-  .dashboard {
-    padding-top: 28px;
-  }
-
   .hero {
     padding: 32px;
   }

@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-primary-light);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.description {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.actions {
+  flex: 0 0 auto;
+}

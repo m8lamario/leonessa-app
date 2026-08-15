@@ -1,0 +1,14 @@
+.textarea {
+  width: 100%;
+  min-height: 112px;
+  padding: var(--space-md);
+  resize: vertical;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: rgb(3 8 23 / 46%);
+  color: var(--color-text);
+}
+
+.textarea::placeholder {
+  color: var(--color-text-muted);
+}

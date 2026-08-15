@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+import { PageContainer } from "@/shared/components";
 import { Skeleton, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
 import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
@@ -48,7 +48,7 @@ function formatPoints(points: number) {
 
 function RankingSkeleton() {
   return (
-    <main aria-busy="true" className={styles.ranking}>
+    <PageContainer aria-busy="true" className={styles.ranking}>
       <header className={styles.hero}>
         <Skeleton height="0.75rem" width="28%" />
         <Skeleton height="3.8rem" style={{ marginTop: "12px" }} width="46%" />
@@ -70,7 +70,7 @@ function RankingSkeleton() {
         <SkeletonList items={5} />
         <SkeletonCard className={styles.personalRank} lines={1} />
       </section>
-    </main>
+    </PageContainer>
   );
 }
 
@@ -265,7 +265,7 @@ export function RankingDashboard({
   }
 
   return (
-    <main className={`${styles.ranking} ${skeletonStyles.fadeIn}`}>
+    <PageContainer className={`${styles.ranking} ${skeletonStyles.fadeIn}`}>
       <header className={styles.hero}>
         <p className={styles.kicker}>Leonessa Cup</p>
         <h1>Ranking</h1>
@@ -480,25 +480,6 @@ export function RankingDashboard({
           </motion.div>
         </AnimatePresence>
       </section>
-
-      <nav className={styles.bottomNavigation} aria-label="Navigazione principale">
-        <Link href="/" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">H</span>
-          Home
-        </Link>
-        <Link href="/" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">C</span>
-          Cup
-        </Link>
-        <a className={styles.navActive} href="/ranking" aria-current="page">
-          <span aria-hidden="true">R</span>
-          Ranking
-        </a>
-        <Link href="/profile" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">P</span>
-          Profilo
-        </Link>
-      </nav>
-    </main>
+    </PageContainer>
   );
 }

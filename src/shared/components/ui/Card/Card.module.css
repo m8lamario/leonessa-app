@@ -1,0 +1,14 @@
+.card {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: rgb(19 30 82 / 72%);
+}
+
+.default {
+  padding: var(--space-lg);
+}
+
+.raised {
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-stadium);
+}

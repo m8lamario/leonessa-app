@@ -1,0 +1,12 @@
+.container {
+  width: min(100%, 720px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: var(--page-top-spacing) var(--space-md) var(--content-bottom-spacer);
+}
+
+@media (min-width: 600px) {
+  .container {
+    padding-top: 28px;
+  }
+}

@@ -1,0 +1,27 @@
+.backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding: var(--space-md);
+  background: rgb(3 8 23 / 68%);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: min(100%, 560px);
+  max-height: min(80svh, 720px);
+  overflow: auto;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-stadium);
+}
+
+@media (min-width: 600px) {
+  .backdrop {
+    place-items: center;
+  }
+}

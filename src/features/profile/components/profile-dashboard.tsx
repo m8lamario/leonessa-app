@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { motion } from "framer-motion";
+import { Award, ClipboardList, Medal, Rocket, type LucideIcon } from "lucide-react";
 import { type FormEvent, useState } from "react";
 
-import {
-  error as hapticError,
-  selection as hapticSelection,
-  success as hapticSuccess,
-} from "@/shared/lib/haptics";
+import { PageContainer } from "@/shared/components";
+import { error as hapticError, success as hapticSuccess } from "@/shared/lib/haptics";
 
 import { profileMock } from "../mock/profile.mock";
 import styles from "../profile.module.css";
@@ -38,26 +35,26 @@ const roleLabels: Record<string, string> = {
 
 const opportunities: Array<{
   kind: ApplicationKind;
-  icon: string;
+  icon: LucideIcon;
   title: string;
   description: string;
   premium?: boolean;
 }> = [
   {
     kind: "player",
-    icon: "⚽",
+    icon: Medal,
     title: "Diventa Giocatore",
     description: "Rappresenta il tuo istituto: candidati alla squadra della tua scuola.",
   },
   {
     kind: "team-staff",
-    icon: "📋",
+    icon: ClipboardList,
     title: "Staff Squadra",
     description: "Aiuta il tuo team durante la stagione Leonessa.",
   },
   {
     kind: "leonessa-staff",
-    icon: "🚀",
+    icon: Rocket,
     title: "Entra nello Staff Leonessa",
     description: "Costruiamo la Leonessa Cup insieme: porta energia, idee e passione.",
     premium: true,
@@ -114,7 +111,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
   }
 
   return (
-    <main className={styles.profile}>
+    <PageContainer className={styles.profile}>
       <motion.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
@@ -124,7 +121,8 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
         <div className={styles.topline}>
           <p className={styles.kicker}>La tua identità Leonessa</p>
           <span aria-label="Badge in evidenza" className={styles.featuredBadge}>
-            🎖 {profileMock.featuredBadge}
+            <Medal aria-hidden="true" size={15} strokeWidth={2.2} />
+            {profileMock.featuredBadge}
           </span>
         </div>
         <div className={styles.identity}>
@@ -134,7 +132,10 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
           <div className={styles.identityCopy}>
             <h1>{name}</h1>
             <p className={styles.meta}>{profileMock.schoolName}</p>
-            <span className={styles.roleBadge}>🏅 {roleLabel}</span>
+            <span className={styles.roleBadge}>
+              <Award aria-hidden="true" size={15} strokeWidth={2.2} />
+              {roleLabel}
+            </span>
           </div>
         </div>
         <div className={styles.levelGrid}>
@@ -202,7 +203,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
                   className={`${styles.card} ${styles.opportunity} ${opportunity.premium ? styles.premiumCard : ""}`}
                   key={opportunity.kind}
                 >
-                  <span aria-hidden="true">{opportunity.icon}</span>
+                  <opportunity.icon aria-hidden="true" size={28} strokeWidth={1.8} />
                   <h3>{opportunity.title}</h3>
                   <p>{opportunity.description}</p>
                   <button
@@ -384,21 +385,6 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
           </button>
         </motion.section>
       </div>
-
-      <nav className={styles.nav} aria-label="Navigazione principale">
-        <Link href="/dashboard" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">H</span>Home
-        </Link>
-        <a href="#opportunities-title" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">C</span>Cup
-        </a>
-        <Link href="/ranking" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">R</span>Ranking
-        </Link>
-        <Link className={styles.navActive} href="/profile" aria-current="page">
-          <span aria-hidden="true">P</span>Profilo
-        </Link>
-      </nav>
-    </main>
+    </PageContainer>
   );
 }

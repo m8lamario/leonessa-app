@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-import { selection as hapticSelection } from "@/shared/lib/haptics";
+import { PageContainer } from "@/shared/components";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import type { DashboardData } from "../types";
 import styles from "../dashboard.module.css";
@@ -34,7 +34,7 @@ export function UserDashboard({
   const visibleSchoolRanking = showFullRanking ? schoolRanking : schoolRanking.slice(0, 5);
 
   return (
-    <main className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
+    <PageContainer className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
       <motion.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
@@ -343,25 +343,6 @@ export function UserDashboard({
           </div>
         </motion.section>
       </div>
-
-      <nav className={styles.bottomNavigation} aria-label="Navigazione principale">
-        <Link className={styles.navActive} href="/dashboard" aria-current="page">
-          <span aria-hidden="true">H</span>
-          Home
-        </Link>
-        <a href="#featured-match" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">C</span>
-          Cup
-        </a>
-        <a href="/ranking" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">R</span>
-          Ranking
-        </a>
-        <Link href="/profile" onClick={() => void hapticSelection()}>
-          <span aria-hidden="true">P</span>
-          Profilo
-        </Link>
-      </nav>
-    </main>
+    </PageContainer>
   );
 }

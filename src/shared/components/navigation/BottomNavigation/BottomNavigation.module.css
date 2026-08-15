@@ -1,0 +1,82 @@
+.navigation {
+  position: fixed;
+  z-index: 10;
+  right: max(16px, calc((100vw - 720px) / 2 + 16px));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, calc((100vw - 720px) / 2 + 16px));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  min-height: 76px;
+  padding: 6px;
+  border: 1px solid rgb(198 204 218 / 18%);
+  border-radius: 24px;
+  background: rgb(3 8 23 / 92%);
+  box-shadow:
+    0 12px 34px rgb(0 0 0 / 34%),
+    0 2px 8px rgb(8 20 70 / 24%);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+}
+
+.item,
+.activeItem {
+  display: flex;
+  min-width: 44px;
+  min-height: 64px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    transform 120ms ease;
+}
+
+.item:active,
+.activeItem:active {
+  transform: scale(0.96);
+}
+
+.activeItem {
+  background: var(--color-primary-light);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  transition: transform 200ms ease;
+}
+
+.activeItem .icon {
+  transform: scale(1.08);
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  display: grid;
+  min-width: 15px;
+  height: 15px;
+  place-items: center;
+  padding: 0 3px;
+  border: 1.5px solid var(--color-background-deep);
+  border-radius: 999px;
+  background: var(--color-danger);
+  color: var(--color-text);
+  font-size: 0.56rem;
+  font-weight: 800;
+  line-height: 1;
+}

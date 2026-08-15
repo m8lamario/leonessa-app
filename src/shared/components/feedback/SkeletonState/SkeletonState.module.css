@@ -1,0 +1,4 @@
+.state {
+  display: grid;
+  gap: var(--space-md);
+}

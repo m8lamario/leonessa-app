@@ -1,0 +1,16 @@
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  min-height: 160px;
+  padding: var(--space-xl);
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.state h2,
+.state p {
+  margin: 0;
+}
