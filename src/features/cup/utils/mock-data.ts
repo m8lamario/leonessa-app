@@ -1,0 +1,207 @@
+import type { Match, Team } from "../types";
+
+const competition = {
+  id: "leonessa-cup",
+  slug: "leonessa-cup",
+  name: "Leonessa Cup",
+} as const;
+
+const teams: Record<string, Team> = {
+  lunardi: {
+    id: "59",
+    slug: "lunardi",
+    name: "Lunardi",
+    shortName: "LUN",
+    logoUrl: null,
+    points: 9,
+    record: "4V - 1VR - 0SR - 0S",
+  },
+  marcoPolo: {
+    id: "72",
+    slug: "liceo-marco-polo",
+    name: "Liceo Marco Polo",
+    shortName: "LMP",
+    logoUrl: null,
+    points: 7,
+    record: "2V - 1VR - 2SR - 0S",
+  },
+  copernico: {
+    id: "73",
+    slug: "liceo-copernico",
+    name: "Liceo Copernico",
+    shortName: "COP",
+    logoUrl: null,
+    points: 3,
+    record: "1V - 0VR - 0SR - 2S",
+  },
+  calvesi: {
+    id: "46",
+    slug: "liceo-calvesibaracca",
+    name: "Liceo Calvesi/Baracca",
+    shortName: "LCB",
+    logoUrl: null,
+    points: 8,
+    record: "2V - 1VR - 0SR - 1S",
+  },
+  castelli: {
+    id: "47",
+    slug: "itis-benedetto-castelli",
+    name: "Itis Benedetto Castelli",
+    shortName: "ITC",
+    logoUrl: null,
+    points: 6,
+    record: "2V - 0VR - 0SR - 1S",
+  },
+  leonardo: {
+    id: "48",
+    slug: "liceo-scientifico-statale-leonardo",
+    name: "Liceo Scientifico Statale Leonardo",
+    shortName: "LEO",
+    logoUrl: null,
+    points: 9,
+    record: "3V - 0VR - 1SR - 0S",
+  },
+  tartaglia: {
+    id: "49",
+    slug: "tartaglia-olivieri",
+    name: "Tartaglia-Olivieri",
+    shortName: "LTO",
+    logoUrl: null,
+    points: 1,
+    record: "0V - 0VR - 1SR - 2S",
+  },
+  golgi: {
+    id: "56",
+    slug: "istituto-camillo-golgi",
+    name: "Istituto Camillo Golgi",
+    shortName: "CGT",
+    logoUrl: null,
+    points: 1,
+    record: "0V - 0VR - 1SR - 2S",
+  },
+};
+
+function createMatch(
+  id: string,
+  kickoff: string,
+  homeTeam: Team,
+  awayTeam: Team,
+  status: Match["status"],
+  homeScore: number | null = null,
+  awayScore: number | null = null,
+): Match {
+  return {
+    id,
+    competition,
+    homeTeam,
+    awayTeam,
+    kickoff,
+    status,
+    stage: "Gironi",
+    homeScore,
+    awayScore,
+    homePenalties: null,
+    awayPenalties: null,
+    scoreText: homeScore !== null && awayScore !== null ? `${homeScore} - ${awayScore}` : null,
+    isLive: status === "live",
+    venue: {
+      name: "Centro Sportivo Mario Rigamonti",
+      address: "Via Serenissima, 34, Brescia",
+      latitude: 45.499608,
+      longitude: 10.271991,
+    },
+  };
+}
+
+export const MOCK_LEONESSA_MATCHES: Match[] = [
+  createMatch(
+    "mock-upcoming-1",
+    "2026-09-02T18:00:00.000Z",
+    teams.lunardi,
+    teams.marcoPolo,
+    "scheduled",
+  ),
+  createMatch(
+    "mock-upcoming-2",
+    "2026-09-04T18:00:00.000Z",
+    teams.copernico,
+    teams.calvesi,
+    "scheduled",
+  ),
+  createMatch(
+    "mock-upcoming-3",
+    "2026-09-06T18:00:00.000Z",
+    teams.castelli,
+    teams.leonardo,
+    "scheduled",
+  ),
+  createMatch(
+    "mock-upcoming-4",
+    "2026-09-09T18:00:00.000Z",
+    teams.tartaglia,
+    teams.golgi,
+    "scheduled",
+  ),
+  createMatch(
+    "mock-upcoming-5",
+    "2026-09-11T18:00:00.000Z",
+    teams.marcoPolo,
+    teams.copernico,
+    "scheduled",
+  ),
+  createMatch(
+    "mock-completed-1",
+    "2026-05-23T19:00:00.000Z",
+    teams.lunardi,
+    teams.marcoPolo,
+    "completed",
+    4,
+    2,
+  ),
+  createMatch(
+    "mock-completed-2",
+    "2026-05-16T19:00:00.000Z",
+    teams.lunardi,
+    teams.calvesi,
+    "completed",
+    2,
+    0,
+  ),
+  createMatch(
+    "mock-completed-3",
+    "2026-05-09T19:00:00.000Z",
+    teams.leonardo,
+    teams.tartaglia,
+    "completed",
+    3,
+    1,
+  ),
+  createMatch(
+    "mock-completed-4",
+    "2026-05-02T19:00:00.000Z",
+    teams.castelli,
+    teams.golgi,
+    "completed",
+    1,
+    1,
+  ),
+  createMatch(
+    "mock-completed-5",
+    "2026-04-25T19:00:00.000Z",
+    teams.copernico,
+    teams.marcoPolo,
+    "completed",
+    0,
+    2,
+  ),
+];
+
+export function getMockMatches(): Match[] {
+  return MOCK_LEONESSA_MATCHES.map((match) => ({
+    ...match,
+    competition: { ...match.competition },
+    homeTeam: { ...match.homeTeam },
+    awayTeam: { ...match.awayTeam },
+    venue: match.venue ? { ...match.venue } : null,
+  }));
+}

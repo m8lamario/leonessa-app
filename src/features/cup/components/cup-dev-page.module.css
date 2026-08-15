@@ -1,0 +1,159 @@
+.page {
+  width: min(100% - 32px, 840px);
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.kicker {
+  margin: 0 0 8px;
+  color: var(--color-primary-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header h1,
+.heading h2 {
+  margin: 0;
+}
+
+.state {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stats > div,
+.panel {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: rgb(19 30 82 / 72%);
+  box-shadow: var(--shadow-stadium);
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+}
+
+.stats span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.stats strong {
+  font-family: var(--font-family-display);
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.panel {
+  margin-top: 20px;
+  padding: 24px;
+}
+
+.heading {
+  margin-bottom: 16px;
+}
+
+.matchList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.match strong,
+.match small {
+  display: block;
+}
+
+.match strong {
+  font-size: 0.95rem;
+}
+
+.match strong span {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.match small,
+.matchMeta {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.match small {
+  margin-top: 5px;
+}
+
+.matchMeta {
+  display: grid;
+  flex-shrink: 0;
+  gap: 5px;
+  text-align: right;
+}
+
+.matchMeta span {
+  color: var(--color-primary-light);
+  font-weight: 700;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.retryButton {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  background: var(--color-primary-light);
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding-top: 28px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .match {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .matchMeta {
+    text-align: left;
+  }
+}
