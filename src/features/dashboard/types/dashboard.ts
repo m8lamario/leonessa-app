@@ -45,6 +45,7 @@ export type DashboardData = {
   school: {
     position: number | null;
     points: number;
+    teamId: string | null;
   };
   featuredMatch: DashboardFeaturedMatch | null;
   missions: DashboardMission[];

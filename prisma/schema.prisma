@@ -28,6 +28,17 @@ enum TeamMemberRole {
   SOCIAL_MANAGER
 }
 
+enum TeamApplicationKind {
+  PLAYER
+  STAFF
+}
+
+enum TeamApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum CompetitionStatus {
   DRAFT
   UPCOMING
@@ -156,6 +167,7 @@ model User {
   accounts            Account[]
   sessions            Session[]
   teamMemberships     TeamMember[]
+  teamApplications    TeamApplication[]
   createdCompetitions Competition[]      @relation("CompetitionCreator")
   createdShifts       Shift[]            @relation("ShiftCreator")
   shiftAssignments    ShiftAssignment[]
@@ -311,11 +323,12 @@ model Team {
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
 
-  competition Competition  @relation(fields: [competitionId], references: [id], onDelete: Restrict)
-  school      School       @relation(fields: [schoolId], references: [id], onDelete: Restrict)
-  members     TeamMember[]
-  homeMatches Match[]      @relation("HomeTeam")
-  awayMatches Match[]      @relation("AwayTeam")
+  competition  Competition       @relation(fields: [competitionId], references: [id], onDelete: Restrict)
+  school       School            @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  members      TeamMember[]
+  applications TeamApplication[]
+  homeMatches  Match[]           @relation("HomeTeam")
+  awayMatches  Match[]           @relation("AwayTeam")
 
   @@unique([competitionId, name])
   @@index([schoolId])
@@ -342,21 +355,40 @@ model TeamMember {
   @@index([teamId, leftAt])
 }
 
+model TeamApplication {
+  id          String                @id @default(uuid())
+  teamId      String
+  userId      String
+  kind        TeamApplicationKind
+  status      TeamApplicationStatus @default(PENDING)
+  submittedAt DateTime              @default(now())
+  reviewedAt  DateTime?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId, kind])
+  @@index([teamId, status, submittedAt])
+  @@index([userId, status, submittedAt])
+}
+
 model Match {
-  id            String      @id @default(uuid())
-  eslId         String?     @unique
-  competitionId String
-  homeTeamId    String
-  awayTeamId    String
-  venue         String?
-  startAt       DateTime
-  status        MatchStatus @default(SCHEDULED)
-  homeScore     Int         @default(0)
-  awayScore     Int         @default(0)
-  rankingProcessed Boolean  @default(false)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  deletedAt     DateTime?
+  id               String      @id @default(uuid())
+  eslId            String?     @unique
+  competitionId    String
+  homeTeamId       String
+  awayTeamId       String
+  venue            String?
+  startAt          DateTime
+  status           MatchStatus @default(SCHEDULED)
+  homeScore        Int         @default(0)
+  awayScore        Int         @default(0)
+  rankingProcessed Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
 
   competition Competition  @relation(fields: [competitionId], references: [id], onDelete: Restrict)
   homeTeam    Team         @relation("HomeTeam", fields: [homeTeamId], references: [id], onDelete: Restrict)

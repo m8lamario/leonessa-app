@@ -81,8 +81,11 @@ export function UserDashboard({
           <a className={styles.primaryAction} href="#featured-match">
             Segui partita
           </a>
-          <a className={styles.secondaryAction} href="#school-ranking">
-            Vedi scuola
+          <a
+            className={styles.secondaryAction}
+            href={school.teamId ? `/team/${school.teamId}` : "#school-ranking"}
+          >
+            {school.teamId ? "Vedi squadra" : "Vedi scuola"}
           </a>
         </div>
       </motion.header>

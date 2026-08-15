@@ -158,66 +158,78 @@ export async function getDashboardData(
     ? { OR: [{ competitionId }, { competitionId: null }] }
     : { competitionId: null };
 
-  const [featuredMatch, userMissions, rankingRows, newsRows, eventRows] = await Promise.all([
-    competitionId
-      ? prisma.match.findFirst({
-          where: {
-            competitionId,
-            status: { in: ["LIVE", "SCHEDULED"] },
+  const [featuredMatch, userMissions, rankingRows, newsRows, eventRows, currentTeam] =
+    await Promise.all([
+      competitionId
+        ? prisma.match.findFirst({
+            where: {
+              competitionId,
+              status: { in: ["LIVE", "SCHEDULED"] },
+              deletedAt: null,
+            },
+            include: { homeTeam: true, awayTeam: true },
+            orderBy: [{ status: "desc" }, { startAt: "asc" }],
+          })
+        : null,
+      prisma.userMission.findMany({
+        where: {
+          userId,
+          status: { in: ["AVAILABLE", "IN_PROGRESS"] },
+          mission: {
             deletedAt: null,
+            ...missionCompetitionFilter,
           },
-          include: { homeTeam: true, awayTeam: true },
-          orderBy: [{ status: "desc" }, { startAt: "asc" }],
-        })
-      : null,
-    prisma.userMission.findMany({
-      where: {
-        userId,
-        status: { in: ["AVAILABLE", "IN_PROGRESS"] },
-        mission: {
-          deletedAt: null,
-          ...missionCompetitionFilter,
         },
-      },
-      include: { mission: true },
-      orderBy: { createdAt: "asc" },
-      take: 3,
-    }),
-    competitionId
-      ? prisma.schoolRanking.findMany({
-          where: { competitionId },
-          include: { school: true },
-          orderBy: [
-            { totalPoints: "desc" },
-            { wins: "desc" },
-            { draws: "desc" },
-            { losses: "asc" },
-          ],
-        })
-      : [],
-    competitionId
-      ? prisma.newsArticle.findMany({
-          where: {
-            deletedAt: null,
-            status: "PUBLISHED",
-            OR: [{ competitionId }, { competitionId: null }],
-          },
-          orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-          take: 2,
-        })
-      : [],
-    competitionId
-      ? prisma.event.findMany({
-          where: {
-            competitionId,
-            startAt: { gte: new Date() },
-            deletedAt: null,
-          },
-          orderBy: { startAt: "asc" },
-          take: 2,
-        })
-      : [],
-  ]);
+        include: { mission: true },
+        orderBy: { createdAt: "asc" },
+        take: 3,
+      }),
+      competitionId
+        ? prisma.schoolRanking.findMany({
+            where: { competitionId },
+            include: { school: true },
+            orderBy: [
+              { totalPoints: "desc" },
+              { wins: "desc" },
+              { draws: "desc" },
+              { losses: "asc" },
+            ],
+          })
+        : [],
+      competitionId
+        ? prisma.newsArticle.findMany({
+            where: {
+              deletedAt: null,
+              status: "PUBLISHED",
+              OR: [{ competitionId }, { competitionId: null }],
+            },
+            orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+            take: 2,
+          })
+        : [],
+      competitionId
+        ? prisma.event.findMany({
+            where: {
+              competitionId,
+              startAt: { gte: new Date() },
+              deletedAt: null,
+            },
+            orderBy: { startAt: "asc" },
+            take: 2,
+          })
+        : [],
+      competitionId && schoolId
+        ? prisma.team.findFirst({
+            where: {
+              competitionId,
+              schoolId,
+              deletedAt: null,
+            },
+            select: { id: true },
+            orderBy: { createdAt: "asc" },
+          })
+        : null,
+    ]);
 
   const ranking = rankingRows;
   const currentSchoolRanking = ranking.find((entry) => entry.schoolId === schoolId);
@@ -230,6 +242,7 @@ export async function getDashboardData(
     school: {
       position: currentSchoolPosition,
       points: currentSchoolRanking?.totalPoints ?? 0,
+      teamId: currentTeam?.id ?? null,
     },
     featuredMatch: mapFeaturedMatch(featuredMatch),
     missions: userMissions.map(mapMission),

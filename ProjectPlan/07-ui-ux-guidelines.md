@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## UI / UX Guidelines v1.0
-
-
-
-\---
+## UI / UX Guidelines v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -20,15 +20,15 @@ L'app deve trasmettere:
 
 
 
-\- Professionalità
+- Professionalità
 
-\- Appartenenza
+- Appartenenza
 
-\- Competizione
+- Competizione
 
-\- Modernità
+- Modernità
 
-\- Esclusività
+- Esclusività
 
 
 
@@ -36,15 +36,15 @@ L'obiettivo è creare un'esperienza che faccia sentire ogni studente parte della
 
 
 
-\---
+---
 
 
 
-\# 2. Brand Identity
+# 2. Brand Identity
 
 
 
-\## Personalità del Brand
+## Personalità del Brand
 
 
 
@@ -52,25 +52,25 @@ Leonessa Cup deve apparire:
 
 
 
-\- Giovane
+- Giovane
 
-\- Ambiziosa
+- Ambiziosa
 
-\- Sportiva
+- Sportiva
 
-\- Tecnologica
+- Tecnologica
 
-\- Premium
+- Premium
 
-\- Inclusiva
-
-
-
-\---
+- Inclusiva
 
 
 
-\## Sensazioni da Trasmettere
+---
+
+
+
+## Sensazioni da Trasmettere
 
 
 
@@ -90,7 +90,7 @@ Questa è LA piattaforma ufficiale della Leonessa Cup.
 
 
 
-\---
+---
 
 # 2.1 Identità Territoriale e Sportiva
 
@@ -253,11 +253,11 @@ Nascondendo il logo Leonessa Cup, la schermata deve continuare a trasmettere:
 
 Se la schermata perde completamente la propria identità senza il logo, il design deve essere rivisto.
 
-\# 3. Logo
+# 3. Logo
 
 
 
-\## Logo Ufficiale
+## Logo Ufficiale
 
 
 
@@ -265,23 +265,23 @@ Logo Leonessa Cup:
 
 
 
-\- Sempre ben visibile.
+- Sempre ben visibile.
 
-\- Utilizzato preferibilmente in bianco.
+- Utilizzato preferibilmente in bianco.
 
-\- Mai deformato.
+- Mai deformato.
 
-\- Mai ruotato.
+- Mai ruotato.
 
-\- Mai utilizzato con colori differenti senza approvazione.
-
-
-
-\---
+- Mai utilizzato con colori differenti senza approvazione.
 
 
 
-\## Safe Area
+---
+
+
+
+## Safe Area
 
 
 
@@ -301,25 +301,25 @@ Minimo:
 
 
 
-\---
+---
 
 
 
-\# 4. Palette Colori
+# 4. Palette Colori
 
 
 
-\## Colori Primari
+## Colori Primari
 
 
 
-\### Leonessa Blue
+### Leonessa Blue
 
 
 
 ```css
 
-\#0D1B60
+#0D1B60
 
 ```
 
@@ -329,27 +329,27 @@ Utilizzo:
 
 
 
-\- CTA principali
+- CTA principali
 
-\- Header
+- Header
 
-\- Bottom Navigation
+- Bottom Navigation
 
-\- Elementi premium
-
-
-
-\---
+- Elementi premium
 
 
 
-\### White
+---
+
+
+
+### White
 
 
 
 ```css
 
-\#FFFFFF
+#FFFFFF
 
 ```
 
@@ -359,29 +359,29 @@ Utilizzo:
 
 
 
-\- Testi
+- Testi
 
-\- Card
+- Card
 
-\- Contrasto
-
-
-
-\---
+- Contrasto
 
 
 
-\## Colori Secondari
+---
 
 
 
-\### Navy Dark
+## Colori Secondari
+
+
+
+### Navy Dark
 
 
 
 ```css
 
-\#071034
+#071034
 
 ```
 
@@ -391,25 +391,25 @@ Utilizzo:
 
 
 
-\- Background principale
+- Background principale
 
-\- Modal
+- Modal
 
-\- Overlay
-
-
-
-\---
+- Overlay
 
 
 
-\### Electric Blue
+---
+
+
+
+### Electric Blue
 
 
 
 ```css
 
-\#305CFF
+#305CFF
 
 ```
 
@@ -419,79 +419,79 @@ Utilizzo:
 
 
 
-\- Hover
+- Hover
 
-\- Focus
+- Focus
 
-\- Elementi attivi
-
-
-
-\---
+- Elementi attivi
 
 
 
-\## Colori Neutri
+---
 
 
 
-\### Gray 100
+## Colori Neutri
 
 
 
-```css
-
-\#F5F7FA
-
-```
-
-
-
-\### Gray 200
+### Gray 100
 
 
 
 ```css
 
-\#E8EDF5
+#F5F7FA
 
 ```
 
 
 
-\### Gray 400
+### Gray 200
 
 
 
 ```css
 
-\#A0A7B5
+#E8EDF5
 
 ```
 
 
 
-\### Gray 700
+### Gray 400
 
 
 
 ```css
 
-\#3C4454
+#A0A7B5
 
 ```
 
 
 
-\---
+### Gray 700
 
 
 
-\# 5. Modalità Tema
+```css
+
+#3C4454
+
+```
 
 
 
-\## Tema Principale
+---
+
+
+
+# 5. Modalità Tema
+
+
+
+## Tema Principale
 
 
 
@@ -503,11 +503,11 @@ La Leonessa App deve essere progettata principalmente in dark mode.
 
 
 
-\---
+---
 
 
 
-\## Tema Secondario
+## Tema Secondario
 
 
 
@@ -519,19 +519,19 @@ Supportato ma non prioritario.
 
 
 
-\---
+---
 
 
 
-\# 6. Tipografia
+# 6. Tipografia
 
 
 
-\## Typography System
+## Typography System
 
 
 
-\### Font roles
+### Font roles
 
 
 
@@ -539,13 +539,13 @@ Utilizzo:
 
 
 
-\- Bebas Neue: Hero, heading, statistiche evidenziate, numeri e KPI importanti.
+- Bebas Neue: Hero, heading, statistiche evidenziate, numeri e KPI importanti.
 
-\- Inter: testo normale, descrizioni, form, navigazione e UI generale.
+- Inter: testo normale, descrizioni, form, navigazione e UI generale.
 
-\- La tipografia display non deve essere usata per paragrafi o controlli operativi.
+- La tipografia display non deve essere usata per paragrafi o controlli operativi.
 
-\- La tipografia body deve restare leggibile, con peso e contrasto sufficienti.
+- La tipografia body deve restare leggibile, con peso e contrasto sufficienti.
 
 ### Design tokens
 
@@ -564,11 +564,11 @@ I token display usano peso `400`, perché Bebas Neue è una famiglia
 condensata pensata per mantenere impatto anche senza pesi aggiuntivi.
 
 
-\---
+---
 
 
 
-\## Font Fallback
+## Font Fallback
 
 
 
@@ -579,15 +579,15 @@ condensata pensata per mantenere impatto anche senza pesi aggiuntivi.
 
 
 
-\---
+---
 
 
 
-\# 7. Gerarchia Tipografica
+# 7. Gerarchia Tipografica
 
 
 
-\## Display (Bebas Neue)
+## Display (Bebas Neue)
 
 
 
@@ -605,17 +605,17 @@ Utilizzo:
 
 
 
-\- Hero
+- Hero
 
-\- Eventi speciali
-
-
-
-\---
+- Eventi speciali
 
 
 
-\## H1 (Bebas Neue)
+---
+
+
+
+## H1 (Bebas Neue)
 
 
 
@@ -629,11 +629,11 @@ var(--type-h1-size)
 
 
 
-\---
+---
 
 
 
-\## H2 (Bebas Neue)
+## H2 (Bebas Neue)
 
 
 
@@ -647,11 +647,11 @@ var(--type-h2-size)
 
 
 
-\---
+---
 
 
 
-\## H3 (Bebas Neue)
+## H3 (Bebas Neue)
 
 
 
@@ -665,11 +665,11 @@ var(--type-h3-size)
 
 
 
-\---
+---
 
 
 
-\## Body (Inter)
+## Body (Inter)
 
 
 
@@ -683,11 +683,11 @@ var(--type-body-size)
 
 
 
-\---
+---
 
 
 
-\## Caption (Inter)
+## Caption (Inter)
 
 
 
@@ -701,15 +701,15 @@ var(--type-caption-size)
 
 
 
-\---
+---
 
 
 
-\# 8. Principi UX
+# 8. Principi UX
 
 
 
-\## Mobile First
+## Mobile First
 
 
 
@@ -717,11 +717,11 @@ Tutte le schermate devono essere progettate prima per smartphone.
 
 
 
-\---
+---
 
 
 
-\## Massimo 3 Tocchi
+## Massimo 3 Tocchi
 
 
 
@@ -737,11 +737,11 @@ Le azioni più frequenti devono essere raggiungibili in massimo:
 
 
 
-\---
+---
 
 
 
-\## Velocità
+## Velocità
 
 
 
@@ -765,11 +765,11 @@ per ogni navigazione principale.
 
 
 
-\---
+---
 
 
 
-\## Chiarezza
+## Chiarezza
 
 
 
@@ -777,23 +777,23 @@ Ogni schermata deve avere:
 
 
 
-\- un obiettivo;
+- un obiettivo;
 
-\- una CTA principale;
+- una CTA principale;
 
-\- una gerarchia visiva evidente.
-
-
-
-\---
+- una gerarchia visiva evidente.
 
 
 
-\# 9. Layout System
+---
 
 
 
-\## Grid
+# 9. Layout System
+
+
+
+## Grid
 
 
 
@@ -805,15 +805,15 @@ Ogni schermata deve avere:
 
 
 
-\---
+---
 
 
 
-\## Border Radius
+## Border Radius
 
 
 
-\### Small
+### Small
 
 
 
@@ -825,7 +825,7 @@ Ogni schermata deve avere:
 
 
 
-\### Medium
+### Medium
 
 
 
@@ -837,7 +837,7 @@ Ogni schermata deve avere:
 
 
 
-\### Large
+### Large
 
 
 
@@ -849,11 +849,11 @@ Ogni schermata deve avere:
 
 
 
-\---
+---
 
 
 
-\## Padding Standard
+## Padding Standard
 
 
 
@@ -865,15 +865,15 @@ Ogni schermata deve avere:
 
 
 
-\---
+---
 
 
 
-\# 10. Componenti Base
+# 10. Componenti Base
 
 
 
-\## Primary Button
+## Primary Button
 
 
 
@@ -883,7 +883,7 @@ Background:
 
 ```css
 
-\#0D1B60
+#0D1B60
 
 ```
 
@@ -895,7 +895,7 @@ Testo:
 
 ```css
 
-\#FFFFFF
+#FFFFFF
 
 ```
 
@@ -905,15 +905,15 @@ Utilizzo:
 
 
 
-\- azione principale.
+- azione principale.
 
 
 
-\---
+---
 
 
 
-\## Secondary Button
+## Secondary Button
 
 
 
@@ -941,11 +941,11 @@ transparent
 
 
 
-\---
+---
 
 
 
-\## Ghost Button
+## Ghost Button
 
 
 
@@ -957,15 +957,15 @@ Utilizzo:
 
 
 
-\- azioni secondarie.
+- azioni secondarie.
 
 
 
-\---
+---
 
 
 
-\# 11. Cards
+# 11. Cards
 
 
 
@@ -973,33 +973,11 @@ Le card rappresentano il componente principale dell'app.
 
 
 
-\---
+---
 
 
 
-\## Match Card
-
-
-
-Contiene:
-
-
-
-\- squadre
-
-\- risultato
-
-\- data
-
-\- stato
-
-
-
-\---
-
-
-
-\## Mission Card
+## Match Card
 
 
 
@@ -1007,39 +985,21 @@ Contiene:
 
 
 
-\- titolo
+- squadre
 
-\- reward
+- risultato
 
-\- progresso
+- data
 
-
-
-\---
+- stato
 
 
 
-\## School Card
+---
 
 
 
-Contiene:
-
-
-
-\- logo
-
-\- nome scuola
-
-\- posizione classifica
-
-
-
-\---
-
-
-
-\## Reward Card
+## Mission Card
 
 
 
@@ -1047,39 +1007,79 @@ Contiene:
 
 
 
-\- premio
+- titolo
 
-\- costo
+- reward
 
-\- disponibilità
-
-
-
-\---
+- progresso
 
 
 
-\# 12. Iconografia
+---
 
 
 
-\## Stile
+## School Card
 
 
 
-\- Outline
-
-\- Rounded
-
-\- Modern
+Contiene:
 
 
 
-\---
+- logo
+
+- nome scuola
+
+- posizione classifica
 
 
 
-\## Libreria
+---
+
+
+
+## Reward Card
+
+
+
+Contiene:
+
+
+
+- premio
+
+- costo
+
+- disponibilità
+
+
+
+---
+
+
+
+# 12. Iconografia
+
+
+
+## Stile
+
+
+
+- Outline
+
+- Rounded
+
+- Modern
+
+
+
+---
+
+
+
+## Libreria
 
 
 
@@ -1095,15 +1095,15 @@ lucide-react
 
 
 
-\---
+---
 
 
 
-\# 13. Animazioni
+# 13. Animazioni
 
 
 
-\## Filosofia
+## Filosofia
 
 
 
@@ -1115,11 +1115,11 @@ Mai eccessive.
 
 
 
-\---
+---
 
 
 
-\## Tecnologia
+## Tecnologia
 
 
 
@@ -1131,15 +1131,15 @@ Framer Motion
 
 
 
-\---
+---
 
 
 
-\## Durate
+## Durate
 
 
 
-\### Hover
+### Hover
 
 
 
@@ -1151,11 +1151,11 @@ Framer Motion
 
 
 
-\---
+---
 
 
 
-\### Transition
+### Transition
 
 
 
@@ -1167,11 +1167,11 @@ Framer Motion
 
 
 
-\---
+---
 
 
 
-\### Page Transition
+### Page Transition
 
 
 
@@ -1183,15 +1183,15 @@ Framer Motion
 
 
 
-\---
+---
 
 
 
-\# 14. Microinterazioni
+# 14. Microinterazioni
 
 
 
-\## Like
+## Like
 
 
 
@@ -1199,11 +1199,11 @@ Piccolo bounce.
 
 
 
-\---
+---
 
 
 
-\## Badge
+## Badge
 
 
 
@@ -1211,11 +1211,11 @@ Animazione reward.
 
 
 
-\---
+---
 
 
 
-\## Missione Completata
+## Missione Completata
 
 
 
@@ -1223,11 +1223,11 @@ Confetti minimali.
 
 
 
-\---
+---
 
 
 
-\## Guadagno Punti
+## Guadagno Punti
 
 
 
@@ -1235,15 +1235,15 @@ Animazione contatore.
 
 
 
-\---
+---
 
 
 
-\# 15. Navigazione
+# 15. Navigazione
 
 
 
-\## Bottom Navigation
+## Bottom Navigation
 
 
 
@@ -1267,11 +1267,11 @@ Sempre presente.
 
 
 
-\---
+---
 
 
 
-\## Staff
+## Staff
 
 
 
@@ -1287,11 +1287,11 @@ Se utente STAFF:
 
 
 
-\---
+---
 
 
 
-\## Admin
+## Admin
 
 
 
@@ -1307,11 +1307,11 @@ Se ADMIN:
 
 
 
-\---
+---
 
 
 
-\# 16. Home Screen
+# 16. Home Screen
 
 
 
@@ -1347,11 +1347,11 @@ Eventi
 
 
 
-\---
+---
 
 
 
-\# 17. Match Center
+# 17. Match Center
 
 
 
@@ -1363,29 +1363,29 @@ Far sembrare ogni partita importante.
 
 
 
-\---
+---
 
 
 
-\## Componenti
+## Componenti
 
 
 
-\- score live
+- score live
 
-\- eventi
+- eventi
 
-\- MVP
+- MVP
 
-\- statistiche
-
-
-
-\---
+- statistiche
 
 
 
-\# 18. Community
+---
+
+
+
+# 18. Community
 
 
 
@@ -1397,33 +1397,33 @@ Creare coinvolgimento.
 
 
 
-\---
+---
 
 
 
-\## Elementi
+## Elementi
 
 
 
-\- Ranking
+- Ranking
 
-\- Badge
+- Badge
 
-\- Missioni
+- Missioni
 
-\- Activity Feed
-
-
-
-\---
+- Activity Feed
 
 
 
-\# 19. Accessibilità
+---
 
 
 
-\## Contrasto
+# 19. Accessibilità
+
+
+
+## Contrasto
 
 
 
@@ -1439,11 +1439,11 @@ WCAG AA
 
 
 
-\---
+---
 
 
 
-\## Touch Target
+## Touch Target
 
 
 
@@ -1459,11 +1459,11 @@ Minimo:
 
 
 
-\---
+---
 
 
 
-\## Leggibilità
+## Leggibilità
 
 
 
@@ -1479,11 +1479,11 @@ Mai testo inferiore a:
 
 
 
-\---
+---
 
 
 
-\# 20. Tone of Voice
+# 20. Tone of Voice
 
 
 
@@ -1491,31 +1491,31 @@ L'app deve parlare come una community.
 
 
 
-\---
+---
 
 
 
-\## Caratteristiche
+## Caratteristiche
 
 
 
-\- Motivante
+- Motivante
 
-\- Positiva
+- Positiva
 
-\- Coinvolgente
+- Coinvolgente
 
-\- Diretta
+- Diretta
 
-\- Mai infantile
-
-
-
-\---
+- Mai infantile
 
 
 
-\## Esempio
+---
+
+
+
+## Esempio
 
 
 
@@ -1527,7 +1527,7 @@ L'app deve parlare come una community.
 
 
 
-\---
+---
 
 
 
@@ -1562,7 +1562,7 @@ e non come:
 "Un gestionale scolastico".
 
 
-\# 22. KPI UX
+# 22. KPI UX
 
 
 
@@ -1570,21 +1570,21 @@ Monitorare:
 
 
 
-\- Tempo medio nell'app
+- Tempo medio nell'app
 
-\- Retention
+- Retention
 
-\- Sessioni giornaliere
+- Sessioni giornaliere
 
-\- Completamento missioni
+- Completamento missioni
 
-\- Click CTA
+- Click CTA
 
-\- Conversione staff
+- Conversione staff
 
 
 
-\---
+---
 
 # 22.1 Regola Anti-SaaS
 
@@ -1604,7 +1604,7 @@ Le forme, la composizione, l'atmosfera e il linguaggio visivo devono comunicare:
 - Brescia
 - sport
 
-\# 23. Regola Fondamentale
+# 23. Regola Fondamentale
 
 
 
@@ -1624,4 +1624,4 @@ Se la risposta è no, va riprogettata.
 
 
 
-\---
+---

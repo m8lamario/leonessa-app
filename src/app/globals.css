@@ -120,8 +120,19 @@ select {
   font: inherit;
 }
 
+/* Keep touch feedback native-like without affecting keyboard focus or form text. */
+:where(a, button, [role="button"], [role="tab"], [data-interactive]) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
 button:focus-visible,
 a:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
 input:focus-visible,
 select:focus-visible {
   outline: 2px solid var(--color-primary-light);
