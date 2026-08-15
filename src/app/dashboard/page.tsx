@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
 import { UserDashboard } from "@/features/dashboard";
+import { getDashboardData } from "@/features/dashboard/server/dashboard-service";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
+  const dashboardData = await getDashboardData(user.id, user.schoolId);
   const userName = [user.name, user.surname].filter(Boolean).join(" ");
   const userInitials = [user.name, user.surname]
     .filter(Boolean)
@@ -24,6 +26,7 @@ export default async function DashboardPage() {
       userInitials={userInitials || "LC"}
       schoolName={user.school?.name ?? "La tua scuola"}
       schoolShortName={user.school?.shortName ?? "LC"}
+      data={dashboardData}
     />
   );
 }

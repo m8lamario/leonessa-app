@@ -174,6 +174,26 @@ model User {
   @@index([deletedAt])
 }
 
+model SchoolRanking {
+  id            String   @id @default(uuid())
+  competitionId String
+  schoolId      String
+  totalPoints   Int      @default(0)
+  wins          Int      @default(0)
+  draws         Int      @default(0)
+  losses        Int      @default(0)
+  matchesPlayed Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  school      School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([competitionId, schoolId])
+  @@index([competitionId, totalPoints])
+  @@index([schoolId])
+}
+
 model Account {
   id                String  @id @default(uuid())
   userId            String
@@ -231,6 +251,7 @@ model UserRole {
 
 model School {
   id             String    @id @default(uuid())
+  eslId          String?   @unique
   name           String    @unique
   shortName      String    @unique
   logoUrl        String?
@@ -245,6 +266,7 @@ model School {
   supportBalance    SchoolSupportBalance?
   pointTransactions PointTransaction[]
   teams             Team[]
+  rankings          SchoolRanking[]
 
   @@index([deletedAt])
 }
@@ -268,6 +290,7 @@ model Competition {
   shifts            Shift[]
   missions          Mission[]
   badges            Badge[]
+  schoolRankings    SchoolRanking[]
   pointTransactions PointTransaction[]
   events            Event[]
   newsArticles      NewsArticle[]
@@ -280,6 +303,7 @@ model Competition {
 
 model Team {
   id            String    @id @default(uuid())
+  eslId         String?   @unique
   competitionId String
   schoolId      String
   name          String
@@ -320,6 +344,7 @@ model TeamMember {
 
 model Match {
   id            String      @id @default(uuid())
+  eslId         String?     @unique
   competitionId String
   homeTeamId    String
   awayTeamId    String
@@ -328,6 +353,7 @@ model Match {
   status        MatchStatus @default(SCHEDULED)
   homeScore     Int         @default(0)
   awayScore     Int         @default(0)
+  rankingProcessed Boolean  @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   deletedAt     DateTime?

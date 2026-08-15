@@ -1,5 +1,6 @@
 export {
   matchesQueryKey,
+  teamsQueryKey,
   useCompletedMatches,
   useLeonessaTeams,
   useMatches,

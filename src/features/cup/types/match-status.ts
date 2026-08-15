@@ -1,1 +1,1 @@
-export type MatchStatus = "scheduled" | "live" | "completed";
+export type MatchStatus = "scheduled" | "live" | "completed" | "cancelled";

@@ -2,10 +2,11 @@
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
-import { leonessaMatchesService } from "../services";
+import { cupApiService } from "../services";
 import type { Match, Team } from "../types";
 
 export const matchesQueryKey = ["cup", "matches"] as const;
+export const teamsQueryKey = ["cup", "teams"] as const;
 
 const matchesQueryOptions = {
   staleTime: 5 * 60 * 1000,
@@ -17,7 +18,7 @@ const matchesQueryOptions = {
 const matchesQueryBase = {
   ...matchesQueryOptions,
   queryKey: matchesQueryKey,
-  queryFn: () => leonessaMatchesService.getMatches(),
+  queryFn: () => cupApiService.getMatches(),
 };
 
 const getUpcomingMatches = (matches: Match[]) =>
@@ -29,17 +30,6 @@ const getCompletedMatches = (matches: Match[]) =>
   matches
     .filter((match) => match.status === "completed")
     .sort((a, b) => b.kickoff.localeCompare(a.kickoff));
-
-const getLeonessaTeams = (matches: Match[]) => {
-  const uniqueTeams = new Map<string, Team>();
-
-  for (const match of matches) {
-    uniqueTeams.set(match.homeTeam.id, match.homeTeam);
-    uniqueTeams.set(match.awayTeam.id, match.awayTeam);
-  }
-
-  return [...uniqueTeams.values()].sort((a, b) => a.name.localeCompare(b.name, "it"));
-};
 
 export function useMatches(): UseQueryResult<Match[], Error> {
   return useQuery<Match[], Error>(matchesQueryBase);
@@ -60,8 +50,9 @@ export function useCompletedMatches(): UseQueryResult<Match[], Error> {
 }
 
 export function useLeonessaTeams(): UseQueryResult<Team[], Error> {
-  return useQuery<Match[], Error, Team[]>({
+  return useQuery<Team[], Error>({
     ...matchesQueryBase,
-    select: getLeonessaTeams,
+    queryKey: teamsQueryKey,
+    queryFn: () => cupApiService.getTeams(),
   });
 }

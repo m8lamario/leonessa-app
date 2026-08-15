@@ -159,6 +159,32 @@
   letter-spacing: 0.03em;
 }
 
+.heroStats .accountPoints {
+  gap: 3px;
+  padding: 18px 0;
+}
+
+.accountPoints strong {
+  color: var(--color-primary-light);
+  font-size: 3rem;
+  line-height: 0.95;
+}
+
+.accountPoints small,
+.schoolPoints small {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.heroStats .schoolPoints {
+  gap: 3px;
+  padding: 18px 0 18px 16px;
+}
+
+.schoolPoints strong {
+  font-size: 1.55rem;
+}
+
 .heroNextMatch {
   display: grid;
   gap: 3px;
@@ -210,6 +236,13 @@
   display: grid;
   gap: 38px;
   margin-top: 38px;
+}
+
+.emptyState {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .section {
@@ -350,7 +383,11 @@
 }
 
 .textAction {
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--color-primary-light);
+  cursor: pointer;
   font-size: 0.78rem;
   font-weight: 800;
   text-decoration: none;

@@ -466,14 +466,12 @@ Utilizzare Framer Motion con moderazione.
 
 ---
 
-# Dati Mock
+# Origine Dati
 
-Per la V1 utilizzare esclusivamente dati mock.
-
-Creare file dedicati:
+La dashboard legge i dati dal database Leonessa tramite il layer server-side.
 
 ```text
-src/features/dashboard/mock/dashboard.mock.ts
+src/features/dashboard/server/dashboard-service.ts
 ```
 
 ---

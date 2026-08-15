@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { Skeleton, SkeletonAvatar, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
 import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
-import { dashboardMock } from "../mock/dashboard.mock";
+import type { DashboardData } from "../types";
 import styles from "../dashboard.module.css";
 
 type UserDashboardProps = {
@@ -15,6 +14,7 @@ type UserDashboardProps = {
   userInitials: string;
   schoolName: string;
   schoolShortName: string;
+  data: DashboardData;
 };
 
 const revealTransition = {
@@ -22,93 +22,16 @@ const revealTransition = {
   ease: "easeOut" as const,
 };
 
-const MOCK_LOADING_DELAY = 400;
-
-function DashboardSkeleton() {
-  return (
-    <main aria-busy="true" className={styles.dashboard}>
-      <header className={styles.hero}>
-        <div className={styles.heroTopline}>
-          <Skeleton height="0.7rem" width="7rem" />
-          <SkeletonAvatar size="42px" />
-        </div>
-        <div style={{ display: "grid", gap: "8px", marginTop: "28px" }}>
-          <Skeleton height="0.9rem" width="42%" />
-          <Skeleton height="3.8rem" width="68%" />
-          <Skeleton height="0.9rem" width="54%" />
-        </div>
-        <div className={styles.heroStats} style={{ marginTop: "22px" }}>
-          <div>
-            <Skeleton height="0.7rem" width="62%" />
-            <Skeleton height="2rem" width="44%" />
-          </div>
-          <div>
-            <Skeleton height="0.7rem" width="62%" />
-            <Skeleton height="2rem" width="58%" />
-          </div>
-        </div>
-        <div style={{ display: "grid", gap: "8px", padding: "18px 0" }}>
-          <Skeleton height="0.75rem" width="32%" />
-          <Skeleton height="1.5rem" width="78%" />
-          <Skeleton height="0.75rem" width="48%" />
-        </div>
-        <div className={styles.heroActions}>
-          <Skeleton height="46px" width="100%" />
-          <Skeleton height="46px" width="100%" />
-        </div>
-      </header>
-
-      <div className={styles.content}>
-        <section className={styles.section}>
-          <Skeleton height="0.75rem" width="28%" />
-          <Skeleton height="2.2rem" style={{ marginTop: "8px" }} width="55%" />
-          <SkeletonCard lines={2} showMedia />
-        </section>
-        <section className={styles.section}>
-          <Skeleton height="0.75rem" width="24%" />
-          <Skeleton
-            height="2.2rem"
-            style={{ marginTop: "8px", marginBottom: "16px" }}
-            width="38%"
-          />
-          <div className={styles.missionList}>
-            <SkeletonCard lines={3} />
-            <SkeletonCard lines={3} />
-            <SkeletonCard lines={3} />
-          </div>
-        </section>
-        <section className={styles.section}>
-          <Skeleton height="0.75rem" width="30%" />
-          <Skeleton
-            height="2.2rem"
-            style={{ marginTop: "8px", marginBottom: "16px" }}
-            width="58%"
-          />
-          <SkeletonList avatarSize="31px" items={5} />
-        </section>
-      </div>
-    </main>
-  );
-}
-
 export function UserDashboard({
   userName,
   userInitials,
   schoolName,
   schoolShortName,
+  data,
 }: UserDashboardProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const { featuredMatch, missions, news, events, profile, school, schoolRanking } = dashboardMock;
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => setIsLoading(false), MOCK_LOADING_DELAY);
-
-    return () => window.clearTimeout(timeoutId);
-  }, []);
-
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
+  const [showFullRanking, setShowFullRanking] = useState(false);
+  const { featuredMatch, missions, news, events, profile, school, schoolRanking } = data;
+  const visibleSchoolRanking = showFullRanking ? schoolRanking : schoolRanking.slice(0, 5);
 
   return (
     <main className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
@@ -128,21 +51,31 @@ export function UserDashboard({
         <h1>{schoolShortName}</h1>
         <p className={styles.schoolName}>{schoolName}</p>
         <div className={styles.heroStats}>
-          <div>
-            <span>Classifica</span>
-            <strong>#{school.position}</strong>
+          <div className={styles.accountPoints}>
+            <span>I tuoi LP</span>
+            <strong>{profile.totalLp.toLocaleString("it-IT")}</strong>
+            <small>Livello {profile.level}</small>
           </div>
-          <div>
+          <div className={styles.schoolPoints}>
             <span>Punti scuola</span>
             <strong>{school.points.toLocaleString("it-IT")}</strong>
+            <small>
+              {school.position ? `Posizione #${school.position}` : "Posizione non disponibile"}
+            </small>
           </div>
         </div>
         <div className={styles.heroNextMatch}>
           <span>Prossima partita</span>
-          <strong>
-            {featuredMatch.homeTeam} vs {featuredMatch.awayTeam}
-          </strong>
-          <p>{featuredMatch.schedule}</p>
+          {featuredMatch ? (
+            <>
+              <strong>
+                {featuredMatch.homeTeam} vs {featuredMatch.awayTeam}
+              </strong>
+              <p>{featuredMatch.schedule}</p>
+            </>
+          ) : (
+            <p>Nessuna partita in programma.</p>
+          )}
         </div>
         <div className={styles.heroActions}>
           <a className={styles.primaryAction} href="#featured-match">
@@ -168,28 +101,34 @@ export function UserDashboard({
               <p className={styles.kicker}>In evidenza</p>
               <h2 id="featured-match-title">Match della settimana</h2>
             </div>
-            <span className={styles.matchStatus}>{featuredMatch.status}</span>
+            {featuredMatch && <span className={styles.matchStatus}>{featuredMatch.status}</span>}
           </div>
-          <article className={styles.matchCard}>
-            <div className={styles.teamScore}>
-              <strong>{featuredMatch.homeTeam}</strong>
-              <span>VS</span>
-              <strong>{featuredMatch.awayTeam}</strong>
-            </div>
-            <dl className={styles.matchDetails}>
-              <div>
-                <dt>Quando</dt>
-                <dd>{featuredMatch.schedule}</dd>
+          {featuredMatch ? (
+            <article className={styles.matchCard}>
+              <div className={styles.teamScore}>
+                <strong>{featuredMatch.homeTeam}</strong>
+                <span>VS</span>
+                <strong>{featuredMatch.awayTeam}</strong>
               </div>
-              <div>
-                <dt>Dove</dt>
-                <dd>{featuredMatch.venue}</dd>
-              </div>
-            </dl>
-            <a className={styles.fullAction} href="#missions">
-              Segui partita
-            </a>
-          </article>
+              <dl className={styles.matchDetails}>
+                <div>
+                  <dt>Quando</dt>
+                  <dd>{featuredMatch.schedule}</dd>
+                </div>
+                <div>
+                  <dt>Dove</dt>
+                  <dd>{featuredMatch.venue}</dd>
+                </div>
+              </dl>
+              <a className={styles.fullAction} href="#missions">
+                Segui partita
+              </a>
+            </article>
+          ) : (
+            <article className={styles.matchCard}>
+              <p className={styles.emptyState}>Il calendario non contiene partite disponibili.</p>
+            </article>
+          )}
         </motion.section>
 
         <motion.section
@@ -208,36 +147,54 @@ export function UserDashboard({
             <span className={styles.sectionCount}>{missions.length}</span>
           </div>
           <div className={styles.missionList}>
-            {missions.map((mission) => {
-              const progress = Math.round((mission.progress / mission.target) * 100);
+            {missions.length === 0 ? (
+              <p className={styles.emptyState}>Non hai ancora missioni attive.</p>
+            ) : (
+              missions.map((mission) => {
+                const progress = mission.target
+                  ? Math.min(100, Math.round((mission.progress / mission.target) * 100))
+                  : mission.progress > 0
+                    ? 100
+                    : 0;
 
-              return (
-                <article className={styles.missionCard} key={mission.title}>
-                  <div className={styles.missionTopline}>
-                    <span>{mission.status}</span>
-                    <strong>+{mission.reward} LP</strong>
-                  </div>
-                  <h3>{mission.title}</h3>
-                  <p>{mission.description}</p>
-                  <div
-                    className={styles.progressTrack}
-                    role="progressbar"
-                    aria-label={`Progresso missione ${mission.title}`}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={progress}
-                  >
-                    <span style={{ width: `${progress}%` }} />
-                  </div>
-                  <div className={styles.progressLabel}>
-                    <span>
-                      {mission.progress}/{mission.target}
-                    </span>
-                    <span>{progress}%</span>
-                  </div>
-                </article>
-              );
-            })}
+                return (
+                  <article className={styles.missionCard} key={mission.id}>
+                    <div className={styles.missionTopline}>
+                      <span>{mission.status}</span>
+                      <strong>+{mission.reward} LP</strong>
+                    </div>
+                    <h3>{mission.title}</h3>
+                    <p>{mission.description}</p>
+                    <div
+                      className={styles.progressTrack}
+                      role="progressbar"
+                      aria-label={`Progresso missione ${mission.title}`}
+                      aria-valuemin={0}
+                      aria-valuemax={mission.target ?? 1}
+                      aria-valuenow={
+                        mission.target
+                          ? Math.min(mission.progress, mission.target)
+                          : progress > 0
+                            ? 1
+                            : 0
+                      }
+                    >
+                      <span style={{ width: `${progress}%` }} />
+                    </div>
+                    <div className={styles.progressLabel}>
+                      <span>
+                        {mission.target
+                          ? `${mission.progress}/${mission.target}`
+                          : mission.progress > 0
+                            ? `Progresso ${mission.progress}`
+                            : mission.status}
+                      </span>
+                      <span>{progress}%</span>
+                    </div>
+                  </article>
+                );
+              })
+            )}
           </div>
         </motion.section>
 
@@ -254,30 +211,34 @@ export function UserDashboard({
               <p className={styles.kicker}>La corsa alla Cup</p>
               <h2 id="ranking-title">Classifica scuole</h2>
             </div>
-            <a className={styles.textAction} href="#school-ranking">
-              Completa
-            </a>
-          </div>
-          <ol className={styles.rankingList}>
-            {schoolRanking.map((entry, index) => (
-              <li
-                className={
-                  entry.name.toLocaleLowerCase("it-IT") ===
-                  schoolShortName.toLocaleLowerCase("it-IT")
-                    ? styles.currentSchool
-                    : ""
-                }
-                key={entry.name}
+            {schoolRanking.length > 5 && (
+              <button
+                className={styles.textAction}
+                onClick={() => setShowFullRanking((current) => !current)}
+                type="button"
               >
-                <span className={styles.rankNumber}>0{index + 1}</span>
-                <span className={styles.schoolMark} aria-hidden="true">
-                  {entry.name.slice(0, 1)}
-                </span>
-                <span className={styles.rankingSchool}>{entry.name}</span>
-                <strong>{entry.points.toLocaleString("it-IT")}</strong>
-              </li>
-            ))}
-          </ol>
+                {showFullRanking ? "Mostra prime 5" : "Vedi tutte"}
+              </button>
+            )}
+          </div>
+          {schoolRanking.length === 0 ? (
+            <p className={styles.emptyState}>
+              La classifica sarà disponibile dopo i primi risultati.
+            </p>
+          ) : (
+            <ol className={styles.rankingList}>
+              {visibleSchoolRanking.map((entry, index) => (
+                <li className={entry.isCurrentSchool ? styles.currentSchool : ""} key={entry.id}>
+                  <span className={styles.rankNumber}>{String(index + 1).padStart(2, "0")}</span>
+                  <span className={styles.schoolMark} aria-hidden="true">
+                    {entry.name.slice(0, 1)}
+                  </span>
+                  <span className={styles.rankingSchool}>{entry.name}</span>
+                  <strong>{entry.points.toLocaleString("it-IT")}</strong>
+                </li>
+              ))}
+            </ol>
+          )}
         </motion.section>
 
         <motion.section
@@ -293,27 +254,31 @@ export function UserDashboard({
               <h2 id="news-title">News</h2>
             </div>
           </div>
-          <div className={styles.newsList}>
-            {news.map((article) => (
-              <article className={styles.newsCard} key={article.title}>
-                <div
-                  className={`${styles.newsVisual} ${styles[`visual${article.visual}`]}`}
-                  aria-hidden="true"
-                >
-                  <span>LC</span>
-                </div>
-                <div>
-                  <div className={styles.newsMeta}>
-                    <span>{article.category}</span>
-                    <time>{article.date}</time>
+          {news.length === 0 ? (
+            <p className={styles.emptyState}>Non ci sono ancora news pubblicate.</p>
+          ) : (
+            <div className={styles.newsList}>
+              {news.map((article) => (
+                <article className={styles.newsCard} key={article.id}>
+                  <div
+                    className={`${styles.newsVisual} ${styles[`visual${article.visual}`]}`}
+                    aria-hidden="true"
+                  >
+                    <span>LC</span>
                   </div>
-                  <h3>{article.title}</h3>
-                  <p>{article.excerpt}</p>
-                  <a href="#news-title">Leggi tutto</a>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div>
+                    <div className={styles.newsMeta}>
+                      <span>{article.category}</span>
+                      <time>{article.date}</time>
+                    </div>
+                    <h3>{article.title}</h3>
+                    <p>{article.excerpt}</p>
+                    <a href="#news-title">Leggi tutto</a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </motion.section>
 
         <motion.section
@@ -329,17 +294,21 @@ export function UserDashboard({
               <h2 id="events-title">Eventi</h2>
             </div>
           </div>
-          <div className={styles.eventsList}>
-            {events.map((event) => (
-              <article className={styles.eventCard} key={event.title}>
-                <time className={styles.eventDate}>{event.date}</time>
-                <div>
-                  <h3>{event.title}</h3>
-                  <p>{event.location}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          {events.length === 0 ? (
+            <p className={styles.emptyState}>Non ci sono eventi in programma.</p>
+          ) : (
+            <div className={styles.eventsList}>
+              {events.map((event) => (
+                <article className={styles.eventCard} key={event.id}>
+                  <time className={styles.eventDate}>{event.date}</time>
+                  <div>
+                    <h3>{event.title}</h3>
+                    <p>{event.location}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </motion.section>
 
         <motion.section

@@ -184,6 +184,10 @@ function normalizeStatus(match: EslMatch): MatchStatus {
     return "completed";
   }
 
+  if (status === "CANCELLED" || status === "CANCELED") {
+    return "cancelled";
+  }
+
   return "scheduled";
 }
 

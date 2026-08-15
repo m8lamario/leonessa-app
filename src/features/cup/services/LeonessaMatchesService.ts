@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getMockMatches, isEslMatchPayload, mapEslMatches } from "../utils";
 import type { Match } from "../types";
 
