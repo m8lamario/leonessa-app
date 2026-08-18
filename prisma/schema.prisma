@@ -43,9 +43,37 @@ model User {
   assignedRoles       UserRole[]         @relation("UserRoleAssigner")
   roles               UserRole[]
   emailVerifications  EmailVerificationDelivery[]
+  fantasyTeam         FantasyTeam?
 
   @@index([schoolId])
   @@index([deletedAt])
+}
+
+model FantasyTeam {
+  id           String              @id @default(cuid())
+  userId       String              @unique
+  name         String
+  budgetLp     Int                 @default(500)
+  totalPoints  Int                 @default(0)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  players      FantasyTeamPlayer[]
+}
+
+model FantasyTeamPlayer {
+  id            String      @id @default(cuid())
+  fantasyTeamId String
+  playerId      String
+  role          String
+  purchaseCost  Int         @default(0)
+  isCaptain     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  fantasyTeam   FantasyTeam @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  player        TeamMember  @relation(fields: [playerId], references: [id], onDelete: Restrict)
+
+  @@unique([fantasyTeamId, playerId])
+  @@index([playerId])
 }
 
 model EmailVerificationDelivery {
@@ -206,11 +234,14 @@ model TeamMember {
   teamId        String
   userId        String
   role          TeamMemberRole @default(PLAYER)
+  fantasyRole   String         @default("CENTROCAMPISTA")
+  fantasyValue  Int            @default(25)
   jerseyNumber  Int?
   joinedAt      DateTime       @default(now())
   leftAt        DateTime?
-  playerEvents  MatchEvent[]   @relation("MatchEventTeamMember")
-  relatedEvents MatchEvent[]   @relation("MatchEventRelatedTeamMember")
+  playerEvents      MatchEvent[]          @relation("MatchEventTeamMember")
+  relatedEvents     MatchEvent[]          @relation("MatchEventRelatedTeamMember")
+  fantasySelections FantasyTeamPlayer[]
   team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user          User           @relation(fields: [userId], references: [id])
 

@@ -8,6 +8,3 @@ Dashboard Utente
 
 GENERALI:
 - Notifiche push
-- Migliorare prestazioni
-- Recupero psw
-- Cambio email 

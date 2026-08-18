@@ -9,6 +9,10 @@ import styles from "./BottomNavigation.module.css";
 export function BottomNavigation() {
   const pathname = usePathname();
 
+  if (pathname === "/fanta/team" || pathname.startsWith("/fanta/team/")) {
+    return null;
+  }
+
   return (
     <nav className={styles.navigation} aria-label="Navigazione principale">
       {bottomNavigationItems.map((item) => (

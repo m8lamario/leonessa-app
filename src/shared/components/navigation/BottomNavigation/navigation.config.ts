@@ -1,8 +1,8 @@
-import { ChartNoAxesColumn, House, Trophy, User, type LucideIcon } from "lucide-react";
+import { ChartNoAxesColumn, House, User, Volleyball, type LucideIcon } from "lucide-react";
 import type { Route } from "next";
 
 export type BottomNavigationItemConfig = {
-  id: "home" | "cup" | "ranking" | "profile";
+  id: "home" | "fanta" | "ranking" | "profile";
   label: string;
   href: Route;
   icon: LucideIcon;
@@ -19,10 +19,11 @@ export const bottomNavigationItems: BottomNavigationItemConfig[] = [
     activePath: "/dashboard",
   },
   {
-    id: "cup",
-    label: "Cup",
-    href: "/dashboard#featured-match",
-    icon: Trophy,
+    id: "fanta",
+    label: "Fanta",
+    href: "/fanta" as Route,
+    icon: Volleyball,
+    activePath: "/fanta",
   },
   {
     id: "ranking",
