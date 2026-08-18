@@ -34,6 +34,26 @@ const missionStatusLabels = {
   CLAIMED: "Riscossa",
 } as const;
 
+type DashboardFeaturedMatchRow = Prisma.MatchGetPayload<{
+  select: {
+    id: true;
+    startAt: true;
+    venue: true;
+    status: true;
+    homeTeam: { select: { name: true } };
+    awayTeam: { select: { name: true } };
+  };
+}>;
+
+type DashboardMissionRow = Prisma.UserMissionGetPayload<{
+  select: {
+    id: true;
+    progress: true;
+    status: true;
+    mission: { select: { title: true; description: true; rewardPoints: true } };
+  };
+}>;
+
 type DashboardNewsRow = Prisma.NewsArticleGetPayload<{
   select: {
     id: true;
@@ -83,12 +103,7 @@ function getNewsVisual(type: "ARTICLE" | "ANNOUNCEMENT" | "MATCH_REPORT") {
 }
 
 function mapFeaturedMatch(
-  match: Prisma.MatchGetPayload<{
-    include: {
-      homeTeam: true;
-      awayTeam: true;
-    };
-  }> | null,
+  match: DashboardFeaturedMatchRow | null,
 ): DashboardData["featuredMatch"] {
   if (!match) {
     return null;
@@ -105,7 +120,7 @@ function mapFeaturedMatch(
 }
 
 function mapMission(
-  userMission: Prisma.UserMissionGetPayload<{ include: { mission: true } }>,
+  userMission: DashboardMissionRow,
 ): DashboardMission {
   return {
     id: userMission.id,
@@ -167,7 +182,14 @@ export async function getDashboardData(
               status: { in: ["LIVE", "SCHEDULED"] },
               deletedAt: null,
             },
-            include: { homeTeam: true, awayTeam: true },
+            select: {
+              id: true,
+              startAt: true,
+              venue: true,
+              status: true,
+              homeTeam: { select: { name: true } },
+              awayTeam: { select: { name: true } },
+            },
             orderBy: [{ status: "desc" }, { startAt: "asc" }],
           })
         : null,
@@ -180,15 +202,28 @@ export async function getDashboardData(
             ...missionCompetitionFilter,
           },
         },
-        include: { mission: true },
+        select: {
+          id: true,
+          progress: true,
+          status: true,
+          mission: { select: { title: true, description: true, rewardPoints: true } },
+        },
         orderBy: { createdAt: "asc" },
         take: 3,
       }),
       competitionId
         ? prisma.schoolRanking.findMany({
             where: { competitionId },
-            include: { school: true },
-            orderBy: [
+          select: {
+            id: true,
+            schoolId: true,
+            totalPoints: true,
+            wins: true,
+            draws: true,
+            losses: true,
+            school: { select: { name: true } },
+          },
+          orderBy: [
               { totalPoints: "desc" },
               { wins: "desc" },
               { draws: "desc" },
@@ -203,6 +238,15 @@ export async function getDashboardData(
               status: "PUBLISHED",
               OR: [{ competitionId }, { competitionId: null }],
             },
+            select: {
+              id: true,
+              title: true,
+              excerpt: true,
+              content: true,
+              publishedAt: true,
+              createdAt: true,
+              type: true,
+            },
             orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
             take: 2,
           })
@@ -214,6 +258,7 @@ export async function getDashboardData(
               startAt: { gte: new Date() },
               deletedAt: null,
             },
+            select: { id: true, title: true, startAt: true, location: true },
             orderBy: { startAt: "asc" },
             take: 2,
           })

@@ -20,7 +20,12 @@ export async function GET() {
       competitionId: competition.id,
       deletedAt: null,
     },
-    include: { school: true },
+    select: {
+      id: true,
+      eslId: true,
+      name: true,
+      school: { select: { shortName: true, logoUrl: true } },
+    },
     orderBy: { name: "asc" },
   });
 

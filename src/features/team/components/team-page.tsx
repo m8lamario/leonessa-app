@@ -399,8 +399,14 @@ function TeamContent({
   );
 }
 
-export function TeamPage({ teamId }: { teamId: string }) {
-  const teamQuery = useTeam(teamId);
+export function TeamPageClient({
+  initialData,
+  teamId,
+}: {
+  initialData?: TeamPageData | null;
+  teamId: string;
+}) {
+  const teamQuery = useTeam(teamId, initialData);
   const applicationMutation = useTeamApplication(teamId);
 
   if (teamQuery.isPending) {

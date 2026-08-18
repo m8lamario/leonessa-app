@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -199,7 +199,7 @@ export function RegisterForm({ schools }: { schools: School[] }) {
           </div>
         </div>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <m.div
             key={step}
             className={styles.step}
             initial={{ opacity: 0, x: 20 }}
@@ -350,7 +350,7 @@ export function RegisterForm({ schools }: { schools: School[] }) {
                 </dl>
               </>
             )}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
         {error && (
           <p className={styles.error} role="alert">

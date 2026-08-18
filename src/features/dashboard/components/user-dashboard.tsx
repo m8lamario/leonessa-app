@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { m } from "framer-motion";
 import { Bell } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   EmailVerificationBanner,
@@ -34,13 +35,22 @@ export function UserDashboard({
   data,
   verificationStatus,
 }: UserDashboardProps) {
+  const router = useRouter();
   const [showFullRanking, setShowFullRanking] = useState(false);
   const { featuredMatch, missions, news, events, profile, school, schoolRanking } = data;
   const visibleSchoolRanking = showFullRanking ? schoolRanking : schoolRanking.slice(0, 5);
 
+  useEffect(() => {
+    router.prefetch("/ranking");
+    router.prefetch("/profile");
+    if (school.teamId) {
+      router.prefetch(`/team/${school.teamId}`);
+    }
+  }, [router, school.teamId]);
+
   return (
     <PageContainer className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
-      <motion.header
+      <m.header
         className={styles.brandHeader}
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -59,9 +69,9 @@ export function UserDashboard({
             {userInitials}
           </Link>
         </div>
-      </motion.header>
+      </m.header>
       {verificationStatus && <EmailVerificationBanner initialStatus={verificationStatus} />}
-      <motion.header
+      <m.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -101,17 +111,20 @@ export function UserDashboard({
           <a className={styles.primaryAction} href="#featured-match">
             Segui partita
           </a>
-          <a
-            className={styles.secondaryAction}
-            href={school.teamId ? `/team/${school.teamId}` : "#school-ranking"}
-          >
-            {school.teamId ? "Vedi squadra" : "Vedi scuola"}
-          </a>
+          {school.teamId ? (
+            <Link className={styles.secondaryAction} href={`/team/${school.teamId}`}>
+              Vedi squadra
+            </Link>
+          ) : (
+            <a className={styles.secondaryAction} href="#school-ranking">
+              Vedi scuola
+            </a>
+          )}
         </div>
-      </motion.header>
+      </m.header>
 
       <div className={styles.content}>
-        <motion.section
+        <m.section
           id="featured-match"
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
@@ -152,9 +165,9 @@ export function UserDashboard({
               <p className={styles.emptyState}>Il calendario non contiene partite disponibili.</p>
             </article>
           )}
-        </motion.section>
+        </m.section>
 
-        <motion.section
+        <m.section
           id="missions"
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
@@ -219,9 +232,9 @@ export function UserDashboard({
               })
             )}
           </div>
-        </motion.section>
+        </m.section>
 
-        <motion.section
+        <m.section
           id="school-ranking"
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
@@ -262,13 +275,10 @@ export function UserDashboard({
               ))}
             </ol>
           )}
-        </motion.section>
+        </m.section>
 
-        <motion.section
+        <section
           className={styles.section}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...revealTransition, delay: 0.24 }}
           aria-labelledby="news-title"
         >
           <div className={styles.sectionHeading}>
@@ -302,13 +312,10 @@ export function UserDashboard({
               ))}
             </div>
           )}
-        </motion.section>
+        </section>
 
-        <motion.section
+        <section
           className={styles.section}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...revealTransition, delay: 0.3 }}
           aria-labelledby="events-title"
         >
           <div className={styles.sectionHeading}>
@@ -332,13 +339,10 @@ export function UserDashboard({
               ))}
             </div>
           )}
-        </motion.section>
+        </section>
 
-        <motion.section
+        <section
           className={`${styles.section} ${styles.profileSection}`}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...revealTransition, delay: 0.36 }}
           aria-labelledby="quick-profile-title"
         >
           <div className={styles.quickProfile}>
@@ -364,7 +368,7 @@ export function UserDashboard({
               <strong>{profile.totalLp.toLocaleString("it-IT")}</strong>
             </div>
           </div>
-        </motion.section>
+        </section>
       </div>
     </PageContainer>
   );

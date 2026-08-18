@@ -1,10 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { AnimatePresence, m } from "framer-motion";
+import { useState } from "react";
 
 import { PageContainer } from "@/shared/components";
-import { Skeleton, SkeletonCard, SkeletonList } from "@/shared/components/skeleton";
 import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import { createRankingMock } from "../mock/ranking.mock";
@@ -40,38 +39,8 @@ const missionStatusLabels = {
   CLAIMED: "Riscossa",
 } as const;
 
-const MOCK_LOADING_DELAY = 400;
-
 function formatPoints(points: number) {
   return points.toLocaleString("it-IT");
-}
-
-function RankingSkeleton() {
-  return (
-    <PageContainer aria-busy="true" className={styles.ranking}>
-      <header className={styles.hero}>
-        <Skeleton height="0.75rem" width="28%" />
-        <Skeleton height="3.8rem" style={{ marginTop: "12px" }} width="46%" />
-        <Skeleton height="0.9rem" style={{ marginTop: "12px" }} width="88%" />
-        <Skeleton height="0.9rem" style={{ marginTop: "8px" }} width="66%" />
-      </header>
-      <div className={styles.tabs}>
-        {Array.from({ length: 4 }, (_, index) => (
-          <Skeleton height="42px" key={index} />
-        ))}
-      </div>
-      <section className={styles.panel}>
-        <Skeleton height="0.75rem" width="28%" />
-        <Skeleton height="2.2rem" style={{ marginTop: "8px" }} width="54%" />
-        <div className={styles.segmentedControl}>
-          <Skeleton height="42px" />
-          <Skeleton height="42px" />
-        </div>
-        <SkeletonList items={5} />
-        <SkeletonCard className={styles.personalRank} lines={1} />
-      </section>
-    </PageContainer>
-  );
 }
 
 function ProgressBar({
@@ -249,20 +218,9 @@ export function RankingDashboard({
 }: RankingDashboardProps) {
   const [activeTab, setActiveTab] = useState<RankingTab>("leaderboards");
   const [activeLeaderboard, setActiveLeaderboard] = useState<LeaderboardTab>("users");
-  const [isLoading, setIsLoading] = useState(true);
   const ranking = createRankingMock({ userName, userInitials, schoolName, schoolShortName });
   const nextLevelLP = 1750;
   const lpToNextLevel = nextLevelLP - ranking.currentUser.lp;
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => setIsLoading(false), MOCK_LOADING_DELAY);
-
-    return () => window.clearTimeout(timeoutId);
-  }, []);
-
-  if (isLoading) {
-    return <RankingSkeleton />;
-  }
 
   return (
     <PageContainer className={`${styles.ranking} ${skeletonStyles.fadeIn}`}>
@@ -301,7 +259,7 @@ export function RankingDashboard({
         role="tabpanel"
       >
         <AnimatePresence initial={false} mode="wait">
-          <motion.div
+          <m.div
             key={activeTab}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -477,7 +435,7 @@ export function RankingDashboard({
                 </dl>
               </div>
             )}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </section>
     </PageContainer>

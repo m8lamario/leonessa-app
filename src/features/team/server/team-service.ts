@@ -133,6 +133,15 @@ export async function getTeamPageData(
   ] = await Promise.all([
     prisma.schoolRanking.findMany({
       where: { competitionId: team.competition.id },
+      select: {
+        id: true,
+        schoolId: true,
+        totalPoints: true,
+        matchesPlayed: true,
+        wins: true,
+        draws: true,
+        losses: true,
+      },
       orderBy: [{ totalPoints: "desc" }, { wins: "desc" }, { draws: "desc" }, { losses: "asc" }],
     }),
     prisma.match.findMany({

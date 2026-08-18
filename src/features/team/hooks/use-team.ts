@@ -7,11 +7,15 @@ import type { TeamPageData } from "../types";
 
 export const teamQueryKey = (teamId: string) => ["team", teamId] as const;
 
-export function useTeam(teamId: string): UseQueryResult<TeamPageData, Error> {
+export function useTeam(
+  teamId: string,
+  initialData?: TeamPageData | null,
+): UseQueryResult<TeamPageData, Error> {
   return useQuery<TeamPageData, Error>({
     queryKey: teamQueryKey(teamId),
     queryFn: () => teamApiService.getTeam(teamId),
-    enabled: Boolean(teamId),
+    enabled: Boolean(teamId) && initialData !== null,
+    initialData: initialData ?? undefined,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     retry: 2,

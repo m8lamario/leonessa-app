@@ -23,11 +23,22 @@ export async function requireUser() {
   const session = await requireSession();
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: {
+    select: {
+      id: true,
+      deletedAt: true,
+      email: true,
+      emailVerified: true,
+      instagram: true,
+      name: true,
+      surname: true,
+      schoolId: true,
       roles: {
         where: { revokedAt: null },
+        select: { role: true, isPrimary: true },
       },
-      school: true,
+      school: {
+        select: { id: true, name: true, shortName: true, logoUrl: true },
+      },
     },
   });
 

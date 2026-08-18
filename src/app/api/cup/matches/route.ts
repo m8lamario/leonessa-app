@@ -19,10 +19,30 @@ export async function GET() {
       competitionId: competition.id,
       deletedAt: null,
     },
-    include: {
-      competition: true,
-      homeTeam: { include: { school: true } },
-      awayTeam: { include: { school: true } },
+    select: {
+      id: true,
+      startAt: true,
+      status: true,
+      homeScore: true,
+      awayScore: true,
+      venue: true,
+      competition: { select: { id: true, slug: true, name: true } },
+      homeTeam: {
+        select: {
+          id: true,
+          eslId: true,
+          name: true,
+          school: { select: { shortName: true, logoUrl: true } },
+        },
+      },
+      awayTeam: {
+        select: {
+          id: true,
+          eslId: true,
+          name: true,
+          school: { select: { shortName: true, logoUrl: true } },
+        },
+      },
     },
     orderBy: { startAt: "asc" },
   });

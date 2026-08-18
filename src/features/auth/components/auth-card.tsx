@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Image from "next/image";
 
 import styles from "../auth.module.css";
@@ -11,7 +11,7 @@ export function AuthCard({ title, children }: { title: string; children: React.R
 
   return (
     <main className={`${styles.page} ${keyboardFocusClassName(keyboardOpen)}`}>
-      <motion.section
+      <m.section
         className={styles.content}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -33,7 +33,7 @@ export function AuthCard({ title, children }: { title: string; children: React.R
         </header>
         <h2 className={styles.formTitle}>{title}</h2>
         {children}
-      </motion.section>
+      </m.section>
     </main>
   );
 }

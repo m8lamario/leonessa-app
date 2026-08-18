@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Award, ClipboardList, Medal, Rocket, type LucideIcon } from "lucide-react";
 import { type FormEvent, useState } from "react";
 
@@ -152,7 +152,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
 
   return (
     <PageContainer className={styles.profile}>
-      <motion.header
+      <m.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -190,10 +190,10 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
             </strong>
           </div>
         </div>
-      </motion.header>
+      </m.header>
 
       <div className={styles.content}>
-        <motion.section
+        <m.section
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -220,9 +220,9 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
             <strong>{profileMock.schoolName}</strong>
             <span>#{profileMock.schoolRank} nel Ranking Scuole</span>
           </article>
-        </motion.section>
+        </m.section>
 
-        <motion.section
+        <m.section
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -255,7 +255,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
                     {isOpen ? "Chiudi candidatura" : "Candidati"}
                   </button>
                   {isOpen && (
-                    <motion.form
+                    <m.form
                       animate={{ opacity: 1, scale: 1 }}
                       className={styles.applicationForm}
                       initial={{ opacity: 0, scale: 0.98 }}
@@ -310,19 +310,16 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
                       <button className={styles.submitButton} type="submit">
                         Invia candidatura
                       </button>
-                    </motion.form>
+                    </m.form>
                   )}
                 </article>
               );
             })}
           </div>
-        </motion.section>
+        </m.section>
 
-        <motion.section
+        <section
           className={styles.section}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...reveal, delay: 0.18 }}
           aria-labelledby="applications-title"
         >
           <div className={styles.sectionHeading}>
@@ -345,13 +342,10 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
               </article>
             ))}
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section
+        <section
           className={styles.settings}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...reveal, delay: 0.24 }}
           aria-labelledby="settings-title"
         >
           <p className={styles.kicker}>In secondo piano</p>
@@ -381,7 +375,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
               </button>
             </div>
             {passwordFormOpen && (
-              <motion.form
+              <m.form
                 animate={{ opacity: 1, y: 0 }}
                 className={styles.passwordForm}
                 initial={{ opacity: 0, y: -8 }}
@@ -415,7 +409,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
                 <button className={styles.submitButton} disabled={passwordPending} type="submit">
                   {passwordPending ? "Aggiornamento..." : "Aggiorna password"}
                 </button>
-              </motion.form>
+              </m.form>
             )}
           </div>
           <div className={styles.settingGroup}>
@@ -469,7 +463,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
           >
             Esci dall&apos;account
           </button>
-        </motion.section>
+        </section>
       </div>
     </PageContainer>
   );
