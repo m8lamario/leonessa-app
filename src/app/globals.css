@@ -38,11 +38,17 @@
 html,
 body {
   min-height: 100%;
-  background: var(--color-background-deep);
+  background: var(--color-background);
+}
+
+html {
+  min-height: 100dvh;
 }
 
 body {
+  min-height: 100dvh;
   margin: 0;
+  overflow-x: hidden;
   background:
     radial-gradient(ellipse at 50% -20%, #305cff33, transparent 48%), var(--color-background);
   color: var(--color-text);

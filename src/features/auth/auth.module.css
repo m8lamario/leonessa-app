@@ -2,7 +2,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 100svh;
+  min-height: 100dvh;
   padding: max(48px, calc(env(safe-area-inset-top) + 32px))
     max(28px, calc(env(safe-area-inset-right) + 24px))
     max(40px, calc(env(safe-area-inset-bottom) + 28px))
@@ -16,7 +16,7 @@
   position: relative;
   display: flex;
   width: min(100%, 440px);
-  min-height: calc(100svh - 136px);
+  min-height: calc(100dvh - 136px);
   flex-direction: column;
   margin: auto;
 }
@@ -458,13 +458,15 @@
 }
 
 .keyboardFocusMode {
+  min-height: 100dvh;
   overflow-y: auto;
+  padding-bottom: 0;
   scroll-behavior: smooth;
   transition: padding 200ms ease;
 }
 
 .keyboardFocusMode .content {
-  min-height: auto;
+  min-height: 100dvh;
   justify-content: flex-start;
   transition: min-height 200ms ease;
 }
@@ -551,6 +553,6 @@
   }
 
   .content {
-    min-height: calc(100svh - 176px);
+    min-height: calc(100dvh - 176px);
   }
 }
