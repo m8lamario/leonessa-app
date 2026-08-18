@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
+import Link from "next/link";
+
+import { Button } from "@/shared/components/ui";
 
 import styles from "../auth.module.css";
 import { AuthModeSwitch } from "./auth-mode-switch";
@@ -40,7 +43,23 @@ export function LoginForm({ callbackUrl = "/dashboard" }: { callbackUrl?: string
 
   return (
     <>
-      <AuthModeSwitch activeMode="login" />
+      <Button
+        className={`${styles.fullWidth} ${styles.googleButton}`}
+        disabled={pending}
+        type="button"
+        variant="secondary"
+        onClick={() => signIn("google", { callbackUrl })}
+      >
+        <span className={styles.googleMark} aria-hidden="true">
+          G
+        </span>
+        Continua con Google
+      </Button>
+      <div className={styles.divider} aria-hidden="true">
+        <span />
+        oppure
+        <span />
+      </div>
       <form className={`${styles.form} ${styles.loginForm}`} onSubmit={handleSubmit}>
         <label>
           Email
@@ -50,18 +69,22 @@ export function LoginForm({ callbackUrl = "/dashboard" }: { callbackUrl?: string
           Password
           <input name="password" type="password" autoComplete="current-password" required />
         </label>
-        {error && <p className={styles.error}>{error}</p>}
-        <button className={styles.primaryButton} disabled={pending} type="submit">
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
+        <Button className={styles.fullWidth} disabled={pending} type="submit">
           {pending ? "Accesso in corso..." : "Accedi"}
-        </button>
+        </Button>
       </form>
-      <button
-        className={styles.secondaryButton}
-        type="button"
-        onClick={() => signIn("google", { callbackUrl })}
-      >
-        Google
-      </button>
+      <Link className={styles.forgotPassword} href="/forgot-password">
+        Password dimenticata?
+      </Link>
+      <footer className={styles.authFooter}>
+        <p>Non hai un account?</p>
+        <AuthModeSwitch activeMode="login" />
+      </footer>
     </>
   );
 }

@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## 11 - MVP Features v1.0
-
-
-
-\---
+## 11 - MVP Features v1.0
 
 
 
-\# Obiettivo del Documento
+---
+
+
+
+# Obiettivo del Documento
 
 
 
@@ -20,13 +20,13 @@ L'MVP deve essere:
 
 
 
-\- utile
+- utile
 
-\- utilizzabile
+- utilizzabile
 
-\- veloce da sviluppare
+- veloce da sviluppare
 
-\- facile da testare
+- facile da testare
 
 
 
@@ -34,11 +34,11 @@ Non deve essere perfetto.
 
 
 
-\---
+---
 
 
 
-\# Regola Fondamentale
+# Regola Fondamentale
 
 
 
@@ -46,11 +46,11 @@ Se una funzionalità non aiuta direttamente a:
 
 
 
-\- seguire il torneo
+- seguire il torneo
 
-\- gestire lo staff
+- gestire lo staff
 
-\- aumentare la partecipazione
+- aumentare la partecipazione
 
 
 
@@ -58,11 +58,11 @@ allora NON entra nella V1.
 
 
 
-\---
+---
 
 
 
-\# Obiettivo della V1
+# Obiettivo della V1
 
 
 
@@ -70,13 +70,13 @@ Permettere a:
 
 
 
-\- spettatori
+- spettatori
 
-\- giocatori
+- giocatori
 
-\- staff
+- staff
 
-\- organizzatori
+- organizzatori
 
 
 
@@ -84,39 +84,15 @@ di utilizzare la Leonessa App durante il torneo.
 
 
 
-\---
+---
 
 
 
-\# Utenti Supportati
+# Utenti Supportati
 
 
 
-\## Utente Base
-
-
-
-Può:
-
-
-
-\- registrarsi
-
-\- seguire il torneo
-
-\- vedere classifiche
-
-\- vedere partite
-
-\- ricevere notifiche
-
-
-
-\---
-
-
-
-\## Giocatore
+## Utente Base
 
 
 
@@ -124,41 +100,23 @@ Può:
 
 
 
-\- vedere la propria squadra
+- registrarsi
 
-\- vedere il calendario
+- seguire il torneo
 
-\- ricevere comunicazioni
+- vedere classifiche
 
+- vedere partite
 
-
-\---
-
-
-
-\## Staff
+- ricevere notifiche
 
 
 
-Può:
+---
 
 
 
-\- vedere i propri turni
-
-\- confermare presenza
-
-\- fare check-in
-
-\- accumulare punti staff
-
-
-
-\---
-
-
-
-\## Organizzatore
+## Giocatore
 
 
 
@@ -166,31 +124,73 @@ Può:
 
 
 
-\- gestire staff
+- vedere la propria squadra
 
-\- creare turni
+- vedere il calendario
 
-\- gestire competizione
-
-\- inviare comunicazioni
+- ricevere comunicazioni
 
 
 
-\---
+---
 
 
 
-\# Modulo 1
-
-\# Autenticazione
+## Staff
 
 
 
-\## Incluso
+Può:
 
 
 
-\### Login Google
+- vedere i propri turni
+
+- confermare presenza
+
+- fare check-in
+
+- accumulare punti staff
+
+
+
+---
+
+
+
+## Organizzatore
+
+
+
+Può:
+
+
+
+- gestire staff
+
+- creare turni
+
+- gestire competizione
+
+- inviare comunicazioni
+
+
+
+---
+
+
+
+# Modulo 1
+
+# Autenticazione
+
+
+
+## Incluso
+
+
+
+### Login Google
 
 
 
@@ -198,11 +198,11 @@ Prioritario.
 
 
 
-\---
+---
 
 
 
-\### Login Email
+### Login Email
 
 
 
@@ -210,11 +210,11 @@ Secondario.
 
 
 
-\---
+---
 
 
 
-\### Recupero Password
+### Recupero Password
 
 
 
@@ -222,11 +222,11 @@ Base.
 
 
 
-\---
+---
 
 
 
-\### Logout
+### Logout
 
 
 
@@ -234,11 +234,11 @@ Completo.
 
 
 
-\---
+---
 
 
 
-\### Onboarding
+### Onboarding
 
 
 
@@ -246,81 +246,81 @@ Per gli utenti che non hanno ancora completato il profilo:
 
 
 
-\- scuola
+- scuola
 
-\- nome e cognome
+- nome e cognome
 
-\- Instagram facoltativo
-
-
-
-\---
+- Instagram facoltativo
 
 
 
-\## Escluso
+---
 
 
 
-\- Login Apple
-
-\- Login TikTok
-
-\- Login Instagram
+## Escluso
 
 
 
-\---
+- Login Apple
+
+- Login TikTok
+
+- Login Instagram
 
 
 
-\# Modulo 2
-
-\# Profilo
+---
 
 
 
-\## Incluso
+# Modulo 2
+
+# Profilo
 
 
 
-\### Dati Profilo
+## Incluso
 
 
 
-\- Nome
-
-\- Cognome
-
-\- Avatar
-
-\- Scuola
-
-\- Instagram
+### Dati Profilo
 
 
 
-\---
+- Nome
+
+- Cognome
+
+- Avatar
+
+- Scuola
+
+- Instagram
 
 
 
-\### Statistiche
+---
 
 
 
-\- LP
-
-\- SP
-
-\- Livello
+### Statistiche
 
 
 
-\---
+- LP
+
+- SP
+
+- Livello
 
 
 
-\### Badge
+---
+
+
+
+### Badge
 
 
 
@@ -328,47 +328,35 @@ Visualizzazione.
 
 
 
-\---
+---
 
 
 
-\## Escluso
+## Escluso
 
 
 
-\- Personalizzazione avanzata
+- Personalizzazione avanzata
 
-\- Temi profilo
-
-
-
-\---
+- Temi profilo
 
 
 
-\# Modulo 3
-
-\# Competizione
+---
 
 
 
-\## Incluso
+# Modulo 3
+
+# Competizione
 
 
 
-\### Competizioni
+## Incluso
 
 
 
-Visualizzazione.
-
-
-
-\---
-
-
-
-\### Squadre
+### Competizioni
 
 
 
@@ -376,11 +364,23 @@ Visualizzazione.
 
 
 
-\---
+---
 
 
 
-\### Calendario
+### Squadre
+
+
+
+Visualizzazione.
+
+
+
+---
+
+
+
+### Calendario
 
 
 
@@ -388,11 +388,11 @@ Completo.
 
 
 
-\---
+---
 
 
 
-\### Match Center
+### Match Center
 
 
 
@@ -400,11 +400,11 @@ Visualizzazione partita.
 
 
 
-\---
+---
 
 
 
-\### Classifiche
+### Classifiche
 
 
 
@@ -412,11 +412,11 @@ Aggiornate.
 
 
 
-\---
+---
 
 
 
-\### Risultati
+### Risultati
 
 
 
@@ -424,61 +424,61 @@ Storico.
 
 
 
-\---
+---
 
 
 
-\## Escluso
+## Escluso
 
 
 
-\- Live streaming
+- Live streaming
 
-\- Statistiche avanzate
+- Statistiche avanzate
 
-\- Analytics partita
-
-
-
-\---
+- Analytics partita
 
 
 
-\# Modulo 4
-
-\# Staff
+---
 
 
 
-\## Incluso
+# Modulo 4
+
+# Staff
 
 
 
-\### Ruoli Staff
+## Incluso
 
 
 
-\- Accoglienza
-
-\- Sicurezza
-
-\- Social
-
-\- Raccattapalle
-
-\- Logistica
-
-\- Spogliatoi
-
-\- Statistiche
+### Ruoli Staff
 
 
 
-\---
+- Accoglienza
+
+- Sicurezza
+
+- Social
+
+- Raccattapalle
+
+- Logistica
+
+- Spogliatoi
+
+- Statistiche
 
 
 
-\### Turni
+---
+
+
+
+### Turni
 
 
 
@@ -486,23 +486,11 @@ Visualizzazione.
 
 
 
-\---
+---
 
 
 
-\### Conferma Presenza
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Check-In QR
+### Conferma Presenza
 
 
 
@@ -510,11 +498,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Storico Turni
+### Check-In QR
 
 
 
@@ -522,35 +510,47 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\## Escluso
+### Storico Turni
 
 
 
-\- Pianificazione automatica
-
-\- AI assegnazione turni
+Sì.
 
 
 
-\---
+---
 
 
 
-\# Modulo 5
-
-\# Gamification
+## Escluso
 
 
 
-\## Incluso
+- Pianificazione automatica
+
+- AI assegnazione turni
 
 
 
-\### LP
+---
+
+
+
+# Modulo 5
+
+# Gamification
+
+
+
+## Incluso
+
+
+
+### LP
 
 
 
@@ -558,11 +558,11 @@ Leonessa Points.
 
 
 
-\---
+---
 
 
 
-\### SP
+### SP
 
 
 
@@ -570,23 +570,11 @@ Staff Points.
 
 
 
-\---
+---
 
 
 
-\### Ranking Utenti
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Ranking Staff
+### Ranking Utenti
 
 
 
@@ -594,11 +582,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Ranking Scuole
+### Ranking Staff
 
 
 
@@ -606,11 +594,23 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Missioni
+### Ranking Scuole
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Missioni
 
 
 
@@ -618,49 +618,37 @@ Solo semplici.
 
 
 
-\---
+---
 
 
 
-\## Escluso
+## Escluso
 
 
 
-\- Reward Store
+- Reward Store
 
-\- Marketplace
+- Marketplace
 
-\- Economia avanzata
-
-
-
-\---
+- Economia avanzata
 
 
 
-\# Modulo 6
-
-\# Notifiche
+---
 
 
 
-\## Incluso
+# Modulo 6
+
+# Notifiche
 
 
 
-\### In-App
+## Incluso
 
 
 
-Sì.
-
-
-
-\---
-
-
-
-\### Push
+### In-App
 
 
 
@@ -668,47 +656,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Comunicazioni Organizzatori
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\## Escluso
-
-
-
-\- Chat
-
-\- Messaggi privati
-
-
-
-\---
-
-
-
-\# Modulo 7
-
-\# Home
-
-
-
-\## Incluso
-
-
-
-\### Hero Evento
+### Push
 
 
 
@@ -716,23 +668,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Match Principale
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Classifica Rapida
+### Comunicazioni Organizzatori
 
 
 
@@ -740,45 +680,35 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Missioni
+## Escluso
 
 
 
-Sì.
+- Chat
+
+- Messaggi privati
 
 
 
-\---
+---
 
 
 
-\### News
+# Modulo 7
+
+# Home
 
 
 
-Sì.
+## Incluso
 
 
 
-\---
-
-
-
-\# Modulo 8
-
-\# Admin Panel
-
-
-
-\## Incluso
-
-
-
-\### Gestione Utenti
+### Hero Evento
 
 
 
@@ -786,23 +716,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Gestione Staff
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Gestione Match
+### Match Principale
 
 
 
@@ -810,23 +728,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Gestione Competizione
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Gestione Missioni
+### Classifica Rapida
 
 
 
@@ -834,35 +740,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\## Escluso
-
-
-
-\- CMS avanzato
-
-\- Analytics avanzate
-
-
-
-\---
-
-
-
-\# Modulo 9
-
-\# News
-
-
-
-\## Incluso
-
-
-
-\### Articoli
+### Missioni
 
 
 
@@ -870,23 +752,11 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\### Comunicati
-
-
-
-Sì.
-
-
-
-\---
-
-
-
-\### Notizie Partite
+### News
 
 
 
@@ -894,29 +764,159 @@ Sì.
 
 
 
-\---
+---
 
 
 
-\## Escluso
+# Modulo 8
+
+# Admin Panel
 
 
 
-\- Commenti
-
-\- Reazioni
+## Incluso
 
 
 
-\---
+### Gestione Utenti
 
 
 
-\# Funzionalità Rinviate
+Sì.
 
 
 
-\## Fanta Leonessa
+---
+
+
+
+### Gestione Staff
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Gestione Match
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Gestione Competizione
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Gestione Missioni
+
+
+
+Sì.
+
+
+
+---
+
+
+
+## Escluso
+
+
+
+- CMS avanzato
+
+- Analytics avanzate
+
+
+
+---
+
+
+
+# Modulo 9
+
+# News
+
+
+
+## Incluso
+
+
+
+### Articoli
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Comunicati
+
+
+
+Sì.
+
+
+
+---
+
+
+
+### Notizie Partite
+
+
+
+Sì.
+
+
+
+---
+
+
+
+## Escluso
+
+
+
+- Commenti
+
+- Reazioni
+
+
+
+---
+
+
+
+# Funzionalità Rinviate
+
+
+
+## Fanta Leonessa
 
 
 
@@ -928,11 +928,11 @@ Richiede molto sviluppo.
 
 
 
-\---
+---
 
 
 
-\## Reward Store
+## Reward Store
 
 
 
@@ -944,11 +944,11 @@ Prima validare LP e SP.
 
 
 
-\---
+---
 
 
 
-\## Sponsor Marketplace
+## Sponsor Marketplace
 
 
 
@@ -960,11 +960,11 @@ Serve una base utenti.
 
 
 
-\---
+---
 
 
 
-\## Ticketing Proprietario
+## Ticketing Proprietario
 
 
 
@@ -976,11 +976,11 @@ Altissima complessità.
 
 
 
-\---
+---
 
 
 
-\## AI Assistant
+## AI Assistant
 
 
 
@@ -992,11 +992,11 @@ Non risolve problemi immediati.
 
 
 
-\---
+---
 
 
 
-\## Community Feed
+## Community Feed
 
 
 
@@ -1008,11 +1008,11 @@ Rischio bassa adozione.
 
 
 
-\---
+---
 
 
 
-\## Chat
+## Chat
 
 
 
@@ -1024,15 +1024,15 @@ Costosa e difficile da moderare.
 
 
 
-\---
+---
 
 
 
-\# KPI Successo MVP
+# KPI Successo MVP
 
 
 
-\## Community
+## Community
 
 
 
@@ -1048,11 +1048,11 @@ Target:
 
 
 
-\---
+---
 
 
 
-\## Staff
+## Staff
 
 
 
@@ -1068,11 +1068,11 @@ Target:
 
 
 
-\---
+---
 
 
 
-\## Utilizzo
+## Utilizzo
 
 
 
@@ -1088,11 +1088,11 @@ Target:
 
 
 
-\---
+---
 
 
 
-\## Retention
+## Retention
 
 
 
@@ -1108,11 +1108,11 @@ Target:
 
 
 
-\---
+---
 
 
 
-\# Definizione di MVP Completato
+# Definizione di MVP Completato
 
 
 
@@ -1120,31 +1120,31 @@ L'MVP è considerato completato quando:
 
 
 
-\- gli utenti possono registrarsi;
+- gli utenti possono registrarsi;
 
-\- le scuole sono presenti;
+- le scuole sono presenti;
 
-\- le squadre sono presenti;
+- le squadre sono presenti;
 
-\- il calendario è operativo;
+- il calendario è operativo;
 
-\- i match sono consultabili;
+- i match sono consultabili;
 
-\- lo staff utilizza i turni;
+- lo staff utilizza i turni;
 
-\- il check-in funziona;
+- il check-in funziona;
 
-\- LP e SP funzionano;
+- LP e SP funzionano;
 
-\- le notifiche funzionano.
-
-
-
-\---
+- le notifiche funzionano.
 
 
 
-\# Funzionalità da Costruire Subito Dopo il Lancio
+---
+
+
+
+# Funzionalità da Costruire Subito Dopo il Lancio
 
 
 
@@ -1152,27 +1152,27 @@ Ordine consigliato:
 
 
 
-1\. Fanta Leonessa
+1. Fanta Leonessa
 
-2\. Badge
+2. Badge
 
-3\. Reward Store
+3. Reward Store
 
-4\. School Challenges
+4. School Challenges
 
-5\. Sponsor Rewards
+5. Sponsor Rewards
 
-6\. Community Feed
+6. Community Feed
 
-7\. AI Assistant
-
-
-
-\---
+7. AI Assistant
 
 
 
-\# Regola Finale
+---
+
+
+
+# Regola Finale
 
 
 

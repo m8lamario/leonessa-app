@@ -3,6 +3,7 @@ import { Bebas_Neue, Inter } from "next/font/google";
 
 import { AuthProvider } from "@/providers/auth-provider";
 import { QueryProvider } from "@/providers/query-provider";
+import { DeepLinkListener } from "@/features/auth/components/deep-link-listener";
 
 import "./globals.css";
 
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <path className="patternGlow" d="M1000 600 L500 1100" />
         </svg>
         <AuthProvider>
+          <DeepLinkListener />
           <QueryProvider>{children}</QueryProvider>
         </AuthProvider>
       </body>

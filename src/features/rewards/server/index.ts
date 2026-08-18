@@ -1,5 +1,6 @@
 export {
   awardLP,
+  awardLPInTransaction,
   awardPoints,
   awardSSP,
   getSchoolSupportPoints,

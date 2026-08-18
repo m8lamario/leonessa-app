@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Design System v1.0
-
-
-
-\---
+## Design System v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -24,99 +24,99 @@ Benefici:
 
 
 
-\- Consistenza visiva
+- Consistenza visiva
 
-\- Sviluppo più rapido
+- Sviluppo più rapido
 
-\- Manutenzione semplice
+- Manutenzione semplice
 
-\- Migliore UX
-
-
-
-\---
+- Migliore UX
 
 
 
-\# 2. Design Tokens
+---
 
 
 
-\## Colors
+# 2. Design Tokens
 
 
 
-\### Primary
+## Colors
 
 
 
-```css
-
-\--color-primary: #0D1B60;
-
-\--color-primary-hover: #162983;
-
-\--color-primary-light: #305CFF;
-
-```
-
-
-
-\### Background
+### Primary
 
 
 
 ```css
 
-\--bg-primary: #071034;
+--color-primary: #0D1B60;
 
-\--bg-secondary: #0F173F;
+--color-primary-hover: #162983;
 
-\--bg-card: #131E52;
+--color-primary-light: #305CFF;
 
 ```
 
 
 
-\### Text
+### Background
 
 
 
 ```css
 
-\--text-primary: #FFFFFF;
+--bg-primary: #071034;
 
-\--text-secondary: #C6CCDA;
+--bg-secondary: #0F173F;
 
-\--text-muted: #8D95A6;
+--bg-card: #131E52;
 
 ```
 
 
 
-\### Status
+### Text
 
 
 
 ```css
 
-\--success: #16A34A;
+--text-primary: #FFFFFF;
 
-\--warning: #F59E0B;
+--text-secondary: #C6CCDA;
 
-\--danger: #DC2626;
-
-\--info: #2563EB;
+--text-muted: #8D95A6;
 
 ```
 
 
 
-\---
+### Status
 
 
 
-\# 3. Spacing
+```css
+
+--success: #16A34A;
+
+--warning: #F59E0B;
+
+--danger: #DC2626;
+
+--info: #2563EB;
+
+```
+
+
+
+---
+
+
+
+# 3. Spacing
 
 
 
@@ -142,11 +142,11 @@ Benefici:
 
 
 
-\---
+---
 
 
 
-\# 4. Border Radius
+# 4. Border Radius
 
 
 
@@ -164,15 +164,15 @@ xl: 32px
 
 
 
-\---
+---
 
 
 
-\# 5. Typography
+# 5. Typography
 
 
 
-\## Display
+## Display
 
 
 
@@ -180,7 +180,7 @@ xl: 32px
 
 
 
-\## H1
+## H1
 
 
 
@@ -188,7 +188,7 @@ xl: 32px
 
 
 
-\## H2
+## H2
 
 
 
@@ -196,7 +196,7 @@ xl: 32px
 
 
 
-\## H3
+## H3
 
 
 
@@ -204,7 +204,7 @@ xl: 32px
 
 
 
-\## Body
+## Body
 
 
 
@@ -212,7 +212,7 @@ xl: 32px
 
 
 
-\## Small
+## Small
 
 
 
@@ -220,15 +220,15 @@ xl: 32px
 
 
 
-\---
+---
 
 
 
-\# 6. Buttons
+# 6. Buttons
 
 
 
-\## Primary Button
+## Primary Button
 
 
 
@@ -236,7 +236,7 @@ Utilizzo:
 
 
 
-\- CTA principali
+- CTA principali
 
 
 
@@ -256,27 +256,11 @@ Riscatta Premio
 
 
 
-\---
+---
 
 
 
-\## Secondary Button
-
-
-
-Utilizzo:
-
-
-
-\- Azioni meno importanti
-
-
-
-\---
-
-
-
-\## Ghost Button
+## Secondary Button
 
 
 
@@ -284,15 +268,15 @@ Utilizzo:
 
 
 
-\- Azioni contestuali
+- Azioni meno importanti
 
 
 
-\---
+---
 
 
 
-\## Icon Button
+## Ghost Button
 
 
 
@@ -300,45 +284,37 @@ Utilizzo:
 
 
 
-\- Menu
-
-\- Azioni rapide
+- Azioni contestuali
 
 
 
-\---
+---
 
 
 
-\# 7. Cards
+## Icon Button
 
 
 
-\## Match Card
+Utilizzo:
 
 
 
-Campi:
+- Menu
+
+- Azioni rapide
 
 
 
-\- Squadra casa
-
-\- Squadra ospite
-
-\- Risultato
-
-\- Data
-
-\- Stato
+---
 
 
 
-\---
+# 7. Cards
 
 
 
-\## School Card
+## Match Card
 
 
 
@@ -346,41 +322,23 @@ Campi:
 
 
 
-\- Logo
+- Squadra casa
 
-\- Nome
+- Squadra ospite
 
-\- Ranking
+- Risultato
 
-\- Punti
+- Data
 
-
-
-\---
+- Stato
 
 
 
-\## Mission Card
+---
 
 
 
-Campi:
-
-
-
-\- Titolo
-
-\- Ricompensa
-
-\- Progresso
-
-
-
-\---
-
-
-
-\## Reward Card
+## School Card
 
 
 
@@ -388,19 +346,21 @@ Campi:
 
 
 
-\- Premio
+- Logo
 
-\- Costo
+- Nome
 
-\- Disponibilità
+- Ranking
 
-
-
-\---
+- Punti
 
 
 
-\## News Card
+---
+
+
+
+## Mission Card
 
 
 
@@ -408,23 +368,63 @@ Campi:
 
 
 
-\- Immagine
+- Titolo
 
-\- Titolo
+- Ricompensa
 
-\- Data
-
-
-
-\---
+- Progresso
 
 
 
-\# 8. Inputs
+---
 
 
 
-\## Text Input
+## Reward Card
+
+
+
+Campi:
+
+
+
+- Premio
+
+- Costo
+
+- Disponibilità
+
+
+
+---
+
+
+
+## News Card
+
+
+
+Campi:
+
+
+
+- Immagine
+
+- Titolo
+
+- Data
+
+
+
+---
+
+
+
+# 8. Inputs
+
+
+
+## Text Input
 
 
 
@@ -432,11 +432,11 @@ Campi standard.
 
 
 
-\---
+---
 
 
 
-\## Search Input
+## Search Input
 
 
 
@@ -444,11 +444,11 @@ Ricerca globale.
 
 
 
-\---
+---
 
 
 
-\## Select
+## Select
 
 
 
@@ -460,11 +460,11 @@ Competizione
 
 
 
-\---
+---
 
 
 
-\## Checkbox
+## Checkbox
 
 
 
@@ -472,11 +472,11 @@ Consensi.
 
 
 
-\---
+---
 
 
 
-\## Toggle
+## Toggle
 
 
 
@@ -484,15 +484,15 @@ Impostazioni.
 
 
 
-\---
+---
 
 
 
-\# 9. Navigation
+# 9. Navigation
 
 
 
-\## Bottom Navigation
+## Bottom Navigation
 
 
 
@@ -512,31 +512,31 @@ Profile
 
 
 
-\---
+---
 
 
 
-\## Top Navigation
+## Top Navigation
 
 
 
-\- Back Button
+- Back Button
 
-\- Titolo
+- Titolo
 
-\- Action Button
-
-
-
-\---
+- Action Button
 
 
 
-\# 10. Feedback Components
+---
 
 
 
-\## Toast
+# 10. Feedback Components
+
+
+
+## Toast
 
 
 
@@ -544,21 +544,21 @@ Tipologie:
 
 
 
-\- Success
+- Success
 
-\- Warning
+- Warning
 
-\- Error
+- Error
 
-\- Info
-
-
-
-\---
+- Info
 
 
 
-\## Modal
+---
+
+
+
+## Modal
 
 
 
@@ -566,11 +566,11 @@ Per azioni importanti.
 
 
 
-\---
+---
 
 
 
-\## Dialog
+## Dialog
 
 
 
@@ -578,11 +578,11 @@ Conferme rapide.
 
 
 
-\---
+---
 
 
 
-\# 11. Skeleton Loading
+# 11. Skeleton Loading
 
 
 
@@ -594,11 +594,11 @@ Mai spinner a schermo vuoto.
 
 
 
-\---
+---
 
 
 
-\# 12. Empty States
+# 12. Empty States
 
 
 
@@ -606,25 +606,25 @@ Ogni sezione deve avere:
 
 
 
-\- Icona
+- Icona
 
-\- Titolo
+- Titolo
 
-\- Descrizione
+- Descrizione
 
-\- CTA
-
-
-
-\---
+- CTA
 
 
 
-\# 13. Ranking Components
+---
 
 
 
-\## Ranking Row
+# 13. Ranking Components
+
+
+
+## Ranking Row
 
 
 
@@ -632,25 +632,25 @@ Campi:
 
 
 
-\- Posizione
+- Posizione
 
-\- Avatar
+- Avatar
 
-\- Nome
+- Nome
 
-\- Punti
-
-
-
-\---
+- Punti
 
 
 
-\# 14. Gamification Components
+---
 
 
 
-\## XP Progress
+# 14. Gamification Components
+
+
+
+## XP Progress
 
 
 
@@ -658,11 +658,11 @@ Barra avanzamento livello.
 
 
 
-\---
+---
 
 
 
-\## Badge Card
+## Badge Card
 
 
 
@@ -670,11 +670,11 @@ Visualizzazione badge.
 
 
 
-\---
+---
 
 
 
-\## Achievement Modal
+## Achievement Modal
 
 
 
@@ -682,15 +682,15 @@ Popup ottenimento badge.
 
 
 
-\---
+---
 
 
 
-\# 15. Match Center Components
+# 15. Match Center Components
 
 
 
-\## Scoreboard
+## Scoreboard
 
 
 
@@ -698,11 +698,11 @@ Elemento principale.
 
 
 
-\---
+---
 
 
 
-\## Timeline
+## Timeline
 
 
 
@@ -716,11 +716,11 @@ MVP
 
 
 
-\---
+---
 
 
 
-\## Statistics Card
+## Statistics Card
 
 
 
@@ -728,11 +728,11 @@ Statistiche partita.
 
 
 
-\---
+---
 
 
 
-\# 16. Accessibility
+# 16. Accessibility
 
 
 
@@ -760,11 +760,11 @@ WCAG AA
 
 
 
-\---
+---
 
 
 
-\# 17. Regola Fondamentale
+# 17. Regola Fondamentale
 
 
 

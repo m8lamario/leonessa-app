@@ -87,6 +87,10 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
     ranking: true,
     missions: true,
   });
+  const [passwordFormOpen, setPasswordFormOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
+  const [passwordPending, setPasswordPending] = useState(false);
   const roleLabel = roleLabels[role] ?? "Supporter";
 
   function submitApplication(
@@ -108,6 +112,42 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
     form.reset();
     setOpenForm(null);
     void hapticSuccess();
+  }
+
+  async function changePassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPasswordError(null);
+    setPasswordMessage(null);
+    setPasswordPending(true);
+
+    const formData = new FormData(event.currentTarget);
+
+    try {
+      const response = await fetch("/api/auth/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: formData.get("currentPassword"),
+          password: formData.get("password"),
+          passwordConfirmation: formData.get("passwordConfirmation"),
+        }),
+      });
+      const body = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        setPasswordError(body.message ?? "Non è stato possibile aggiornare la password.");
+        return;
+      }
+
+      event.currentTarget.reset();
+      setPasswordMessage(body.message ?? "Password aggiornata correttamente.");
+      void hapticSuccess();
+    } catch {
+      setPasswordError("Non è stato possibile aggiornare la password. Riprova.");
+      void hapticError();
+    } finally {
+      setPasswordPending(false);
+    }
   }
 
   return (
@@ -327,10 +367,56 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
             </div>
             <div className={styles.settingRow}>
               <span>Password</span>
-              <button className={styles.textButton} type="button">
-                Aggiorna
+              <button
+                className={styles.textButton}
+                type="button"
+                aria-expanded={passwordFormOpen}
+                onClick={() => {
+                  setPasswordFormOpen((current) => !current);
+                  setPasswordError(null);
+                  setPasswordMessage(null);
+                }}
+              >
+                {passwordFormOpen ? "Chiudi" : "Aggiorna"}
               </button>
             </div>
+            {passwordFormOpen && (
+              <motion.form
+                animate={{ opacity: 1, y: 0 }}
+                className={styles.passwordForm}
+                initial={{ opacity: 0, y: -8 }}
+                onSubmit={changePassword}
+                transition={reveal}
+              >
+                <label className={styles.formLabel}>
+                  Password attuale
+                  <input
+                    name="currentPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                  />
+                </label>
+                <label className={styles.formLabel}>
+                  Nuova password
+                  <input name="password" type="password" autoComplete="new-password" required />
+                </label>
+                <label className={styles.formLabel}>
+                  Conferma nuova password
+                  <input
+                    name="passwordConfirmation"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                  />
+                </label>
+                {passwordError && <p className={styles.formError}>{passwordError}</p>}
+                {passwordMessage && <p className={styles.formSuccess}>{passwordMessage}</p>}
+                <button className={styles.submitButton} disabled={passwordPending} type="submit">
+                  {passwordPending ? "Aggiornamento..." : "Aggiorna password"}
+                </button>
+              </motion.form>
+            )}
           </div>
           <div className={styles.settingGroup}>
             <h3>Notifiche</h3>

@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Database Design v1.0
-
-
-
-\---
+## Database Design v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -20,27 +20,27 @@ Questo documento rappresenta la base per:
 
 
 
-\- Prisma Schema
+- Prisma Schema
 
-\- PostgreSQL
+- PostgreSQL
 
-\- API Design
+- API Design
 
-\- Permissions System
+- Permissions System
 
-\- Business Logic
-
-
-
-\---
+- Business Logic
 
 
 
-\# 2. Principi di Progettazione
+---
 
 
 
-\## Scalabilità
+# 2. Principi di Progettazione
+
+
+
+## Scalabilità
 
 
 
@@ -48,21 +48,21 @@ Il database deve supportare:
 
 
 
-\- più competizioni;
+- più competizioni;
 
-\- più stagioni;
+- più stagioni;
 
-\- nuovi sport;
+- nuovi sport;
 
-\- nuove funzionalità.
-
-
-
-\---
+- nuove funzionalità.
 
 
 
-\## Modularità
+---
+
+
+
+## Modularità
 
 
 
@@ -74,11 +74,11 @@ Esempio:
 
 
 
-\- Community
+- Community
 
-\- Staff
+- Staff
 
-\- Tournament
+- Tournament
 
 
 
@@ -86,11 +86,11 @@ devono poter evolvere separatamente.
 
 
 
-\---
+---
 
 
 
-\## Auditabilità
+## Auditabilità
 
 
 
@@ -98,11 +98,11 @@ Ogni operazione importante deve essere tracciabile.
 
 
 
-\---
+---
 
 
 
-\## Soft Delete
+## Soft Delete
 
 
 
@@ -112,7 +112,7 @@ Per entità importanti utilizzare:
 
 ```sql
 
-deleted\_at
+deleted_at
 
 ```
 
@@ -122,11 +122,11 @@ invece della cancellazione fisica.
 
 
 
-\---
+---
 
 
 
-\# 3. Entity Relationship Overview
+# 3. Entity Relationship Overview
 
 
 
@@ -192,15 +192,15 @@ StaffRole
 
 
 
-\---
+---
 
 
 
-\# 4. Users
+# 4. Users
 
 
 
-\## User
+## User
 
 
 
@@ -208,7 +208,7 @@ Rappresenta un utente registrato.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -240,11 +240,11 @@ Rappresenta un utente registrato.
 
 
 
-\---
+---
 
 
 
-\## Relazioni
+## Relazioni
 
 
 
@@ -270,15 +270,15 @@ User
 
 
 
-\---
+---
 
 
 
-\# 5. Roles
+# 5. Roles
 
 
 
-\## Role
+## Role
 
 
 
@@ -286,7 +286,7 @@ Ruoli applicativi.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -300,11 +300,11 @@ Ruoli applicativi.
 
 
 
-\---
+---
 
 
 
-\### Valori
+### Valori
 
 
 
@@ -316,7 +316,7 @@ PLAYER
 
 STAFF
 
-SCHOOL\_REP
+SCHOOL_REP
 
 ORGANIZER
 
@@ -326,11 +326,11 @@ ADMIN
 
 
 
-\---
+---
 
 
 
-\## UserRole
+## UserRole
 
 
 
@@ -338,7 +338,7 @@ Relazione molti-a-molti.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -358,15 +358,15 @@ Relazione molti-a-molti.
 
 
 
-\---
+---
 
 
 
-\# 6. Schools
+# 6. Schools
 
 
 
-\## School
+## School
 
 
 
@@ -374,7 +374,7 @@ Scuola partecipante.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -398,11 +398,11 @@ Scuola partecipante.
 
 
 
-\---
+---
 
 
 
-\## Relazioni
+## Relazioni
 
 
 
@@ -418,15 +418,15 @@ School
 
 
 
-\---
+---
 
 
 
-\# 7. Competitions
+# 7. Competitions
 
 
 
-\## Competition
+## Competition
 
 
 
@@ -434,7 +434,7 @@ Competizione sportiva.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -458,11 +458,11 @@ Competizione sportiva.
 
 
 
-\---
+---
 
 
 
-\### Esempi
+### Esempi
 
 
 
@@ -476,15 +476,15 @@ Invibe Padel Cup 2027
 
 
 
-\---
+---
 
 
 
-\# 8. Teams
+# 8. Teams
 
 
 
-\## Team
+## Team
 
 
 
@@ -492,7 +492,7 @@ Squadra partecipante.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -510,11 +510,11 @@ Squadra partecipante.
 
 
 
-\---
+---
 
 
 
-\## Relazioni
+## Relazioni
 
 
 
@@ -534,11 +534,11 @@ Team
 
 
 
-\---
+---
 
 
 
-\## TeamMember
+## TeamMember
 
 
 
@@ -546,7 +546,7 @@ Associazione utente-squadra.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -566,11 +566,11 @@ Associazione utente-squadra.
 
 
 
-\---
+---
 
 
 
-\### Valori ruolo
+### Valori ruolo
 
 
 
@@ -582,21 +582,21 @@ COACH
 
 MANAGER
 
-SOCIAL\_MANAGER
+SOCIAL_MANAGER
 
 ```
 
 
 
-\---
+---
 
 
 
-\# 9. Matches
+# 9. Matches
 
 
 
-\## Match
+## Match
 
 
 
@@ -604,7 +604,7 @@ Partita.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -632,11 +632,11 @@ Partita.
 
 
 
-\---
+---
 
 
 
-\### Stati
+### Stati
 
 
 
@@ -654,11 +654,11 @@ CANCELLED
 
 
 
-\---
+---
 
 
 
-\## MatchEvent
+## MatchEvent
 
 
 
@@ -666,7 +666,7 @@ Evento partita.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -688,11 +688,11 @@ Evento partita.
 
 
 
-\---
+---
 
 
 
-\### Tipologie
+### Tipologie
 
 
 
@@ -702,9 +702,9 @@ GOAL
 
 ASSIST
 
-YELLOW\_CARD
+YELLOW_CARD
 
-RED\_CARD
+RED_CARD
 
 MVP
 
@@ -712,15 +712,15 @@ MVP
 
 
 
-\---
+---
 
 
 
-\# 10. Staff
+# 10. Staff
 
 
 
-\## StaffRole
+## StaffRole
 
 
 
@@ -728,7 +728,7 @@ Ruolo operativo.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -742,11 +742,11 @@ Ruolo operativo.
 
 
 
-\---
+---
 
 
 
-\### Valori
+### Valori
 
 
 
@@ -776,11 +776,11 @@ INTERVISTATORE
 
 
 
-\---
+---
 
 
 
-\## Shift
+## Shift
 
 
 
@@ -788,7 +788,7 @@ Turno operativo.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -810,11 +810,11 @@ Turno operativo.
 
 
 
-\---
+---
 
 
 
-\## ShiftAssignment
+## ShiftAssignment
 
 
 
@@ -822,7 +822,7 @@ Assegnazione turno.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -840,11 +840,11 @@ Assegnazione turno.
 
 
 
-\---
+---
 
 
 
-\### Stati
+### Stati
 
 
 
@@ -854,7 +854,7 @@ ASSIGNED
 
 CONFIRMED
 
-CHECKED\_IN
+CHECKED_IN
 
 COMPLETED
 
@@ -862,11 +862,11 @@ COMPLETED
 
 
 
-\---
+---
 
 
 
-\## CheckIn
+## CheckIn
 
 
 
@@ -874,7 +874,7 @@ Registrazione presenza.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -894,11 +894,11 @@ Registrazione presenza.
 
 
 
-\---
+---
 
 
 
-\### Metodi
+### Metodi
 
 
 
@@ -912,15 +912,15 @@ MANUAL
 
 
 
-\---
+---
 
 
 
-\# 11. Community
+# 11. Community
 
 
 
-\## Mission
+## Mission
 
 
 
@@ -928,7 +928,7 @@ Missione disponibile.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -948,11 +948,11 @@ Missione disponibile.
 
 
 
-\---
+---
 
 
 
-\## UserMission
+## UserMission
 
 
 
@@ -960,7 +960,7 @@ Progressione missione.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -980,11 +980,11 @@ Progressione missione.
 
 
 
-\---
+---
 
 
 
-\### Stati
+### Stati
 
 
 
@@ -992,7 +992,7 @@ Progressione missione.
 
 AVAILABLE
 
-IN\_PROGRESS
+IN_PROGRESS
 
 COMPLETED
 
@@ -1002,11 +1002,11 @@ CLAIMED
 
 
 
-\---
+---
 
 
 
-\## Badge
+## Badge
 
 
 
@@ -1014,7 +1014,7 @@ Achievement.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1032,11 +1032,11 @@ Achievement.
 
 
 
-\---
+---
 
 
 
-\## UserBadge
+## UserBadge
 
 
 
@@ -1044,7 +1044,7 @@ Badge ottenuto.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1062,15 +1062,15 @@ Badge ottenuto.
 
 
 
-\---
+---
 
 
 
-\# 12. Points System
+# 12. Points System
 
 
 
-\## PointTransaction
+## PointTransaction
 
 
 
@@ -1078,7 +1078,7 @@ Storico movimenti punti.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1100,11 +1100,11 @@ Storico movimenti punti.
 
 
 
-\---
+---
 
 
 
-\### Tipologie
+### Tipologie
 
 
 
@@ -1118,11 +1118,11 @@ SP
 
 
 
-\---
+---
 
 
 
-\### Esempi
+### Esempi
 
 
 
@@ -1132,21 +1132,21 @@ SP
 
 +100 SP - Turno completato
 
-\-200 LP - Riscatto premio
+-200 LP - Riscatto premio
 
 ```
 
 
 
-\---
+---
 
 
 
-\# 13. Events
+# 13. Events
 
 
 
-\## Event
+## Event
 
 
 
@@ -1154,7 +1154,7 @@ Evento generico.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1176,11 +1176,11 @@ Evento generico.
 
 
 
-\---
+---
 
 
 
-\## EventAttendance
+## EventAttendance
 
 
 
@@ -1188,7 +1188,7 @@ Partecipazione evento.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1206,15 +1206,15 @@ Partecipazione evento.
 
 
 
-\---
+---
 
 
 
-\# 14. Notifications
+# 14. Notifications
 
 
 
-\## Notification
+## Notification
 
 
 
@@ -1222,7 +1222,7 @@ Notifica utente.
 
 
 
-\### Campi
+### Campi
 
 
 
@@ -1244,15 +1244,15 @@ Notifica utente.
 
 
 
-\---
+---
 
 
 
-\# 15. Future Entities (Non MVP)
+# 15. Future Entities (Non MVP)
 
 
 
-\## Reward
+## Reward
 
 
 
@@ -1260,7 +1260,7 @@ Premi riscattabili.
 
 
 
-\## Redemption
+## Redemption
 
 
 
@@ -1268,7 +1268,7 @@ Storico riscatti.
 
 
 
-\## Sponsor
+## Sponsor
 
 
 
@@ -1276,7 +1276,7 @@ Sponsor ufficiali.
 
 
 
-\## SponsorCampaign
+## SponsorCampaign
 
 
 
@@ -1284,7 +1284,7 @@ Attività sponsor.
 
 
 
-\## FantasyTeam
+## FantasyTeam
 
 
 
@@ -1292,7 +1292,7 @@ Fanta Leonessa.
 
 
 
-\## FantasyPlayer
+## FantasyPlayer
 
 
 
@@ -1300,7 +1300,7 @@ Giocatori fantasy.
 
 
 
-\## Coupon
+## Coupon
 
 
 
@@ -1308,7 +1308,7 @@ Sconti e promozioni.
 
 
 
-\## AIConversation
+## AIConversation
 
 
 
@@ -1316,11 +1316,11 @@ Assistente AI.
 
 
 
-\---
+---
 
 
 
-\# 16. Database MVP Scope
+# 16. Database MVP Scope
 
 
 
@@ -1328,55 +1328,55 @@ Entità incluse nella V1:
 
 
 
-\- User
+- User
 
-\- Role
+- Role
 
-\- UserRole
+- UserRole
 
-\- School
+- School
 
-\- Competition
+- Competition
 
-\- Team
+- Team
 
-\- TeamMember
+- TeamMember
 
-\- Match
+- Match
 
-\- MatchEvent
+- MatchEvent
 
-\- StaffRole
+- StaffRole
 
-\- Shift
+- Shift
 
-\- ShiftAssignment
+- ShiftAssignment
 
-\- CheckIn
+- CheckIn
 
-\- Mission
+- Mission
 
-\- UserMission
+- UserMission
 
-\- Badge
+- Badge
 
-\- UserBadge
+- UserBadge
 
-\- PointTransaction
+- PointTransaction
 
-\- Event
+- Event
 
-\- EventAttendance
+- EventAttendance
 
-\- Notification
-
-
-
-\---
+- Notification
 
 
 
-\# 17. Note per Prisma
+---
+
+
+
+# 17. Note per Prisma
 
 
 
@@ -1384,17 +1384,17 @@ Linee guida:
 
 
 
-\- UUID come primary key.
+- UUID come primary key.
 
-\- createdAt e updatedAt ovunque.
+- createdAt e updatedAt ovunque.
 
-\- Foreign key esplicite.
+- Foreign key esplicite.
 
-\- Enum Prisma per stati e tipologie.
+- Enum Prisma per stati e tipologie.
 
-\- Soft delete per entità critiche.
+- Soft delete per entità critiche.
 
-\- Indici su:
+- Indici su:
 
 &#x20; - email
 
@@ -1408,5 +1408,5 @@ Linee guida:
 
 
 
-\---
+---
 

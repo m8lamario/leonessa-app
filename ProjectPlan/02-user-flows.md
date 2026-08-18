@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## User Flows v1.0
-
-
-
-\---
+## User Flows v1.0
 
 
 
-\# 1. Obiettivo del Documento
+---
+
+
+
+# 1. Obiettivo del Documento
 
 
 
@@ -20,15 +20,15 @@ Lo scopo è definire:
 
 
 
-\- percorsi utente;
+- percorsi utente;
 
-\- schermate;
+- schermate;
 
-\- azioni disponibili;
+- azioni disponibili;
 
-\- dati coinvolti;
+- dati coinvolti;
 
-\- regole di business.
+- regole di business.
 
 
 
@@ -36,15 +36,15 @@ Questo documento sarà utilizzato per progettazione UX/UI, backend, database e p
 
 
 
-\---
+---
 
 
 
-\# 2. Registrazione
+# 2. Registrazione
 
 
 
-\## Obiettivo
+## Obiettivo
 
 
 
@@ -52,11 +52,11 @@ Consentire a qualsiasi studente di registrarsi nel minor tempo possibile.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -84,69 +84,69 @@ Home
 
 
 
-\---
+---
 
 
 
-\## Schermata Login
+## Schermata Login
 
 
 
-\### Azioni disponibili
+### Azioni disponibili
 
 
 
-\- Continua con Google
+- Continua con Google
 
-\- Continua con Email
-
-
-
-\---
+- Continua con Email
 
 
 
-\## Schermata Profilo Base
+---
 
 
 
-\### Campi
+## Schermata Profilo Base
 
 
 
-\- Nome
-
-\- Cognome
-
-\- Scuola
+### Campi
 
 
 
-\---
+- Nome
+
+- Cognome
+
+- Scuola
 
 
 
-\## Regole
+---
 
 
 
-\- Email obbligatoria.
-
-\- Ogni account appartiene ad una scuola.
-
-\- Ogni nuovo account nasce con ruolo USER.
+## Regole
 
 
 
-\---
+- Email obbligatoria.
+
+- Ogni account appartiene ad una scuola.
+
+- Ogni nuovo account nasce con ruolo USER.
 
 
 
-\# 3. Primo Accesso
+---
 
 
 
-\## Obiettivo
+# 3. Primo Accesso
+
+
+
+## Obiettivo
 
 
 
@@ -154,11 +154,11 @@ Permettere all'utente di iniziare subito ad utilizzare la piattaforma.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -178,11 +178,11 @@ Esplorazione libera
 
 
 
-\---
+---
 
 
 
-\## Home iniziale
+## Home iniziale
 
 
 
@@ -190,25 +190,25 @@ Mostra:
 
 
 
-\- prossime partite;
+- prossime partite;
 
-\- classifica;
+- classifica;
 
-\- novità;
+- novità;
 
-\- community.
-
-
-
-\---
+- community.
 
 
 
-\# 4. Gestione Profilo
+---
 
 
 
-\## Obiettivo
+# 4. Gestione Profilo
+
+
+
+## Obiettivo
 
 
 
@@ -216,11 +216,11 @@ Consentire la modifica delle informazioni personali.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -240,35 +240,35 @@ Salva
 
 
 
-\---
+---
 
 
 
-\## Campi modificabili
+## Campi modificabili
 
 
 
-\- Foto profilo
+- Foto profilo
 
-\- Biografia
+- Biografia
 
-\- Instagram
+- Instagram
 
-\- Classe
+- Classe
 
-\- Anno scolastico
-
-
-
-\---
+- Anno scolastico
 
 
 
-\# 5. Richiesta Ruolo Staff
+---
 
 
 
-\## Obiettivo
+# 5. Richiesta Ruolo Staff
+
+
+
+## Obiettivo
 
 
 
@@ -276,11 +276,11 @@ Consentire ad uno studente di candidarsi allo staff.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -308,49 +308,49 @@ In attesa approvazione
 
 
 
-\---
+---
 
 
 
-\## Aree disponibili
+## Aree disponibili
 
 
 
-\- Accoglienza
+- Accoglienza
 
-\- Sicurezza
+- Sicurezza
 
-\- Social
+- Social
 
-\- Logistica
+- Logistica
 
-\- Spogliatoi
+- Spogliatoi
 
-\- Statistiche
+- Statistiche
 
-\- Raccattapalle
-
-
-
-\---
+- Raccattapalle
 
 
 
-\## Dati richiesti
+---
 
 
 
-\- Area scelta
-
-\- Motivazione
+## Dati richiesti
 
 
 
-\---
+- Area scelta
+
+- Motivazione
 
 
 
-\## Approvazione
+---
+
+
+
+## Approvazione
 
 
 
@@ -358,21 +358,21 @@ L'organizzatore può:
 
 
 
-\- approvare;
+- approvare;
 
-\- rifiutare.
-
-
-
-\---
+- rifiutare.
 
 
 
-\# 6. Assegnazione Ruolo Giocatore
+---
 
 
 
-\## Obiettivo
+# 6. Assegnazione Ruolo Giocatore
+
+
+
+## Obiettivo
 
 
 
@@ -380,11 +380,11 @@ Associare un utente ad una squadra.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -408,11 +408,11 @@ Conferma
 
 
 
-\---
+---
 
 
 
-\## Risultato
+## Risultato
 
 
 
@@ -420,21 +420,21 @@ L'utente ottiene:
 
 
 
-\- ruolo PLAYER
+- ruolo PLAYER
 
-\- collegamento alla squadra
-
-
-
-\---
+- collegamento alla squadra
 
 
 
-\# 7. Consultazione Torneo
+---
 
 
 
-\## Obiettivo
+# 7. Consultazione Torneo
+
+
+
+## Obiettivo
 
 
 
@@ -442,11 +442,11 @@ Consentire la consultazione rapida del torneo.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -466,49 +466,49 @@ Partita
 
 
 
-\---
+---
 
 
 
-\## Informazioni disponibili
+## Informazioni disponibili
 
 
 
-\### Competizione
+### Competizione
 
 
 
-\- classifica
+- classifica
 
-\- calendario
+- calendario
 
-\- squadre
-
-
-
-\### Partita
+- squadre
 
 
 
-\- risultato
-
-\- eventi
-
-\- MVP
-
-\- statistiche
+### Partita
 
 
 
-\---
+- risultato
+
+- eventi
+
+- MVP
+
+- statistiche
 
 
 
-\# 8. Visualizzazione Squadra
+---
 
 
 
-\## Obiettivo
+# 8. Visualizzazione Squadra
+
+
+
+## Obiettivo
 
 
 
@@ -516,11 +516,11 @@ Permettere agli utenti di seguire la propria scuola.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -536,35 +536,35 @@ Squadra
 
 
 
-\---
+---
 
 
 
-\## Informazioni
+## Informazioni
 
 
 
-\- logo
+- logo
 
-\- giocatori
+- giocatori
 
-\- classifica
+- classifica
 
-\- statistiche
+- statistiche
 
-\- prossime partite
-
-
-
-\---
+- prossime partite
 
 
 
-\# 9. Turni Staff
+---
 
 
 
-\## Obiettivo
+# 9. Turni Staff
+
+
+
+## Obiettivo
 
 
 
@@ -572,11 +572,11 @@ Mostrare attività e responsabilità dello staff.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -596,47 +596,47 @@ Dettaglio turno
 
 
 
-\---
+---
 
 
 
-\## Informazioni
+## Informazioni
 
 
 
-\- ruolo
+- ruolo
 
-\- orario
+- orario
 
-\- luogo
+- luogo
 
-\- punti assegnati
-
-
-
-\---
+- punti assegnati
 
 
 
-\## Azioni
+---
 
 
 
-\- conferma presenza
-
-\- visualizza dettagli
+## Azioni
 
 
 
-\---
+- conferma presenza
+
+- visualizza dettagli
 
 
 
-\# 10. Check-In Staff
+---
 
 
 
-\## Obiettivo
+# 10. Check-In Staff
+
+
+
+## Obiettivo
 
 
 
@@ -644,11 +644,11 @@ Verificare la presenza dello staff.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -672,29 +672,29 @@ Conferma
 
 
 
-\---
+---
 
 
 
-\## Risultato
+## Risultato
 
 
 
-\- presenza registrata
+- presenza registrata
 
-\- punti assegnati
-
-
-
-\---
+- punti assegnati
 
 
 
-\# 11. Sistema Punti
+---
 
 
 
-\## Obiettivo
+# 11. Sistema Punti
+
+
+
+## Obiettivo
 
 
 
@@ -702,15 +702,15 @@ Premiare la partecipazione.
 
 
 
-\---
+---
 
 
 
-\## Tipologie
+## Tipologie
 
 
 
-\### LP
+### LP
 
 
 
@@ -722,19 +722,19 @@ Utilizzati per:
 
 
 
-\- community
+- community
 
-\- missioni
+- missioni
 
-\- partecipazione
-
-
-
-\---
+- partecipazione
 
 
 
-\### SP
+---
+
+
+
+### SP
 
 
 
@@ -746,23 +746,23 @@ Utilizzati per:
 
 
 
-\- attività staff
+- attività staff
 
-\- turni
+- turni
 
-\- contributi organizzativi
-
-
-
-\---
+- contributi organizzativi
 
 
 
-\# 12. Storico Punti
+---
 
 
 
-\## Flusso
+# 12. Storico Punti
+
+
+
+## Flusso
 
 
 
@@ -782,31 +782,31 @@ Storico
 
 
 
-\---
+---
 
 
 
-\## Informazioni
+## Informazioni
 
 
 
-\- data
+- data
 
-\- quantità
+- quantità
 
-\- motivo
-
-
-
-\---
+- motivo
 
 
 
-\# 13. Missioni
+---
 
 
 
-\## Obiettivo
+# 13. Missioni
+
+
+
+## Obiettivo
 
 
 
@@ -814,11 +814,11 @@ Incentivare comportamenti desiderati.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -838,51 +838,51 @@ Dettaglio Missione
 
 
 
-\---
+---
 
 
 
-\## Esempi
+## Esempi
 
 
 
-\- partecipa ad una partita
+- partecipa ad una partita
 
-\- completa un turno
+- completa un turno
 
-\- effettua check-in
+- effettua check-in
 
-\- invita un amico
-
-
-
-\---
+- invita un amico
 
 
 
-\## Stati
+---
 
 
 
-\- disponibile
-
-\- in corso
-
-\- completata
-
-\- riscossa
+## Stati
 
 
 
-\---
+- disponibile
+
+- in corso
+
+- completata
+
+- riscossa
 
 
 
-\# 14. Notifiche
+---
 
 
 
-\## Obiettivo
+# 14. Notifiche
+
+
+
+## Obiettivo
 
 
 
@@ -890,57 +890,35 @@ Comunicare informazioni rilevanti.
 
 
 
-\---
+---
 
 
 
-\## Eventi
+## Eventi
 
 
 
-\- assegnazione turno
+- assegnazione turno
 
-\- approvazione ruolo
+- approvazione ruolo
 
-\- partita imminente
+- partita imminente
 
-\- missione completata
+- missione completata
 
-\- nuovi punti ricevuti
-
-
-
-\---
+- nuovi punti ricevuti
 
 
 
-\# 15. Home Personalizzata
+---
 
 
 
-\## USER
+# 15. Home Personalizzata
 
 
 
-Visualizza:
-
-
-
-\- partite
-
-\- classifiche
-
-\- missioni
-
-\- novità
-
-
-
-\---
-
-
-
-\## PLAYER
+## USER
 
 
 
@@ -948,43 +926,21 @@ Visualizza:
 
 
 
-\- prossima partita
+- partite
 
-\- squadra
+- classifiche
 
-\- statistiche personali
+- missioni
 
-\- classifica
-
-
-
-\---
+- novità
 
 
 
-\## STAFF
+---
 
 
 
-Visualizza:
-
-
-
-\- prossimi turni
-
-\- missioni staff
-
-\- punti staff
-
-\- comunicazioni operative
-
-
-
-\---
-
-
-
-\## ORGANIZER
+## PLAYER
 
 
 
@@ -992,27 +948,71 @@ Visualizza:
 
 
 
-\- dashboard operativa
+- prossima partita
 
-\- turni scoperti
+- squadra
 
-\- presenze
+- statistiche personali
 
-\- stato partite
-
-\- notifiche urgenti
+- classifica
 
 
 
-\---
+---
 
 
 
-\# 16. Gestione Competizioni Future
+## STAFF
 
 
 
-\## Obiettivo
+Visualizza:
+
+
+
+- prossimi turni
+
+- missioni staff
+
+- punti staff
+
+- comunicazioni operative
+
+
+
+---
+
+
+
+## ORGANIZER
+
+
+
+Visualizza:
+
+
+
+- dashboard operativa
+
+- turni scoperti
+
+- presenze
+
+- stato partite
+
+- notifiche urgenti
+
+
+
+---
+
+
+
+# 16. Gestione Competizioni Future
+
+
+
+## Obiettivo
 
 
 
@@ -1020,11 +1020,11 @@ Supportare nuove competizioni senza modifiche strutturali.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -1056,11 +1056,11 @@ Nuova competizione
 
 
 
-\---
+---
 
 
 
-\## Regola
+## Regola
 
 
 
@@ -1068,11 +1068,11 @@ Tutti i moduli devono essere collegati ad una competizione specifica.
 
 
 
-\---
+---
 
 
 
-\# 17. Flussi Fuori MVP
+# 17. Flussi Fuori MVP
 
 
 
@@ -1080,21 +1080,21 @@ Da progettare successivamente:
 
 
 
-\- Fanta Leonessa
+- Fanta Leonessa
 
-\- Reward Store
+- Reward Store
 
-\- Ticketing
+- Ticketing
 
-\- Sponsor
+- Sponsor
 
-\- Coupon
+- Coupon
 
-\- AI Assistant
+- AI Assistant
 
-\- Marketplace premi
+- Marketplace premi
 
 
 
-\---
+---
 

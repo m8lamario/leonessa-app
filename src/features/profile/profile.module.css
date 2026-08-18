@@ -282,6 +282,38 @@
   padding-top: 18px;
   border-top: 1px solid var(--color-line);
 }
+
+.passwordForm {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--color-line);
+}
+
+.passwordForm input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgb(198 204 218 / 22%);
+  border-radius: var(--radius-sm);
+  background: rgb(3 8 23 / 58%);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.formError,
+.formSuccess {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.formError {
+  color: #ffadad;
+}
+
+.formSuccess {
+  color: #94efb7;
+}
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;

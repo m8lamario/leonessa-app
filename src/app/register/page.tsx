@@ -14,7 +14,7 @@ export default async function RegisterPage() {
   const schools = await prisma.school.findMany({
     where: { deletedAt: null },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, shortName: true },
+    select: { id: true, name: true, shortName: true, logoUrl: true },
   });
 
   return (

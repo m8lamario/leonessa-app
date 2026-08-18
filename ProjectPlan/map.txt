@@ -1,0 +1,13 @@
+Dashboard Utente
+- Fanta integrazione
+- Candidature
+- Pagina profilo
+- Estetica badge
+- Regole punteggi (Da definire non appena possibile)
+- Guida prima volta
+
+GENERALI:
+- Notifiche push
+- Migliorare prestazioni
+- Recupero psw
+- Cambio email 

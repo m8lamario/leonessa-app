@@ -104,6 +104,13 @@ not import UI code.
 Copy `.env.example` to `.env.local` and fill values before running the
 application. Never commit environment files.
 
+Email verification and password recovery require `RESEND_API_KEY` and
+`RESEND_FROM_EMAIL` (a verified Resend sender). Native HTTPS deep links additionally
+require `APPLE_TEAM_ID`, `ANDROID_APP_LINK_SHA256`, and the production domain in
+`APP_LINK_HOST` for the Android/iOS native projects. The generated association
+endpoints are `/.well-known/apple-app-site-association` and
+`/.well-known/assetlinks.json`.
+
 ```bash
 npm run dev
 npm run lint

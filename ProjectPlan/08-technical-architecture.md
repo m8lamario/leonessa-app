@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Technical Architecture v1.0
-
-
-
-\---
+## Technical Architecture v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -20,27 +20,27 @@ L'architettura deve essere:
 
 
 
-\- Scalabile
+- Scalabile
 
-\- Manutenibile
+- Manutenibile
 
-\- Performante
+- Performante
 
-\- Economica
+- Economica
 
-\- Facilmente espandibile
-
-
-
-\---
+- Facilmente espandibile
 
 
 
-\# 2. Principi Architetturali
+---
 
 
 
-\## Mobile First
+# 2. Principi Architetturali
+
+
+
+## Mobile First
 
 
 
@@ -52,11 +52,11 @@ Successivamente viene adattata per tablet e desktop.
 
 
 
-\---
+---
 
 
 
-\## API First
+## API First
 
 
 
@@ -68,21 +68,21 @@ Questo permetterà in futuro:
 
 
 
-\- App native
+- App native
 
-\- Dashboard amministrative
+- Dashboard amministrative
 
-\- Integrazioni esterne
+- Integrazioni esterne
 
-\- AI Assistant
-
-
-
-\---
+- AI Assistant
 
 
 
-\## Modularità
+---
+
+
+
+## Modularità
 
 
 
@@ -114,11 +114,11 @@ possono evolvere separatamente.
 
 
 
-\---
+---
 
 
 
-\## Scalabilità Progressiva
+## Scalabilità Progressiva
 
 
 
@@ -140,19 +140,19 @@ Scalare quando necessario
 
 
 
-\---
+---
 
 
 
-\# 3. Stack Tecnologico
+# 3. Stack Tecnologico
 
 
 
-\## Frontend
+## Frontend
 
 
 
-\### Framework
+### Framework
 
 
 
@@ -164,11 +164,11 @@ Next.js 16
 
 
 
-\---
+---
 
 
 
-\### Linguaggio
+### Linguaggio
 
 
 
@@ -180,11 +180,11 @@ TypeScript
 
 
 
-\---
+---
 
 
 
-\### Styling
+### Styling
 
 
 
@@ -196,11 +196,11 @@ CSS Modules
 
 
 
-\---
+---
 
 
 
-\### Animazioni
+### Animazioni
 
 
 
@@ -212,11 +212,11 @@ Framer Motion
 
 
 
-\---
+---
 
 
 
-\### Component Library
+### Component Library
 
 
 
@@ -228,15 +228,15 @@ Nessuna libreria UI pesante.
 
 
 
-\---
+---
 
 
 
-\# 4. Mobile App
+# 4. Mobile App
 
 
 
-\## Tecnologia
+## Tecnologia
 
 
 
@@ -248,11 +248,11 @@ Capacitor
 
 
 
-\---
+---
 
 
 
-\## Motivazione
+## Motivazione
 
 
 
@@ -260,21 +260,21 @@ Permette di:
 
 
 
-\- riutilizzare Next.js
+- riutilizzare Next.js
 
-\- pubblicare su Play Store
+- pubblicare su Play Store
 
-\- pubblicare su App Store
+- pubblicare su App Store
 
-\- mantenere un unico codice
-
-
-
-\---
+- mantenere un unico codice
 
 
 
-\## Accesso Funzionalità Native
+---
+
+
+
+## Accesso Funzionalità Native
 
 
 
@@ -282,27 +282,27 @@ Capacitor verrà utilizzato per:
 
 
 
-\- Push Notification
+- Push Notification
 
-\- Camera
+- Camera
 
-\- QR Scanner
+- QR Scanner
 
-\- Deep Linking
+- Deep Linking
 
-\- Storage locale
-
-
-
-\---
+- Storage locale
 
 
 
-\# 5. Backend
+---
 
 
 
-\## Framework
+# 5. Backend
+
+
+
+## Framework
 
 
 
@@ -314,11 +314,11 @@ Next.js Route Handlers
 
 
 
-\---
+---
 
 
 
-\## Motivazione
+## Motivazione
 
 
 
@@ -326,19 +326,19 @@ Permette di:
 
 
 
-\- mantenere un monorepo
+- mantenere un monorepo
 
-\- ridurre complessità
+- ridurre complessità
 
-\- sviluppare più velocemente
-
-
-
-\---
+- sviluppare più velocemente
 
 
 
-\## Organizzazione
+---
+
+
+
+## Organizzazione
 
 
 
@@ -350,11 +350,11 @@ Permette di:
 
 
 
-\---
+---
 
 
 
-\### Esempio
+### Esempio
 
 
 
@@ -380,15 +380,15 @@ Permette di:
 
 
 
-\---
+---
 
 
 
-\# 6. Database
+# 6. Database
 
 
 
-\## Database Principale
+## Database Principale
 
 
 
@@ -400,11 +400,11 @@ PostgreSQL
 
 
 
-\---
+---
 
 
 
-\## Provider
+## Provider
 
 
 
@@ -416,11 +416,11 @@ DigitalOcean Managed PostgreSQL
 
 
 
-\---
+---
 
 
 
-\## ORM
+## ORM
 
 
 
@@ -432,33 +432,33 @@ Prisma
 
 
 
-\---
+---
 
 
 
-\## Motivazione
+## Motivazione
 
 
 
-\- Ottima integrazione con Next.js
+- Ottima integrazione con Next.js
 
-\- Migrazioni semplici
+- Migrazioni semplici
 
-\- Type safety
+- Type safety
 
-\- Sviluppo rapido
-
-
-
-\---
+- Sviluppo rapido
 
 
 
-\# 7. Autenticazione
+---
 
 
 
-\## Libreria
+# 7. Autenticazione
+
+
+
+## Libreria
 
 
 
@@ -470,15 +470,15 @@ Auth.js
 
 
 
-\---
+---
 
 
 
-\## Login Supportati
+## Login Supportati
 
 
 
-\### Google
+### Google
 
 
 
@@ -486,11 +486,11 @@ Principale.
 
 
 
-\---
+---
 
 
 
-\### Email + Password
+### Email + Password
 
 
 
@@ -498,11 +498,11 @@ Secondario.
 
 
 
-\---
+---
 
 
 
-\## Sessioni
+## Sessioni
 
 
 
@@ -514,11 +514,11 @@ JWT
 
 
 
-\---
+---
 
 
 
-\## Ruoli
+## Ruoli
 
 
 
@@ -526,15 +526,15 @@ Gestiti nel database.
 
 
 
-\---
+---
 
 
 
-\# 8. Storage
+# 8. Storage
 
 
 
-\## File Upload
+## File Upload
 
 
 
@@ -546,33 +546,33 @@ Cloudinary
 
 
 
-\---
+---
 
 
 
-\## Contenuti
+## Contenuti
 
 
 
-\- Avatar
+- Avatar
 
-\- Loghi scuole
+- Loghi scuole
 
-\- Immagini eventi
+- Immagini eventi
 
-\- Media community
-
-
-
-\---
+- Media community
 
 
 
-\# 9. Hosting
+---
 
 
 
-\## Frontend
+# 9. Hosting
+
+
+
+## Frontend
 
 
 
@@ -584,27 +584,27 @@ Vercel
 
 
 
-\---
+---
 
 
 
-\## Motivazione
+## Motivazione
 
 
 
-\- Deploy immediato
+- Deploy immediato
 
-\- Ottima integrazione Next.js
+- Ottima integrazione Next.js
 
-\- CDN globale
-
-
-
-\---
+- CDN globale
 
 
 
-\## Database
+---
+
+
+
+## Database
 
 
 
@@ -616,11 +616,11 @@ DigitalOcean
 
 
 
-\---
+---
 
 
 
-\# 10. Architettura Applicativa
+# 10. Architettura Applicativa
 
 
 
@@ -652,37 +652,15 @@ PostgreSQL
 
 
 
-\---
+---
 
 
 
-\# 11. Architettura Modulare
+# 11. Architettura Modulare
 
 
 
-\## Auth Module
-
-
-
-Responsabilità:
-
-
-
-\- Login
-
-\- Registrazione
-
-\- Sessioni
-
-\- Permessi
-
-
-
-\---
-
-
-
-\## Tournament Module
+## Auth Module
 
 
 
@@ -690,43 +668,21 @@ Responsabilità:
 
 
 
-\- Competizioni
+- Login
 
-\- Match
+- Registrazione
 
-\- Classifiche
+- Sessioni
 
-\- Eventi partita
-
-
-
-\---
+- Permessi
 
 
 
-\## Staff Module
+---
 
 
 
-Responsabilità:
-
-
-
-\- Turni
-
-\- Presenze
-
-\- Check-in
-
-\- Missioni staff
-
-
-
-\---
-
-
-
-\## Community Module
+## Tournament Module
 
 
 
@@ -734,21 +690,21 @@ Responsabilità:
 
 
 
-\- Badge
+- Competizioni
 
-\- Ranking
+- Match
 
-\- Missioni
+- Classifiche
 
-\- Activity Feed
-
-
-
-\---
+- Eventi partita
 
 
 
-\## Rewards Module
+---
+
+
+
+## Staff Module
 
 
 
@@ -756,23 +712,67 @@ Responsabilità:
 
 
 
-\- LP
+- Turni
 
-\- SP
+- Presenze
 
-\- Reward Store
+- Check-in
 
-
-
-\---
+- Missioni staff
 
 
 
-\# 12. State Management
+---
 
 
 
-\## Server State
+## Community Module
+
+
+
+Responsabilità:
+
+
+
+- Badge
+
+- Ranking
+
+- Missioni
+
+- Activity Feed
+
+
+
+---
+
+
+
+## Rewards Module
+
+
+
+Responsabilità:
+
+
+
+- LP
+
+- SP
+
+- Reward Store
+
+
+
+---
+
+
+
+# 12. State Management
+
+
+
+## Server State
 
 
 
@@ -788,11 +788,11 @@ TanStack Query
 
 
 
-\---
+---
 
 
 
-\## Client State
+## Client State
 
 
 
@@ -808,11 +808,11 @@ Zustand
 
 
 
-\---
+---
 
 
 
-\## Evitare
+## Evitare
 
 
 
@@ -828,11 +828,11 @@ Per il momento aggiungerebbe complessità inutile.
 
 
 
-\---
+---
 
 
 
-\# 13. Cartelle Frontend
+# 13. Cartelle Frontend
 
 
 
@@ -868,11 +868,11 @@ src
 
 
 
-\---
+---
 
 
 
-\# 14. Features Structure
+# 14. Features Structure
 
 
 
@@ -906,15 +906,15 @@ features
 
 
 
-\---
+---
 
 
 
-\# 15. Security
+# 15. Security
 
 
 
-\## Regole
+## Regole
 
 
 
@@ -922,11 +922,11 @@ Mai fidarsi del frontend.
 
 
 
-\---
+---
 
 
 
-\## Validazioni
+## Validazioni
 
 
 
@@ -934,11 +934,11 @@ Tutte lato server.
 
 
 
-\---
+---
 
 
 
-\## Permessi
+## Permessi
 
 
 
@@ -946,11 +946,11 @@ Sempre verificati backend.
 
 
 
-\---
+---
 
 
 
-\## Rate Limiting
+## Rate Limiting
 
 
 
@@ -958,23 +958,23 @@ Applicare a:
 
 
 
-\- Login
+- Login
 
-\- Registrazione
+- Registrazione
 
-\- API pubbliche
-
-
-
-\---
+- API pubbliche
 
 
 
-\# 16. Logging
+---
 
 
 
-\## Sistema
+# 16. Logging
+
+
+
+## Sistema
 
 
 
@@ -986,35 +986,35 @@ Pino
 
 
 
-\---
+---
 
 
 
-\## Tracciamento
+## Tracciamento
 
 
 
-\- Errori
+- Errori
 
-\- Login
+- Login
 
-\- Assegnazioni ruoli
+- Assegnazioni ruoli
 
-\- Check-in
+- Check-in
 
-\- Modifiche risultati
-
-
-
-\---
+- Modifiche risultati
 
 
 
-\# 17. Monitoring
+---
 
 
 
-\## Error Tracking
+# 17. Monitoring
+
+
+
+## Error Tracking
 
 
 
@@ -1026,11 +1026,11 @@ Sentry
 
 
 
-\---
+---
 
 
 
-\## Analytics
+## Analytics
 
 
 
@@ -1042,11 +1042,11 @@ PostHog
 
 
 
-\---
+---
 
 
 
-\## KPI
+## KPI
 
 
 
@@ -1054,25 +1054,25 @@ Monitorare:
 
 
 
-\- Utenti attivi
+- Utenti attivi
 
-\- Crash
+- Crash
 
-\- Performance
+- Performance
 
-\- Conversione staff
-
-
-
-\---
+- Conversione staff
 
 
 
-\# 18. Push Notifications
+---
 
 
 
-\## Provider
+# 18. Push Notifications
+
+
+
+## Provider
 
 
 
@@ -1084,33 +1084,33 @@ Firebase Cloud Messaging
 
 
 
-\---
+---
 
 
 
-\## Utilizzi
+## Utilizzi
 
 
 
-\- Turni assegnati
+- Turni assegnati
 
-\- Partite imminenti
+- Partite imminenti
 
-\- Missioni completate
+- Missioni completate
 
-\- Comunicazioni organizzatori
-
-
-
-\---
+- Comunicazioni organizzatori
 
 
 
-\# 19. QR System
+---
 
 
 
-\## Utilizzo
+# 19. QR System
+
+
+
+## Utilizzo
 
 
 
@@ -1118,11 +1118,11 @@ Check-in staff.
 
 
 
-\---
+---
 
 
 
-\## Flusso
+## Flusso
 
 
 
@@ -1150,63 +1150,63 @@ Assegnazione Punti
 
 
 
-\---
+---
 
 
 
-\# 20. Environment Variables
+# 20. Environment Variables
 
 
 
-\## Frontend
-
-
-
-```env
-
-NEXT\_PUBLIC\_APP\_URL=
-
-NEXT\_PUBLIC\_CLOUDINARY\_CLOUD\_NAME=
-
-```
-
-
-
-\---
-
-
-
-\## Backend
+## Frontend
 
 
 
 ```env
 
-DATABASE\_URL=
+NEXT_PUBLIC_APP_URL=
 
-AUTH\_SECRET=
-
-AUTH\_GOOGLE\_ID=
-
-AUTH\_GOOGLE\_SECRET=
-
-CLOUDINARY\_API\_KEY=
-
-CLOUDINARY\_API\_SECRET=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
 
 ```
 
 
 
-\---
+---
 
 
 
-\# 21. CI/CD
+## Backend
 
 
 
-\## Repository
+```env
+
+DATABASE_URL=
+
+AUTH_SECRET=
+
+AUTH_GOOGLE_ID=
+
+AUTH_GOOGLE_SECRET=
+
+CLOUDINARY_API_KEY=
+
+CLOUDINARY_API_SECRET=
+
+```
+
+
+
+---
+
+
+
+# 21. CI/CD
+
+
+
+## Repository
 
 
 
@@ -1218,11 +1218,11 @@ GitHub
 
 
 
-\---
+---
 
 
 
-\## Workflow
+## Workflow
 
 
 
@@ -1250,11 +1250,11 @@ Deploy
 
 
 
-\---
+---
 
 
 
-\## Branch Strategy
+## Branch Strategy
 
 
 
@@ -1264,17 +1264,17 @@ main
 
 develop
 
-feature/\*
+feature/*
 
 ```
 
 
 
-\---
+---
 
 
 
-\# 22. MVP Infrastructure
+# 22. MVP Infrastructure
 
 
 
@@ -1282,21 +1282,21 @@ Servizi necessari:
 
 
 
-\- Vercel
+- Vercel
 
-\- PostgreSQL
+- PostgreSQL
 
-\- Cloudinary
+- Cloudinary
 
-\- Auth.js
+- Auth.js
 
-\- Sentry
+- Sentry
 
-\- PostHog
+- PostHog
 
 
 
-\---
+---
 
 
 
@@ -1316,11 +1316,11 @@ nelle prime fasi.
 
 
 
-\---
+---
 
 
 
-\# 23. Scalabilità Futura
+# 23. Scalabilità Futura
 
 
 
@@ -1328,25 +1328,25 @@ Possibili evoluzioni:
 
 
 
-\- Ticketing proprietario
+- Ticketing proprietario
 
-\- AI Assistant
+- AI Assistant
 
-\- Fanta Leonessa
+- Fanta Leonessa
 
-\- Live Match Center
+- Live Match Center
 
-\- Multi-competition platform
+- Multi-competition platform
 
-\- Sponsor Marketplace
-
-
-
-\---
+- Sponsor Marketplace
 
 
 
-\# 24. Architettura Finale
+---
+
+
+
+# 24. Architettura Finale
 
 
 
@@ -1378,11 +1378,11 @@ Leonessa App
 
 
 
-\---
+---
 
 
 
-\# 25. Regola Fondamentale
+# 25. Regola Fondamentale
 
 
 
@@ -1404,5 +1404,5 @@ Se la risposta è no, probabilmente è una complessità prematura.
 
 
 
-\---
+---
 

@@ -205,6 +205,16 @@ async function awardPointsInTransaction(transaction: TransactionClient, input: A
   };
 }
 
+export async function awardLPInTransaction(
+  transaction: TransactionClient,
+  input: Omit<AwardPointsInput, "type" | "schoolId">,
+) {
+  const award = { ...input, type: "LP" as const };
+  validateAwardInput(award);
+
+  return awardPointsInTransaction(transaction, award);
+}
+
 function toAwardResult(result: {
   applied: boolean;
   pointTransaction: {

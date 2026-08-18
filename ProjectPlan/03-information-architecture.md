@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Information Architecture v1.0
-
-
-
-\---
+## Information Architecture v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -16,15 +16,15 @@ Definire la struttura completa dell'applicazione, la navigazione principale e le
 
 
 
-\---
+---
 
 
 
-\# 2. Navigation Principale
+# 2. Navigation Principale
 
 
 
-\## Bottom Navigation
+## Bottom Navigation
 
 
 
@@ -52,15 +52,15 @@ Alcune sezioni possono comparire o scomparire in base ai ruoli.
 
 
 
-\---
+---
 
 
 
-\## Navigation Dinamica
+## Navigation Dinamica
 
 
 
-\### Staff
+### Staff
 
 
 
@@ -68,11 +68,11 @@ Visibile solo a:
 
 
 
-\- STAFF
+- STAFF
 
-\- ORGANIZER
+- ORGANIZER
 
-\- ADMIN
+- ADMIN
 
 
 
@@ -84,11 +84,11 @@ Visibile solo a:
 
 
 
-\---
+---
 
 
 
-\### Admin
+### Admin
 
 
 
@@ -96,7 +96,7 @@ Visibile solo a:
 
 
 
-\- ADMIN
+- ADMIN
 
 
 
@@ -108,11 +108,11 @@ Visibile solo a:
 
 
 
-\---
+---
 
 
 
-\# 3. Sitemap Generale
+# 3. Sitemap Generale
 
 
 
@@ -206,15 +206,15 @@ Profile
 
 
 
-\---
+---
 
 
 
-\# 4. Home
+# 4. Home
 
 
 
-\## Obiettivo
+## Obiettivo
 
 
 
@@ -222,85 +222,85 @@ Fornire una panoramica immediata e personalizzata.
 
 
 
-\---
+---
 
 
 
-\## Contenuti
+## Contenuti
 
 
 
-\### Tutti gli utenti
+### Tutti gli utenti
 
 
 
-\- Match in evidenza
+- Match in evidenza
 
-\- Ultime news
+- Ultime news
 
-\- Eventi imminenti
+- Eventi imminenti
 
-\- Notifiche
-
-
-
-\---
+- Notifiche
 
 
 
-\### Player
+---
 
 
 
-\- Prossima partita
-
-\- Classifica squadra
-
-\- Statistiche personali
+### Player
 
 
 
-\---
+- Prossima partita
+
+- Classifica squadra
+
+- Statistiche personali
 
 
 
-\### Staff
+---
 
 
 
-\- Prossimo turno
-
-\- Comunicazioni operative
-
-\- Missioni staff
+### Staff
 
 
 
-\---
+- Prossimo turno
+
+- Comunicazioni operative
+
+- Missioni staff
 
 
 
-\### Organizer
+---
 
 
 
-\- Dashboard operativa
-
-\- Turni scoperti
-
-\- Alert
+### Organizer
 
 
 
-\---
+- Dashboard operativa
+
+- Turni scoperti
+
+- Alert
 
 
 
-\# 5. Cup
+---
 
 
 
-\## Competizioni
+# 5. Cup
+
+
+
+## Competizioni
 
 
 
@@ -312,21 +312,21 @@ Esempi:
 
 
 
-\- Leonessa Cup
+- Leonessa Cup
 
-\- Invibe Padel Cup
-
-
-
-\---
+- Invibe Padel Cup
 
 
 
-\## Dettaglio Competizione
+---
 
 
 
-\### Tab
+## Dettaglio Competizione
+
+
+
+### Tab
 
 
 
@@ -346,15 +346,15 @@ Statistiche
 
 
 
-\---
+---
 
 
 
-\# 6. Squadre
+# 6. Squadre
 
 
 
-\## Lista Squadre
+## Lista Squadre
 
 
 
@@ -362,11 +362,11 @@ Visualizzazione di tutte le scuole partecipanti.
 
 
 
-\---
+---
 
 
 
-\## Pagina Squadra
+## Pagina Squadra
 
 
 
@@ -374,31 +374,31 @@ Informazioni:
 
 
 
-\- Logo
+- Logo
 
-\- Nome
+- Nome
 
-\- Colori
+- Colori
 
-\- Classifica
+- Classifica
 
-\- Rosa
+- Rosa
 
-\- Statistiche
+- Statistiche
 
-\- Partite
-
-
-
-\---
+- Partite
 
 
 
-\# 7. Match Center
+---
 
 
 
-\## Lista Partite
+# 7. Match Center
+
+
+
+## Lista Partite
 
 
 
@@ -406,21 +406,21 @@ Filtri:
 
 
 
-\- Oggi
+- Oggi
 
-\- Questa settimana
+- Questa settimana
 
-\- Fase a gironi
+- Fase a gironi
 
-\- Eliminazione diretta
-
-
-
-\---
+- Eliminazione diretta
 
 
 
-\## Dettaglio Partita
+---
+
+
+
+## Dettaglio Partita
 
 
 
@@ -428,27 +428,27 @@ Informazioni:
 
 
 
-\- Risultato
+- Risultato
 
-\- Squadre
+- Squadre
 
-\- Cronologia eventi
+- Cronologia eventi
 
-\- MVP
+- MVP
 
-\- Statistiche
-
-
-
-\---
+- Statistiche
 
 
 
-\# 8. Community
+---
 
 
 
-\## Obiettivo
+# 8. Community
+
+
+
+## Obiettivo
 
 
 
@@ -456,11 +456,11 @@ Creare coinvolgimento oltre le partite.
 
 
 
-\---
+---
 
 
 
-\## Ranking
+## Ranking
 
 
 
@@ -468,19 +468,19 @@ Classifiche:
 
 
 
-\- Utenti
+- Utenti
 
-\- Scuole
+- Scuole
 
-\- Staff
-
-
-
-\---
+- Staff
 
 
 
-\## Missioni
+---
+
+
+
+## Missioni
 
 
 
@@ -488,19 +488,19 @@ Visualizzazione:
 
 
 
-\- Disponibili
+- Disponibili
 
-\- In corso
+- In corso
 
-\- Completate
-
-
-
-\---
+- Completate
 
 
 
-\## Badge
+---
+
+
+
+## Badge
 
 
 
@@ -508,11 +508,11 @@ Raccolta badge ottenuti.
 
 
 
-\---
+---
 
 
 
-\## Feed
+## Feed
 
 
 
@@ -520,15 +520,15 @@ Attività recenti della community.
 
 
 
-\---
+---
 
 
 
-\# 9. Rewards
+# 9. Rewards
 
 
 
-\## Wallet
+## Wallet
 
 
 
@@ -536,17 +536,17 @@ Visualizzazione:
 
 
 
-\- Leonessa Points (LP)
+- Leonessa Points (LP)
 
-\- Staff Points (SP)
-
-
-
-\---
+- Staff Points (SP)
 
 
 
-\## Premi
+---
+
+
+
+## Premi
 
 
 
@@ -554,11 +554,11 @@ Catalogo premi disponibili.
 
 
 
-\---
+---
 
 
 
-\## Storico
+## Storico
 
 
 
@@ -566,15 +566,15 @@ Movimenti punti.
 
 
 
-\---
+---
 
 
 
-\# 10. Profile
+# 10. Profile
 
 
 
-\## Informazioni Personali
+## Informazioni Personali
 
 
 
@@ -582,27 +582,27 @@ Campi:
 
 
 
-\- Foto profilo
+- Foto profilo
 
-\- Nome
+- Nome
 
-\- Cognome
+- Cognome
 
-\- Scuola
+- Scuola
 
-\- Classe
+- Classe
 
-\- Bio
+- Bio
 
-\- Instagram
-
-
-
-\---
+- Instagram
 
 
 
-\## Ruoli
+---
+
+
+
+## Ruoli
 
 
 
@@ -626,11 +626,11 @@ STAFF
 
 
 
-\---
+---
 
 
 
-\## Storico Punti
+## Storico Punti
 
 
 
@@ -638,11 +638,11 @@ Visualizzazione dettagliata delle attività.
 
 
 
-\---
+---
 
 
 
-\# 11. Area Staff
+# 11. Area Staff
 
 
 
@@ -650,11 +650,11 @@ Disponibile solo ai ruoli autorizzati.
 
 
 
-\---
+---
 
 
 
-\## I Miei Turni
+## I Miei Turni
 
 
 
@@ -662,19 +662,19 @@ Visualizzazione:
 
 
 
-\- Futuri
+- Futuri
 
-\- In corso
+- In corso
 
-\- Completati
-
-
-
-\---
+- Completati
 
 
 
-\## Turni Disponibili
+---
+
+
+
+## Turni Disponibili
 
 
 
@@ -682,11 +682,11 @@ Turni ancora da assegnare.
 
 
 
-\---
+---
 
 
 
-\## Check-In
+## Check-In
 
 
 
@@ -694,11 +694,11 @@ Accesso rapido allo scanner QR.
 
 
 
-\---
+---
 
 
 
-\## Missioni Staff
+## Missioni Staff
 
 
 
@@ -706,11 +706,11 @@ Missioni dedicate allo staff.
 
 
 
-\---
+---
 
 
 
-\# 12. Organizer Dashboard
+# 12. Organizer Dashboard
 
 
 
@@ -718,63 +718,63 @@ Disponibile solo agli organizzatori.
 
 
 
-\---
+---
 
 
 
-\## Sezioni
+## Sezioni
 
 
 
-\### Staff
+### Staff
 
 
 
-\- Presenze
+- Presenze
 
-\- Turni
+- Turni
 
-\- Attività
-
-
-
-\### Competizione
+- Attività
 
 
 
-\- Match
-
-\- Classifiche
-
-\- Eventi
+### Competizione
 
 
 
-\### Community
+- Match
+
+- Classifiche
+
+- Eventi
 
 
 
-\- Ranking
-
-\- Missioni
+### Community
 
 
 
-\### Comunicazioni
+- Ranking
+
+- Missioni
 
 
 
-\- Notifiche
-
-\- Annunci
+### Comunicazioni
 
 
 
-\---
+- Notifiche
+
+- Annunci
 
 
 
-\# 13. Admin Area
+---
+
+
+
+# 13. Admin Area
 
 
 
@@ -782,61 +782,61 @@ Disponibile solo agli amministratori.
 
 
 
-\---
+---
 
 
 
-\## Gestione Utenti
+## Gestione Utenti
 
 
 
-\- Ricerca
+- Ricerca
 
-\- Modifica
+- Modifica
 
-\- Sospensione
-
-
-
-\---
+- Sospensione
 
 
 
-\## Gestione Ruoli
+---
 
 
 
-\- Assegnazione
-
-\- Revoca
+## Gestione Ruoli
 
 
 
-\---
+- Assegnazione
+
+- Revoca
 
 
 
-\## Gestione Competizioni
+---
 
 
 
-\- Creazione
-
-\- Modifica
-
-\- Archiviazione
+## Gestione Competizioni
 
 
 
-\---
+- Creazione
+
+- Modifica
+
+- Archiviazione
 
 
 
-\# 14. Principi UX
+---
 
 
 
-\## Mobile First
+# 14. Principi UX
+
+
+
+## Mobile First
 
 
 
@@ -844,11 +844,11 @@ Tutte le schermate devono essere progettate prima per smartphone.
 
 
 
-\---
+---
 
 
 
-\## Performance
+## Performance
 
 
 
@@ -856,11 +856,11 @@ Le animazioni non devono compromettere la fluidità.
 
 
 
-\---
+---
 
 
 
-\## Accessibilità
+## Accessibilità
 
 
 
@@ -868,11 +868,11 @@ Componenti facilmente utilizzabili da tutti gli utenti.
 
 
 
-\---
+---
 
 
 
-\## Coerenza
+## Coerenza
 
 
 
@@ -880,35 +880,15 @@ Pattern grafici e comportamentali uniformi.
 
 
 
-\---
+---
 
 
 
-\# 15. Componenti Principali
+# 15. Componenti Principali
 
 
 
-\## Match Card
-
-
-
-Mostra:
-
-
-
-\- squadre
-
-\- risultato
-
-\- data
-
-
-
-\---
-
-
-
-\## School Card
+## Match Card
 
 
 
@@ -916,39 +896,19 @@ Mostra:
 
 
 
-\- logo
+- squadre
 
-\- nome
+- risultato
 
-\- posizione
-
-
-
-\---
+- data
 
 
 
-\## Mission Card
+---
 
 
 
-Mostra:
-
-
-
-\- titolo
-
-\- progresso
-
-\- ricompensa
-
-
-
-\---
-
-
-
-\## Reward Card
+## School Card
 
 
 
@@ -956,19 +916,19 @@ Mostra:
 
 
 
-\- premio
+- logo
 
-\- costo
+- nome
 
-\- disponibilità
-
-
-
-\---
+- posizione
 
 
 
-\## Notification Card
+---
+
+
+
+## Mission Card
 
 
 
@@ -976,13 +936,53 @@ Mostra:
 
 
 
-\- titolo
+- titolo
 
-\- descrizione
+- progresso
 
-\- data
+- ricompensa
 
 
 
-\---
+---
+
+
+
+## Reward Card
+
+
+
+Mostra:
+
+
+
+- premio
+
+- costo
+
+- disponibilità
+
+
+
+---
+
+
+
+## Notification Card
+
+
+
+Mostra:
+
+
+
+- titolo
+
+- descrizione
+
+- data
+
+
+
+---
 

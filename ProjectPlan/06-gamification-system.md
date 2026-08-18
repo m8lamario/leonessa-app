@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Gamification System v1.0
-
-
-
-\---
+## Gamification System v1.0
 
 
 
-\# 1. Obiettivo
+---
+
+
+
+# 1. Obiettivo
 
 
 
@@ -16,15 +16,15 @@ Il sistema di gamification ha lo scopo di:
 
 
 
-\- aumentare la partecipazione degli studenti;
+- aumentare la partecipazione degli studenti;
 
-\- incentivare la presenza dello staff;
+- incentivare la presenza dello staff;
 
-\- rafforzare il senso di appartenenza;
+- rafforzare il senso di appartenenza;
 
-\- premiare i contributi più importanti;
+- premiare i contributi più importanti;
 
-\- rendere l'app coinvolgente anche al di fuori delle partite.
+- rendere l'app coinvolgente anche al di fuori delle partite.
 
 
 
@@ -32,11 +32,11 @@ La gamification non deve sembrare un "gioco artificiale", ma un'estensione natur
 
 
 
-\---
+---
 
 
 
-\# 2. Filosofia
+# 2. Filosofia
 
 
 
@@ -52,11 +52,11 @@ Ogni riconoscimento deve essere visibile.
 
 
 
-\---
+---
 
 
 
-\# 3. Sistemi di Progressione
+# 3. Sistemi di Progressione
 
 
 
@@ -84,15 +84,15 @@ Ricompense
 
 
 
-\---
+---
 
 
 
-\# 4. Leonessa Points (LP)
+# 4. Leonessa Points (LP)
 
 
 
-\## Descrizione
+## Descrizione
 
 
 
@@ -104,15 +104,15 @@ Tutti gli utenti possono accumularla.
 
 
 
-\---
+---
 
 
 
-\## Come si ottengono
+## Come si ottengono
 
 
 
-\### Partecipazione
+### Partecipazione
 
 
 
@@ -132,11 +132,11 @@ Tutti gli utenti possono accumularla.
 
 
 
-\---
+---
 
 
 
-\### Community
+### Community
 
 
 
@@ -154,11 +154,11 @@ Tutti gli utenti possono accumularla.
 
 
 
-\---
+---
 
 
 
-\### Speciali
+### Speciali
 
 
 
@@ -174,15 +174,15 @@ Tutti gli utenti possono accumularla.
 
 
 
-\---
+---
 
 
 
-\# 5. Staff Points (SP)
+# 5. Staff Points (SP)
 
 
 
-\## Descrizione
+## Descrizione
 
 
 
@@ -194,11 +194,11 @@ Serve a premiare il contributo operativo.
 
 
 
-\---
+---
 
 
 
-\## Come si ottengono
+## Come si ottengono
 
 
 
@@ -218,15 +218,15 @@ Serve a premiare il contributo operativo.
 
 
 
-\---
+---
 
 
 
-\## Bonus
+## Bonus
 
 
 
-\### Affidabilità
+### Affidabilità
 
 
 
@@ -242,15 +242,15 @@ Serve a premiare il contributo operativo.
 
 
 
-\---
+---
 
 
 
-\# 6. Livelli
+# 6. Livelli
 
 
 
-\## Obiettivo
+## Obiettivo
 
 
 
@@ -258,11 +258,11 @@ Fornire un senso di crescita continua.
 
 
 
-\---
+---
 
 
 
-\## Formula
+## Formula
 
 
 
@@ -274,11 +274,11 @@ Livello = LP Totali Accumulati
 
 
 
-\---
+---
 
 
 
-\## Esempio
+## Esempio
 
 
 
@@ -302,11 +302,11 @@ Livello = LP Totali Accumulati
 
 
 
-\---
+---
 
 
 
-\## Benefici
+## Benefici
 
 
 
@@ -314,11 +314,11 @@ Attualmente:
 
 
 
-\- prestigio;
+- prestigio;
 
-\- badge;
+- badge;
 
-\- posizione in classifica.
+- posizione in classifica.
 
 
 
@@ -326,21 +326,21 @@ In futuro:
 
 
 
-\- accesso anticipato;
+- accesso anticipato;
 
-\- premi esclusivi.
-
-
-
-\---
+- premi esclusivi.
 
 
 
-\# 7. Badge
+---
 
 
 
-\## Descrizione
+# 7. Badge
+
+
+
+## Descrizione
 
 
 
@@ -352,15 +352,15 @@ Non possono essere persi.
 
 
 
-\---
+---
 
 
 
-\## Tipologie
+## Tipologie
 
 
 
-\### Community
+### Community
 
 
 
@@ -378,11 +378,11 @@ Presenza Costante
 
 
 
-\---
+---
 
 
 
-\### Staff
+### Staff
 
 
 
@@ -400,11 +400,11 @@ Operativo Elite
 
 
 
-\---
+---
 
 
 
-\### Competizione
+### Competizione
 
 
 
@@ -422,11 +422,11 @@ MVP
 
 
 
-\---
+---
 
 
 
-\### Speciali
+### Speciali
 
 
 
@@ -444,15 +444,15 @@ Leggenda Leonessa
 
 
 
-\---
+---
 
 
 
-\# 8. Missioni
+# 8. Missioni
 
 
 
-\## Obiettivo
+## Obiettivo
 
 
 
@@ -460,11 +460,11 @@ Guidare i comportamenti desiderati.
 
 
 
-\---
+---
 
 
 
-\# 9. Missioni Giornaliere
+# 9. Missioni Giornaliere
 
 
 
@@ -472,15 +472,15 @@ Reset automatico ogni giorno.
 
 
 
-\---
+---
 
 
 
-\## Esempi
+## Esempi
 
 
 
-\### Community
+### Community
 
 
 
@@ -514,11 +514,11 @@ Guadagna 10 LP
 
 
 
-\---
+---
 
 
 
-\# 10. Missioni Settimanali
+# 10. Missioni Settimanali
 
 
 
@@ -534,11 +534,11 @@ Durata:
 
 
 
-\---
+---
 
 
 
-\## Esempi
+## Esempi
 
 
 
@@ -572,15 +572,15 @@ Ottieni 250 LP
 
 
 
-\---
+---
 
 
 
-\# 11. Missioni Staff
+# 11. Missioni Staff
 
 
 
-\## Esempi
+## Esempi
 
 
 
@@ -624,15 +624,15 @@ Partecipa a tutti gli eventi del mese
 
 
 
-\---
+---
 
 
 
-\# 12. School Challenges
+# 12. School Challenges
 
 
 
-\## Descrizione
+## Descrizione
 
 
 
@@ -640,15 +640,15 @@ Competizioni tra scuole.
 
 
 
-\---
+---
 
 
 
-\## Esempi
+## Esempi
 
 
 
-\### Partecipazione
+### Partecipazione
 
 
 
@@ -660,11 +660,11 @@ Quale scuola porta più studenti?
 
 
 
-\---
+---
 
 
 
-\### Community
+### Community
 
 
 
@@ -676,11 +676,11 @@ Quale scuola completa più missioni?
 
 
 
-\---
+---
 
 
 
-\### Presenze
+### Presenze
 
 
 
@@ -692,31 +692,31 @@ Quale scuola registra più check-in?
 
 
 
-\---
+---
 
 
 
-\## Ricompense
+## Ricompense
 
 
 
-\- LP bonus
+- LP bonus
 
-\- Badge esclusivi
+- Badge esclusivi
 
-\- Trofei digitali
-
-
-
-\---
+- Trofei digitali
 
 
 
-\# 13. Ranking
+---
 
 
 
-\## Ranking Utenti
+# 13. Ranking
+
+
+
+## Ranking Utenti
 
 
 
@@ -732,11 +732,11 @@ LP Totali
 
 
 
-\---
+---
 
 
 
-\## Ranking Staff
+## Ranking Staff
 
 
 
@@ -752,11 +752,11 @@ SP Totali
 
 
 
-\---
+---
 
 
 
-\## Ranking Scuole
+## Ranking Scuole
 
 
 
@@ -768,11 +768,11 @@ Basato su:
 
 LP aggregati
 
-\+
++
 
 Partecipazione
 
-\+
++
 
 Missioni completate
 
@@ -780,15 +780,15 @@ Missioni completate
 
 
 
-\---
+---
 
 
 
-\# 14. Reward Store
+# 14. Reward Store
 
 
 
-\## Obiettivo
+## Obiettivo
 
 
 
@@ -796,93 +796,93 @@ Trasformare i punti in valore reale.
 
 
 
-\---
+---
 
 
 
-\## Premi Possibili
+## Premi Possibili
 
 
 
-\### Merch
+### Merch
 
 
 
-\- Magliette
+- Magliette
 
-\- Felpe
+- Felpe
 
-\- Cappellini
+- Cappellini
 
-\- Adesivi
-
-
-
-\---
+- Adesivi
 
 
 
-\### Esperienze
+---
 
 
 
-\- Accesso anticipato
-
-\- Area riservata
-
-\- Meet \& Greet
+### Esperienze
 
 
 
-\---
+- Accesso anticipato
+
+- Area riservata
+
+- Meet & Greet
 
 
 
-\### Sponsor
+---
 
 
 
-\- Coupon
-
-\- Sconti
-
-\- Omaggi
+### Sponsor
 
 
 
-\---
+- Coupon
+
+- Sconti
+
+- Omaggi
 
 
 
-\# 15. Sistema Anti-Abuso
+---
 
 
 
-\## Regole
+# 15. Sistema Anti-Abuso
 
 
 
-\- Nessuna missione ripetibile all'infinito.
-
-\- Rate limit sui punti.
-
-\- Validazione server-side.
-
-\- Logging attività.
-
-\- Controllo automatico comportamenti anomali.
+## Regole
 
 
 
-\---
+- Nessuna missione ripetibile all'infinito.
+
+- Rate limit sui punti.
+
+- Validazione server-side.
+
+- Logging attività.
+
+- Controllo automatico comportamenti anomali.
 
 
 
-\# 16. Coinvolgimento Staff
+---
 
 
 
-\## Problema
+# 16. Coinvolgimento Staff
+
+
+
+## Problema
 
 
 
@@ -890,11 +890,11 @@ Storicamente la partecipazione dello staff è poco costante.
 
 
 
-\---
+---
 
 
 
-\## Soluzione
+## Soluzione
 
 
 
@@ -902,23 +902,23 @@ L'app deve rendere visibili:
 
 
 
-\- presenze;
+- presenze;
 
-\- affidabilità;
+- affidabilità;
 
-\- contributo reale.
-
-
-
-\---
+- contributo reale.
 
 
 
-\## Meccaniche
+---
 
 
 
-\### Streak
+## Meccaniche
+
+
+
+### Streak
 
 
 
@@ -930,11 +930,11 @@ Turni consecutivi completati
 
 
 
-\---
+---
 
 
 
-\### Ranking Staff
+### Ranking Staff
 
 
 
@@ -942,11 +942,11 @@ Classifica pubblica.
 
 
 
-\---
+---
 
 
 
-\### Badge Rari
+### Badge Rari
 
 
 
@@ -954,11 +954,11 @@ Riconoscimenti esclusivi.
 
 
 
-\---
+---
 
 
 
-\### Premi Staff
+### Premi Staff
 
 
 
@@ -966,15 +966,15 @@ Premi dedicati ai membri più attivi.
 
 
 
-\---
+---
 
 
 
-\# 17. Coinvolgimento Spettatori
+# 17. Coinvolgimento Spettatori
 
 
 
-\## Problema
+## Problema
 
 
 
@@ -982,11 +982,11 @@ Lo spettatore spesso utilizza la Leonessa Cup solo durante le partite.
 
 
 
-\---
+---
 
 
 
-\## Soluzione
+## Soluzione
 
 
 
@@ -994,87 +994,87 @@ Creare motivi per aprire l'app ogni settimana.
 
 
 
-\---
+---
 
 
 
-\## Meccaniche
+## Meccaniche
 
 
 
-\- Missioni
+- Missioni
 
-\- Ranking
+- Ranking
 
-\- Fanta Leonessa (V2)
+- Fanta Leonessa (V2)
 
-\- School Challenges
+- School Challenges
 
-\- Badge
+- Badge
 
-\- Eventi speciali
-
-
-
-\---
+- Eventi speciali
 
 
 
-\# 18. KPI da Monitorare
+---
 
 
 
-\## Community
+# 18. KPI da Monitorare
 
 
 
-\- Utenti attivi giornalieri
-
-\- Utenti attivi settimanali
-
-\- Missioni completate
-
-\- Tempo medio nell'app
+## Community
 
 
 
-\---
+- Utenti attivi giornalieri
+
+- Utenti attivi settimanali
+
+- Missioni completate
+
+- Tempo medio nell'app
 
 
 
-\## Staff
+---
 
 
 
-\- Presenze
-
-\- Turni completati
-
-\- Affidabilità
+## Staff
 
 
 
-\---
+- Presenze
+
+- Turni completati
+
+- Affidabilità
 
 
 
-\## Competizione
+---
 
 
 
-\- Partecipazione eventi
-
-\- Check-in
-
-\- Coinvolgimento scuole
+## Competizione
 
 
 
-\---
+- Partecipazione eventi
+
+- Check-in
+
+- Coinvolgimento scuole
 
 
 
-\# 19. MVP Scope
+---
+
+
+
+# 19. MVP Scope
 
 
 
@@ -1082,21 +1082,21 @@ Incluso nella V1:
 
 
 
-\- LP
+- LP
 
-\- SP
+- SP
 
-\- Missioni
+- Missioni
 
-\- Badge
+- Badge
 
-\- Ranking
+- Ranking
 
-\- Livelli
+- Livelli
 
 
 
-\---
+---
 
 
 
@@ -1104,23 +1104,23 @@ Escluso dalla V1:
 
 
 
-\- Reward Store completo
+- Reward Store completo
 
-\- Sponsor Rewards
+- Sponsor Rewards
 
-\- Fanta Leonessa
+- Fanta Leonessa
 
-\- Achievement avanzati
+- Achievement avanzati
 
-\- Stagioni competitive
-
-
-
-\---
+- Stagioni competitive
 
 
 
-\# 20. Visione Finale
+---
+
+
+
+# 20. Visione Finale
 
 
 
@@ -1132,15 +1132,15 @@ L'obiettivo è costruire un ecosistema in cui:
 
 
 
-\- gli studenti si sentano parte della Leonessa Cup;
+- gli studenti si sentano parte della Leonessa Cup;
 
-\- lo staff sia incentivato a contribuire;
+- lo staff sia incentivato a contribuire;
 
-\- le scuole competano anche fuori dal campo;
+- le scuole competano anche fuori dal campo;
 
-\- l'app rimanga utile e interessante durante tutta la stagione.
+- l'app rimanga utile e interessante durante tutta la stagione.
 
 
 
-\---
+---
 

@@ -3,7 +3,9 @@ import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { sendInitialEmailVerification } from "@/features/auth/server/account-service";
 import { registrationSchema } from "@/features/auth/validation";
+import { AppError } from "@/utils/errors";
 
 export async function POST(request: Request) {
   let payload: unknown;
@@ -68,7 +70,20 @@ export async function POST(request: Request) {
       select: { id: true },
     });
 
-    return NextResponse.json({ id: user.id }, { status: 201 });
+    try {
+      await sendInitialEmailVerification(user.id);
+    } catch (error) {
+      if (error instanceof AppError) {
+        return NextResponse.json(
+          { id: user.id, verificationEmailSent: false, verificationMessage: error.message },
+          { status: 201 },
+        );
+      }
+
+      throw error;
+    }
+
+    return NextResponse.json({ id: user.id, verificationEmailSent: true }, { status: 201 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json(

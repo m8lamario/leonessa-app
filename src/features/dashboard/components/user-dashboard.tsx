@@ -5,6 +5,10 @@ import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
 import { useState } from "react";
 
+import {
+  EmailVerificationBanner,
+  type EmailVerificationBannerStatus,
+} from "@/features/auth/components/email-verification-banner";
 import { Logo, PageContainer } from "@/shared/components";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import type { DashboardData } from "../types";
@@ -15,6 +19,7 @@ type UserDashboardProps = {
   userInitials: string;
   schoolName: string;
   data: DashboardData;
+  verificationStatus: EmailVerificationBannerStatus | null;
 };
 
 const revealTransition = {
@@ -22,7 +27,13 @@ const revealTransition = {
   ease: "easeOut" as const,
 };
 
-export function UserDashboard({ userName, userInitials, schoolName, data }: UserDashboardProps) {
+export function UserDashboard({
+  userName,
+  userInitials,
+  schoolName,
+  data,
+  verificationStatus,
+}: UserDashboardProps) {
   const [showFullRanking, setShowFullRanking] = useState(false);
   const { featuredMatch, missions, news, events, profile, school, schoolRanking } = data;
   const visibleSchoolRanking = showFullRanking ? schoolRanking : schoolRanking.slice(0, 5);
@@ -49,6 +60,7 @@ export function UserDashboard({ userName, userInitials, schoolName, data }: User
           </Link>
         </div>
       </motion.header>
+      {verificationStatus && <EmailVerificationBanner initialStatus={verificationStatus} />}
       <motion.header
         className={styles.hero}
         initial={{ opacity: 0, y: 14 }}

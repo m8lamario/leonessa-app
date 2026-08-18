@@ -1,14 +1,14 @@
-\# Leonessa App
+# Leonessa App
 
-\## Prisma Schema Blueprint v1.0
-
-
-
-\---
+## Prisma Schema Blueprint v1.0
 
 
 
-\# Database
+---
+
+
+
+# Database
 
 
 
@@ -26,7 +26,7 @@ datasource db {
 
 &#x20; provider = "postgresql"
 
-&#x20; url      = env("DATABASE\_URL")
+&#x20; url      = env("DATABASE_URL")
 
 }
 
@@ -34,11 +34,11 @@ datasource db {
 
 
 
-\---
+---
 
 
 
-\# Enums
+# Enums
 
 
 
@@ -52,7 +52,7 @@ enum UserRoleType {
 
 &#x20; STAFF
 
-&#x20; SCHOOL\_REP
+&#x20; SCHOOL_REP
 
 &#x20; ORGANIZER
 
@@ -82,7 +82,7 @@ enum ShiftStatus {
 
 &#x20; CONFIRMED
 
-&#x20; CHECKED\_IN
+&#x20; CHECKED_IN
 
 &#x20; COMPLETED
 
@@ -94,7 +94,7 @@ enum MissionStatus {
 
 &#x20; AVAILABLE
 
-&#x20; IN\_PROGRESS
+&#x20; IN_PROGRESS
 
 &#x20; COMPLETED
 
@@ -116,11 +116,11 @@ enum PointType {
 
 
 
-\---
+---
 
 
 
-\# User
+# User
 
 
 
@@ -146,27 +146,27 @@ model User {
 
 &#x20; schoolId      String?
 
-&#x20; school        School? @relation(fields: \[schoolId], references: \[id])
+&#x20; school        School? @relation(fields: [schoolId], references: [id])
 
 
 
-&#x20; roles         UserRole\[]
+&#x20; roles         UserRole[]
 
-&#x20; teamMembers   TeamMember\[]
-
-
-
-&#x20; badges        UserBadge\[]
-
-&#x20; missions      UserMission\[]
+&#x20; teamMembers   TeamMember[]
 
 
 
-&#x20; points        PointTransaction\[]
+&#x20; badges        UserBadge[]
+
+&#x20; missions      UserMission[]
 
 
 
-&#x20; notifications Notification\[]
+&#x20; points        PointTransaction[]
+
+
+
+&#x20; notifications Notification[]
 
 
 
@@ -180,11 +180,11 @@ model User {
 
 
 
-\---
+---
 
 
 
-\# School
+# School
 
 
 
@@ -212,9 +212,9 @@ model School {
 
 
 
-&#x20; users          User\[]
+&#x20; users          User[]
 
-&#x20; teams          Team\[]
+&#x20; teams          Team[]
 
 
 
@@ -228,11 +228,11 @@ model School {
 
 
 
-\---
+---
 
 
 
-\# UserRole
+# UserRole
 
 
 
@@ -250,7 +250,7 @@ model UserRole {
 
 
 
-&#x20; user       User         @relation(fields: \[userId], references: \[id])
+&#x20; user       User         @relation(fields: [userId], references: [id])
 
 
 
@@ -262,11 +262,11 @@ model UserRole {
 
 
 
-\---
+---
 
 
 
-\# Competition
+# Competition
 
 
 
@@ -294,9 +294,9 @@ model Competition {
 
 
 
-&#x20; teams       Team\[]
+&#x20; teams       Team[]
 
-&#x20; matches     Match\[]
+&#x20; matches     Match[]
 
 
 
@@ -310,11 +310,11 @@ model Competition {
 
 
 
-\---
+---
 
 
 
-\# Team
+# Team
 
 
 
@@ -332,23 +332,23 @@ model Team {
 
 &#x20; schoolId       String
 
-&#x20; school         School @relation(fields: \[schoolId], references: \[id])
+&#x20; school         School @relation(fields: [schoolId], references: [id])
 
 
 
 &#x20; competitionId  String
 
-&#x20; competition    Competition @relation(fields: \[competitionId], references: \[id])
+&#x20; competition    Competition @relation(fields: [competitionId], references: [id])
 
 
 
-&#x20; members        TeamMember\[]
+&#x20; members        TeamMember[]
 
 
 
-&#x20; homeMatches    Match\[] @relation("HomeTeam")
+&#x20; homeMatches    Match[] @relation("HomeTeam")
 
-&#x20; awayMatches    Match\[] @relation("AwayTeam")
+&#x20; awayMatches    Match[] @relation("AwayTeam")
 
 
 
@@ -360,11 +360,11 @@ model Team {
 
 
 
-\---
+---
 
 
 
-\# TeamMember
+# TeamMember
 
 
 
@@ -386,9 +386,9 @@ model TeamMember {
 
 
 
-&#x20; team        Team @relation(fields: \[teamId], references: \[id])
+&#x20; team        Team @relation(fields: [teamId], references: [id])
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
 }
 
@@ -396,11 +396,11 @@ model TeamMember {
 
 
 
-\---
+---
 
 
 
-\# Match
+# Match
 
 
 
@@ -414,7 +414,7 @@ model Match {
 
 &#x20; competitionId   String
 
-&#x20; competition     Competition @relation(fields: \[competitionId], references: \[id])
+&#x20; competition     Competition @relation(fields: [competitionId], references: [id])
 
 
 
@@ -424,9 +424,9 @@ model Match {
 
 
 
-&#x20; homeTeam        Team @relation("HomeTeam", fields: \[homeTeamId], references: \[id])
+&#x20; homeTeam        Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
 
-&#x20; awayTeam        Team @relation("AwayTeam", fields: \[awayTeamId], references: \[id])
+&#x20; awayTeam        Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
 
 
@@ -448,7 +448,7 @@ model Match {
 
 
 
-&#x20; events          MatchEvent\[]
+&#x20; events          MatchEvent[]
 
 
 
@@ -460,11 +460,11 @@ model Match {
 
 
 
-\---
+---
 
 
 
-\# MatchEvent
+# MatchEvent
 
 
 
@@ -490,7 +490,7 @@ model MatchEvent {
 
 
 
-&#x20; match           Match @relation(fields: \[matchId], references: \[id])
+&#x20; match           Match @relation(fields: [matchId], references: [id])
 
 }
 
@@ -498,11 +498,11 @@ model MatchEvent {
 
 
 
-\---
+---
 
 
 
-\# StaffRole
+# StaffRole
 
 
 
@@ -518,7 +518,7 @@ model StaffRole {
 
 
 
-&#x20; shifts      Shift\[]
+&#x20; shifts      Shift[]
 
 }
 
@@ -526,11 +526,11 @@ model StaffRole {
 
 
 
-\---
+---
 
 
 
-\# Shift
+# Shift
 
 
 
@@ -560,11 +560,11 @@ model Shift {
 
 
 
-&#x20; staffRole     StaffRole @relation(fields: \[staffRoleId], references: \[id])
+&#x20; staffRole     StaffRole @relation(fields: [staffRoleId], references: [id])
 
 
 
-&#x20; assignments   ShiftAssignment\[]
+&#x20; assignments   ShiftAssignment[]
 
 }
 
@@ -572,11 +572,11 @@ model Shift {
 
 
 
-\---
+---
 
 
 
-\# ShiftAssignment
+# ShiftAssignment
 
 
 
@@ -598,9 +598,9 @@ model ShiftAssignment {
 
 
 
-&#x20; shift       Shift @relation(fields: \[shiftId], references: \[id])
+&#x20; shift       Shift @relation(fields: [shiftId], references: [id])
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
 }
 
@@ -608,11 +608,11 @@ model ShiftAssignment {
 
 
 
-\---
+---
 
 
 
-\# Mission
+# Mission
 
 
 
@@ -634,7 +634,7 @@ model Mission {
 
 
 
-&#x20; users         UserMission\[]
+&#x20; users         UserMission[]
 
 }
 
@@ -642,11 +642,11 @@ model Mission {
 
 
 
-\---
+---
 
 
 
-\# UserMission
+# UserMission
 
 
 
@@ -668,9 +668,9 @@ model UserMission {
 
 
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
-&#x20; mission     Mission @relation(fields: \[missionId], references: \[id])
+&#x20; mission     Mission @relation(fields: [missionId], references: [id])
 
 }
 
@@ -678,11 +678,11 @@ model UserMission {
 
 
 
-\---
+---
 
 
 
-\# Badge
+# Badge
 
 
 
@@ -700,7 +700,7 @@ model Badge {
 
 
 
-&#x20; users       UserBadge\[]
+&#x20; users       UserBadge[]
 
 }
 
@@ -708,11 +708,11 @@ model Badge {
 
 
 
-\---
+---
 
 
 
-\# UserBadge
+# UserBadge
 
 
 
@@ -730,9 +730,9 @@ model UserBadge {
 
 
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
-&#x20; badge       Badge @relation(fields: \[badgeId], references: \[id])
+&#x20; badge       Badge @relation(fields: [badgeId], references: [id])
 
 
 
@@ -744,11 +744,11 @@ model UserBadge {
 
 
 
-\---
+---
 
 
 
-\# PointTransaction
+# PointTransaction
 
 
 
@@ -776,7 +776,7 @@ model PointTransaction {
 
 
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
 
 
@@ -788,11 +788,11 @@ model PointTransaction {
 
 
 
-\---
+---
 
 
 
-\# Notification
+# Notification
 
 
 
@@ -818,7 +818,7 @@ model Notification {
 
 
 
-&#x20; user        User @relation(fields: \[userId], references: \[id])
+&#x20; user        User @relation(fields: [userId], references: [id])
 
 
 
@@ -830,11 +830,11 @@ model Notification {
 
 
 
-\---
+---
 
 
 
-\# V1 Database Scope
+# V1 Database Scope
 
 
 
@@ -882,41 +882,41 @@ model Notification {
 
 
 
-\---
+---
 
 
 
-\# V2
+# V2
 
 
 
-\- Reward Store
+- Reward Store
 
-\- Sponsor System
+- Sponsor System
 
-\- Fanta Leonessa
+- Fanta Leonessa
 
-\- AI Assistant
+- AI Assistant
 
-\- Ticketing
-
-
-
-\---
+- Ticketing
 
 
 
-\# V3
+---
 
 
 
-\- Multi Tournament Platform
-
-\- API Pubbliche
-
-\- White Label Competitions
+# V3
 
 
 
-\---
+- Multi Tournament Platform
+
+- API Pubbliche
+
+- White Label Competitions
+
+
+
+---
 

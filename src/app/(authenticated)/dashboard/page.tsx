@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { getEmailVerificationStatus } from "@/features/auth/server/account-service";
 import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
 import { UserDashboard } from "@/features/dashboard";
 import { getDashboardData } from "@/features/dashboard/server/dashboard-service";
@@ -14,6 +15,7 @@ export default async function DashboardPage() {
   }
 
   const dashboardData = await getDashboardData(user.id, user.schoolId);
+  const verificationStatus = user.emailVerified ? null : await getEmailVerificationStatus(user.id);
   const userName = [user.name, user.surname].filter(Boolean).join(" ");
   const userInitials = [user.name, user.surname]
     .filter(Boolean)
@@ -26,6 +28,13 @@ export default async function DashboardPage() {
       userInitials={userInitials || "LC"}
       schoolName={user.school?.name ?? "La tua scuola"}
       data={dashboardData}
+      verificationStatus={
+        verificationStatus && {
+          ...verificationStatus,
+          sentAt: verificationStatus.sentAt?.toISOString() ?? null,
+          cooldownEndsAt: verificationStatus.cooldownEndsAt?.toISOString() ?? null,
+        }
+      }
     />
   );
 }
