@@ -3,6 +3,15 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { ACHIEVEMENTS, type AchievementCode } from "../achievements";
 
+export const ACTIVITY_TYPES = {
+  rankingUp: "ranking_up",
+  playerBought: "player_bought",
+  bigPoints: "big_points",
+  captainChange: "captain_change",
+  bestBuy: "best_buy",
+  achievement: "achievement",
+} as const;
+
 export type ActivityDto = {
   id: string;
   type: string;
