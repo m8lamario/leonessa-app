@@ -13,11 +13,19 @@ type EslTeam = {
   record?: string | null;
 };
 
+type EslMatchEvent = {
+  id: number | string;
+  minute: number;
+  event_type: string;
+  player?: { id: number | string; first_name?: string | null; last_name?: string | null } | null;
+};
+
 type EslTeamMatch = {
   is_home: boolean;
   penalties?: number | null;
   score?: number | null;
   team: EslTeam;
+  events?: EslMatchEvent[];
 };
 
 type EslStadium = {
@@ -93,6 +101,30 @@ function asEslTeam(value: unknown): EslTeam | null {
   };
 }
 
+function asEslMatchEvent(value: unknown): EslMatchEvent | null {
+  if (!isRecord(value) || (typeof value.id !== "number" && typeof value.id !== "string")) {
+    return null;
+  }
+
+  const minute = asNumber(value.minute);
+  const eventType = asString(value.event_type);
+  const player =
+    isRecord(value.player) &&
+    (typeof value.player.id === "number" || typeof value.player.id === "string")
+      ? {
+          id: value.player.id,
+          first_name: asString(value.player.first_name),
+          last_name: asString(value.player.last_name),
+        }
+      : null;
+
+  if (minute === null || !eventType) {
+    return null;
+  }
+
+  return { id: value.id, minute, event_type: eventType, player };
+}
+
 function asEslTeamMatch(value: unknown): EslTeamMatch | null {
   if (!isRecord(value) || typeof value.is_home !== "boolean") {
     return null;
@@ -104,11 +136,16 @@ function asEslTeamMatch(value: unknown): EslTeamMatch | null {
     return null;
   }
 
+  const events = Array.isArray(value.events)
+    ? value.events.map(asEslMatchEvent).filter((event): event is EslMatchEvent => event !== null)
+    : [];
+
   return {
     is_home: value.is_home,
     penalties: asNumber(value.penalties),
     score: asNumber(value.score),
     team,
+    events,
   };
 }
 
@@ -216,6 +253,37 @@ function normalizeVenue(stadium: EslStadium | null): MatchVenue | null {
   };
 }
 
+function normalizeEvents(teams: EslTeamMatch[]): Match["events"] {
+  const supportedTypes = new Set<Match["events"][number]["type"]>([
+    "GOAL",
+    "ASSIST",
+    "YELLOW_CARD",
+    "RED_CARD",
+    "OWN_GOAL",
+  ]);
+
+  return teams.flatMap((team) =>
+    (team.events ?? []).flatMap((event) => {
+      const type = event.event_type.toUpperCase().replace(/\s+/g, "_");
+      if (!supportedTypes.has(type as Match["events"][number]["type"])) {
+        return [];
+      }
+
+      return [
+        {
+          id: String(event.id),
+          playerEslId: event.player ? String(event.player.id) : null,
+          playerFirstName: event.player?.first_name ?? null,
+          playerLastName: event.player?.last_name ?? null,
+          teamEslId: String(team.team.id),
+          minute: event.minute,
+          type: type as Match["events"][number]["type"],
+        },
+      ];
+    }),
+  );
+}
+
 function normalizeMatch(match: EslMatch): Match | null {
   const home = match.teams.find((team) => team.is_home);
   const away = match.teams.find((team) => !team.is_home);
@@ -243,6 +311,7 @@ function normalizeMatch(match: EslMatch): Match | null {
     awayPenalties: away.penalties ?? null,
     scoreText: match.score_text ?? null,
     isLive: match.isLive ?? false,
+    events: normalizeEvents(match.teams),
     venue: normalizeVenue(match.stadium ?? null),
   };
 }

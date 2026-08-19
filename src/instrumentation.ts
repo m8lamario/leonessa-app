@@ -30,9 +30,9 @@ async function runSync(trigger: "startup" | "interval") {
   scheduler.running = true;
 
   try {
-    const { syncLeonessaCup } = await import("@/features/cup/server");
-    const result = await syncLeonessaCup();
-    logger.info({ trigger, result }, "Cup sync trigger completed");
+    const { syncFantasyScoring } = await import("@/features/fanta/server");
+    const result = await syncFantasyScoring();
+    logger.info({ trigger, result }, "Fantasy scoring sync trigger completed");
   } catch (error) {
     logger.error({ err: error, trigger }, "Cup sync trigger failed");
   } finally {

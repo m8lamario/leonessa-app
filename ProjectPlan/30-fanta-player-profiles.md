@@ -1,4 +1,4 @@
-# 22-fanta-player-profiles.md
+# 30-fanta-player-profiles.md
 
 ## Obiettivo
 

@@ -1,0 +1,359 @@
+.page {
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+.header h1 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--type-h1-size);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+}
+.kicker {
+  margin: 0 0 8px;
+  color: #9cb2ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.headerStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  white-space: nowrap;
+}
+.headerStat span {
+  color: var(--color-text-secondary);
+  font-size: 0.74rem;
+}
+.headerStat strong {
+  font-size: 0.9rem;
+}
+
+.section {
+  margin-top: 28px;
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sectionHeading h2 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--type-h2-size);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.sectionHeading svg {
+  color: #9cb2ff;
+}
+.emptyState {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed rgb(198 204 218 / 22%);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.activityCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid rgb(198 204 218 / 14%);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 5%);
+}
+.activityEmoji {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgb(48 92 255 / 40%), rgb(48 92 255 / 10%));
+  font-size: 1.2rem;
+}
+.activityCard > div {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+.activityCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.activityCard small {
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+}
+.activityCard time {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.podiumList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.podiumRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border: 1px solid rgb(198 204 218 / 14%);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(145deg, rgb(255 255 255 / 8%), rgb(255 255 255 / 3%));
+}
+.podiumMedal {
+  font-size: 1.4rem;
+}
+.podiumName {
+  flex: 1;
+  font-weight: 700;
+}
+.podiumRow b {
+  color: #9ee3b3;
+  font-family: var(--font-family-display);
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+.mvpCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgb(247 201 72 / 45%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgb(247 201 72 / 16%), rgb(247 201 72 / 5%));
+}
+.mvpIcon {
+  font-size: 2rem;
+}
+.mvpCard > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+.mvpCard strong {
+  font-size: 1rem;
+}
+.mvpCard small {
+  color: var(--color-text-secondary);
+}
+.mvpCard b {
+  color: #f7c948;
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.duelCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid rgb(48 92 255 / 40%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgb(48 92 255 / 20%), rgb(48 92 255 / 6%));
+}
+.duelSide {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.duelAway {
+  align-items: flex-end;
+}
+.duelSide span {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.duelSide b {
+  font-family: var(--font-family-display);
+  font-size: 2rem;
+  font-weight: 400;
+}
+.vs {
+  color: #f7c948;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.achievementGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.achievementUnlocked,
+.achievementLocked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+}
+.achievementUnlocked {
+  border: 1px solid rgb(247 201 72 / 45%);
+  background: linear-gradient(145deg, rgb(247 201 72 / 14%), rgb(247 201 72 / 4%));
+}
+.achievementLocked {
+  border: 1px solid rgb(198 204 218 / 14%);
+  background: rgb(255 255 255 / 4%);
+  opacity: 0.6;
+}
+.achievementUnlocked > span,
+.achievementLocked > span {
+  font-size: 1.5rem;
+}
+.achievementUnlocked strong,
+.achievementLocked strong {
+  font-size: 0.82rem;
+}
+.achievementUnlocked small,
+.achievementLocked small {
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+}
+.achievementLocked em {
+  color: var(--color-text-muted);
+  font-size: 0.66rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.rivalCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgb(198 204 218 / 18%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgb(19 30 82 / 96%), rgb(6 15 51 / 98%));
+}
+.rivalCard > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rivalCard span {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+}
+.rivalCard strong {
+  font-size: 1.1rem;
+}
+.deltaUp {
+  color: #9ee3b3;
+}
+.deltaDown {
+  color: #ffb3b3;
+}
+
+.hofList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hofRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid rgb(198 204 218 / 14%);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 5%);
+}
+.hofRow span {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.hofRow b {
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.trendGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.trendBlock {
+  padding: 14px;
+  border: 1px solid rgb(198 204 218 / 14%);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 5%);
+}
+.trendBlock h3 {
+  margin: 0 0 10px;
+  color: #9cb2ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.trendItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trendItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.trendItem span {
+  overflow: hidden;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trendItem b {
+  flex: 0 0 auto;
+  color: #9cb2ff;
+  font-size: 0.76rem;
+}
+
+@media (max-width: 420px) {
+  .achievementGrid,
+  .trendGrid {
+    grid-template-columns: 1fr;
+  }
+}

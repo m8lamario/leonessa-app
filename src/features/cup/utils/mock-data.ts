@@ -104,6 +104,7 @@ function createMatch(
     awayPenalties: null,
     scoreText: homeScore !== null && awayScore !== null ? `${homeScore} - ${awayScore}` : null,
     isLive: status === "live",
+    events: [],
     venue: {
       name: "Centro Sportivo Mario Rigamonti",
       address: "Via Serenissima, 34, Brescia",

@@ -176,6 +176,69 @@ async function alertAdmins(
   }
 }
 
+async function syncMatchEvents(
+  transaction: Prisma.TransactionClient,
+  matchId: string,
+  events: Match["events"],
+) {
+  const playerEslIds = events
+    .map((event) => event.playerEslId)
+    .filter((id): id is string => id !== null);
+  const players = await transaction.teamMember.findMany({
+    where: {
+      OR: [
+        { eslId: { in: playerEslIds } },
+        { team: { eslId: { in: [...new Set(events.map((event) => event.teamEslId))] } } },
+      ],
+    },
+    select: {
+      id: true,
+      eslId: true,
+      team: { select: { eslId: true } },
+      user: { select: { name: true, surname: true } },
+    },
+  });
+  const playerIds = new Map(
+    players
+      .filter((player) => player.eslId !== null)
+      .map((player) => [player.eslId!, player.id] as const),
+  );
+  const normalizeName = (value: string | null) => value?.trim().toLocaleLowerCase("it-IT") ?? "";
+  const getPlayerId = (event: Match["events"][number]) => {
+    if (event.playerEslId && playerIds.has(event.playerEslId)) {
+      return playerIds.get(event.playerEslId) ?? null;
+    }
+
+    return (
+      players.find(
+        (player) =>
+          player.team.eslId === event.teamEslId &&
+          normalizeName(player.user.name) === normalizeName(event.playerFirstName) &&
+          normalizeName(player.user.surname) === normalizeName(event.playerLastName),
+      )?.id ?? null
+    );
+  };
+
+  for (const event of events) {
+    await transaction.matchEvent.upsert({
+      where: { eslId: event.id },
+      create: {
+        eslId: event.id,
+        matchId,
+        type: event.type,
+        minute: event.minute,
+        playerId: getPlayerId(event),
+      },
+      update: {
+        matchId,
+        type: event.type,
+        minute: event.minute,
+        playerId: getPlayerId(event),
+      },
+    });
+  }
+}
+
 async function persistSync(matches: Match[]): Promise<PersistedSync> {
   const dates = matches.map((match) => new Date(match.kickoff));
   const startDate = new Date(Math.min(...dates.map((date) => date.getTime())));
@@ -261,12 +324,11 @@ async function persistSync(matches: Match[]): Promise<PersistedSync> {
           });
         }
 
-        if (existing) {
-          await transaction.match.update({ where: { id: existing.id }, data: matchData });
-        } else {
-          await transaction.match.create({ data: matchData });
-        }
+        const persistedMatch = existing
+          ? await transaction.match.update({ where: { id: existing.id }, data: matchData })
+          : await transaction.match.create({ data: matchData });
 
+        await syncMatchEvents(transaction, persistedMatch.id, sourceMatch.events);
         matchesUpdated += 1;
       }
 

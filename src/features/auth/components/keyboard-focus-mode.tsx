@@ -2,12 +2,15 @@
 
 import { Keyboard } from "@capacitor/keyboard";
 import { Capacitor } from "@capacitor/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "../auth.module.css";
 
+const SCROLL_MARGIN_PX = 8;
+
 export function useKeyboardFocusMode() {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const keyboardHeightRef = useRef(0);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
@@ -22,15 +25,34 @@ export function useKeyboardFocusMode() {
       }
 
       window.setTimeout(() => {
-        target.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-      }, 180);
+        const keyboardHeight = keyboardHeightRef.current;
+
+        if (keyboardHeight <= 0) {
+          return;
+        }
+
+        const rect = target.getBoundingClientRect();
+        const visibleBottom = window.innerHeight - keyboardHeight + SCROLL_MARGIN_PX;
+
+        if (rect.bottom <= visibleBottom) {
+          return;
+        }
+
+        target.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+      }, 50);
     };
     document.addEventListener("focusin", keepFocusedControlVisible);
 
     const showListener = Keyboard.addListener("keyboardWillShow", () => setKeyboardOpen(true));
-    const didShowListener = Keyboard.addListener("keyboardDidShow", () => setKeyboardOpen(true));
+    const didShowListener = Keyboard.addListener("keyboardDidShow", (info) => {
+      setKeyboardOpen(true);
+      keyboardHeightRef.current = info.keyboardHeight;
+    });
     const hideListener = Keyboard.addListener("keyboardWillHide", () => setKeyboardOpen(false));
-    const didHideListener = Keyboard.addListener("keyboardDidHide", () => setKeyboardOpen(false));
+    const didHideListener = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardOpen(false);
+      keyboardHeightRef.current = 0;
+    });
 
     return () => {
       document.removeEventListener("focusin", keepFocusedControlVisible);
@@ -41,12 +63,6 @@ export function useKeyboardFocusMode() {
   }, []);
 
   return keyboardOpen;
-}
-
-export function keepInputVisible(event: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) {
-  window.setTimeout(() => {
-    event.currentTarget.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-  }, 180);
 }
 
 export function keyboardFocusClassName(keyboardOpen: boolean) {

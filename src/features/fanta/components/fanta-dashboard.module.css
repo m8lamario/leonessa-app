@@ -498,12 +498,61 @@
   flex: 0 0 auto;
   gap: 7px;
   padding: 0 12px;
-  border: 1px solid rgb(255 255 255 / 15%);
+  border: 1px solid rgb(156 178 255 / 55%);
   border-radius: 9px;
-  background: rgb(255 255 255 / 7%);
-  color: var(--color-text-secondary);
+  background: linear-gradient(135deg, #315dff, #183bab);
+  color: #fff;
+  text-decoration: none;
   font-weight: 700;
 }
+.socialLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid rgb(198 204 218 / 16%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgb(48 92 255 / 22%), rgb(48 92 255 / 6%));
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+.socialLink:active {
+  border-color: rgb(156 178 255 / 60%);
+  background: linear-gradient(145deg, rgb(48 92 255 / 32%), rgb(48 92 255 / 10%));
+}
+.socialEmoji {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #6482ff, #2847bd);
+  font-size: 1.2rem;
+}
+.socialLink > div {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+.socialLink strong {
+  font-size: 0.9rem;
+}
+.socialLink small {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+.socialLink svg {
+  flex: 0 0 auto;
+  color: #9cb2ff;
+}
+
 .discoveryGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

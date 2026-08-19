@@ -1,0 +1,503 @@
+.page {
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+.header h1 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--type-h1-size);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+}
+.kicker {
+  margin: 0 0 8px;
+  color: #9cb2ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.headerStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  white-space: nowrap;
+}
+.headerStat span {
+  color: var(--color-text-secondary);
+  font-size: 0.74rem;
+}
+.headerStat strong {
+  font-size: 0.9rem;
+}
+
+.statusOpen,
+.statusClosed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+}
+.statusOpen {
+  border: 1px solid rgb(22 163 74 / 40%);
+  background: rgb(22 163 74 / 14%);
+}
+.statusClosed {
+  border: 1px solid rgb(198 204 218 / 18%);
+  background: rgb(255 255 255 / 5%);
+}
+.statusLight {
+  font-size: 1.2rem;
+}
+.statusOpen div,
+.statusClosed div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.statusClosed svg {
+  color: var(--color-text-secondary);
+}
+.statusOpen small,
+.statusClosed small {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.notice {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid rgb(48 92 255 / 50%);
+  border-radius: 10px;
+  background: rgb(48 92 255 / 16%);
+  font-size: 0.85rem;
+}
+
+.walletCard {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgb(198 204 218 / 18%);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 88% 12%, rgb(48 92 255 / 30%), transparent 40%),
+    linear-gradient(145deg, rgb(19 30 82 / 96%), rgb(6 15 51 / 98%));
+  box-shadow: var(--shadow-stadium);
+}
+.walletMain {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.budget {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.4rem, 12vw, 3.6rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+}
+.walletMain small {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+.walletPoints {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  padding-left: 16px;
+  border-left: 1px solid rgb(255 255 255 / 12%);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.walletPoints b {
+  color: var(--color-text);
+  font-family: var(--font-family-display);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.section {
+  margin-top: 30px;
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sectionHeading h2 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--type-h2-size);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.sectionHeading > span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.squadGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.squadCard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid rgb(198 204 218 / 16%);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 5%);
+}
+.squadTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.squadRole {
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 10%);
+  color: #bfcaff;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.crown {
+  color: #f7c948;
+  fill: #f7c948;
+}
+.squadCard > strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.squadCard > small {
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+}
+.squadActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.sellButton,
+.captainButton {
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.sellButton {
+  border: 1px solid rgb(220 38 38 / 45%);
+  background: rgb(220 38 38 / 16%);
+  color: #ffb3b3;
+}
+.captainButton {
+  border: 1px solid rgb(247 201 72 / 45%);
+  background: rgb(247 201 72 / 14%);
+  color: #ffe3a3;
+}
+.sellButton:disabled,
+.captainButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.captainTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #f7c948;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 6%);
+  color: var(--color-text-secondary);
+}
+.searchField input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+}
+.roleFilter {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.roleFilter button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 6%);
+  color: var(--color-text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.roleFilter .roleActive {
+  border-color: var(--color-primary-light);
+  background: rgb(48 92 255 / 24%);
+  color: var(--color-text);
+}
+
+.playerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.playerCard,
+.playerOwned {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgb(198 204 218 / 14%);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 5%);
+}
+.playerOwned {
+  opacity: 0.65;
+}
+.playerHead {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #6482ff, #2847bd);
+  font-family: var(--font-family-display);
+  font-size: 1.25rem;
+}
+.playerMain {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.playerMain strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playerLink {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playerMain small {
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+}
+.playerChange {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+.buyButton {
+  min-height: 40px;
+  flex: 0 0 auto;
+  padding: 0 12px;
+  border: 1px solid rgb(156 178 255 / 55%);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #315dff, #183bab);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.buyButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ownedTag {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 8%);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.dealBadge {
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+  color: #f7c948;
+}
+.positive {
+  color: #9ee3b3;
+}
+.negative {
+  color: #ffb3b3;
+}
+.emptyPool {
+  margin: 0;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 4%);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.trendRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.trendCol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trendHead {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #9cb2ff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid rgb(198 204 218 / 12%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 4%);
+}
+.mini div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.mini strong {
+  overflow: hidden;
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mini small {
+  color: var(--color-text-secondary);
+  font-size: 0.62rem;
+}
+.mini b {
+  font-size: 0.76rem;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.historyCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgb(198 204 218 / 12%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 4%);
+}
+.historyCard div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.historyCard strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.historyCard small {
+  color: var(--color-text-secondary);
+  font-size: 0.64rem;
+}
+.historyCard b {
+  font-size: 0.82rem;
+}
+.historyCard > span {
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+}
+
+@media (max-width: 420px) {
+  .squadGrid {
+    grid-template-columns: 1fr;
+  }
+  .playerCard,
+  .playerOwned {
+    flex-wrap: wrap;
+  }
+  .buyButton {
+    width: 100%;
+  }
+}

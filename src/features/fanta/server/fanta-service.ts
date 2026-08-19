@@ -6,6 +6,7 @@ import { awardLPInTransaction } from "@/features/rewards/server/reward-engine";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
 import { FORMATION_LIMITS, FANTA_CREATION_REWARD, INITIAL_BUDGET } from "../constants/fanta";
+import { grantAchievement, recordActivity } from "./social-service";
 import type { FantasyRole } from "../types";
 
 const fantasyRoles = Object.keys(FORMATION_LIMITS) as FantasyRole[];
@@ -241,6 +242,14 @@ export async function createFantasyTeam(userId: string, input: CreateFantasyTeam
         idempotencyKey: `fanta-team-created:${userId}`,
       });
 
+      return team;
+    })
+    .then(async (team) => {
+      await grantAchievement(userId, "FOUNDER");
+      await recordActivity({
+        type: "achievement",
+        title: `${team.name} ha creato la sua squadra fantasy 🏁`,
+      });
       return team;
     })
     .catch((error: unknown) => {

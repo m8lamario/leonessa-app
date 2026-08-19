@@ -2,6 +2,16 @@ import type { Competition } from "./competition";
 import type { MatchStatus } from "./match-status";
 import type { Team } from "./team";
 
+export type MatchEvent = {
+  id: string;
+  playerEslId: string | null;
+  playerFirstName: string | null;
+  playerLastName: string | null;
+  teamEslId: string;
+  minute: number;
+  type: "GOAL" | "ASSIST" | "YELLOW_CARD" | "RED_CARD" | "OWN_GOAL";
+};
+
 export type MatchVenue = {
   name: string;
   address: string | null;
@@ -23,5 +33,6 @@ export type Match = {
   awayPenalties: number | null;
   scoreText: string | null;
   isLive: boolean;
+  events: MatchEvent[];
   venue: MatchVenue | null;
 };

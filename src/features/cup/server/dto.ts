@@ -89,6 +89,7 @@ export function toMatchDto(match: CupDbMatch): Match {
     awayPenalties: null,
     scoreText: isScored ? `${match.homeScore} - ${match.awayScore}` : null,
     isLive: match.status === "LIVE",
+    events: [],
     venue: match.venue
       ? {
           name: match.venue,

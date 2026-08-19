@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Crown, LockKeyhole, Store, Trophy } from "lucide-react";
+import { ArrowUpRight, Crown, Store, Trophy } from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
 import styles from "./fanta-dashboard.module.css";
@@ -146,13 +146,11 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
         <div>
           <p className={styles.kicker}>Mercato</p>
           <h2 id="market-title">{dashboard.team.budgetLp} LP disponibili</h2>
-          <p>
-            <LockKeyhole aria-hidden="true" size={15} /> Mercato chiuso · prossimamente
-          </p>
+          <p>Gestisci la tua squadra nel mercato.</p>
         </div>
-        <button className={styles.marketButton} disabled type="button">
+        <Link className={styles.marketButton} href="/fanta/market">
           <Store aria-hidden="true" size={18} /> Vai al mercato
-        </button>
+        </Link>
       </section>
 
       <section className={styles.section} id="ranking" aria-labelledby="ranking-title">
@@ -182,6 +180,23 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
             </li>
           )}
         </ol>
+      </section>
+
+      <section className={styles.section} aria-labelledby="social-title">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.kicker}>Community</p>
+            <h2 id="social-title">Cosa succede intorno a te</h2>
+          </div>
+        </div>
+        <Link className={styles.socialLink} href={"/fanta/social" as never}>
+          <span className={styles.socialEmoji}>🏅</span>
+          <div>
+            <strong>Feed & rivalità</strong>
+            <small>Attività, podio, achievement e Hall of Fame</small>
+          </div>
+          <ArrowUpRight aria-hidden="true" size={18} />
+        </Link>
       </section>
 
       <section className={styles.section} aria-labelledby="discover-title">

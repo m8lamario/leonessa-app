@@ -44,21 +44,116 @@ model User {
   roles               UserRole[]
   emailVerifications  EmailVerificationDelivery[]
   fantasyTeam         FantasyTeam?
+  fantasyAchievements FantasyAchievement[]
 
   @@index([schoolId])
   @@index([deletedAt])
 }
 
 model FantasyTeam {
-  id           String              @id @default(cuid())
-  userId       String              @unique
+  id           String                @id @default(cuid())
+  userId       String                @unique
   name         String
-  budgetLp     Int                 @default(500)
-  totalPoints  Int                 @default(0)
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  budgetLp     Int                   @default(500)
+  totalPoints  Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   players      FantasyTeamPlayer[]
+  scores       FantasyScore[]
+  transfers    FantasyTeamTransfer[]
+}
+
+model FantasyActivity {
+  id          String          @id @default(cuid())
+  type        String
+  title       String
+  description String?
+  createdAt   DateTime        @default(now())
+
+  @@index([createdAt])
+}
+
+model FantasyAchievement {
+  id         String       @id @default(cuid())
+  userId     String
+  code       String
+  unlockedAt DateTime     @default(now())
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, code])
+  @@index([userId, unlockedAt])
+}
+
+model FantasyMatchday {
+  id             String                 @id @default(cuid())
+  round          Int                    @unique
+  startedAt      DateTime?
+  completedAt    DateTime?
+  valueUpdatedAt DateTime?
+  createdAt      DateTime               @default(now())
+  scores         FantasyScore[]
+  transfers      FantasyTeamTransfer[]
+}
+
+model FantasyTeamTransfer {
+  id            String         @id @default(cuid())
+  fantasyTeamId String
+  matchdayId    String
+  freeTransfers Int            @default(0)
+  paidTransfers Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  fantasyTeam   FantasyTeam    @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  matchday      FantasyMatchday @relation(fields: [matchdayId], references: [id], onDelete: Cascade)
+
+  @@unique([fantasyTeamId, matchdayId])
+  @@index([matchdayId])
+}
+
+model FantasyPlayerValueHistory {
+  id        String     @id @default(cuid())
+  playerId  String
+  oldValue  Int
+  newValue  Int
+  reason    String?
+  createdAt DateTime   @default(now())
+  player    TeamMember @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, createdAt])
+}
+
+model FantasyScore {
+  id            String          @id @default(cuid())
+  fantasyTeamId String
+  matchdayId    String
+  points        Int
+  createdAt     DateTime        @default(now())
+  fantasyTeam   FantasyTeam     @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  matchday      FantasyMatchday @relation(fields: [matchdayId], references: [id], onDelete: Cascade)
+
+  @@unique([fantasyTeamId, matchdayId])
+  @@index([matchdayId])
+}
+
+model FantasyPlayerStat {
+  id          String     @id @default(cuid())
+  playerId    String     @unique
+  goals       Int        @default(0)
+  assists     Int        @default(0)
+  yellowCards Int        @default(0)
+  redCards    Int        @default(0)
+  matches     Int        @default(0)
+  totalPoints Int        @default(0)
+  updatedAt   DateTime   @updatedAt
+  player      TeamMember @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
+model FantasyProcessedMatch {
+  id        String   @id @default(cuid())
+  matchId   String   @unique
+  syncedAt  DateTime @default(now())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
 }
 
 model FantasyTeamPlayer {
@@ -230,20 +325,26 @@ model Team {
 }
 
 model TeamMember {
-  id            String         @id @default(uuid())
-  teamId        String
-  userId        String
-  role          TeamMemberRole @default(PLAYER)
-  fantasyRole   String         @default("CENTROCAMPISTA")
-  fantasyValue  Int            @default(25)
-  jerseyNumber  Int?
-  joinedAt      DateTime       @default(now())
-  leftAt        DateTime?
-  playerEvents      MatchEvent[]          @relation("MatchEventTeamMember")
-  relatedEvents     MatchEvent[]          @relation("MatchEventRelatedTeamMember")
+  id                String              @id @default(uuid())
+  teamId            String
+  userId            String
+  eslId             String?             @unique
+  role              TeamMemberRole      @default(PLAYER)
+  fantasyRole       String              @default("CENTROCAMPISTA")
+  fantasyValue      Int                 @default(25)
+  jerseyNumber      Int?
+  schoolYear        String?
+  avatarUrl         String?
+  isVerifiedPlayer  Boolean             @default(false)
+  joinedAt          DateTime            @default(now())
+  leftAt            DateTime?
+  playerEvents      MatchEvent[]        @relation("MatchEventTeamMember")
+  relatedEvents     MatchEvent[]        @relation("MatchEventRelatedTeamMember")
   fantasySelections FantasyTeamPlayer[]
-  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user          User           @relation(fields: [userId], references: [id])
+  fantasyStat       FantasyPlayerStat?
+  valueHistory      FantasyPlayerValueHistory[]
+  team              Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user              User                @relation(fields: [userId], references: [id])
 
   @@unique([teamId, userId])
   @@unique([teamId, jerseyNumber])
@@ -288,6 +389,7 @@ model Match {
   competition      Competition  @relation(fields: [competitionId], references: [id])
   homeTeam         Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
   events           MatchEvent[]
+  fantasyProcessedMatch FantasyProcessedMatch?
 
   @@index([competitionId, startAt])
   @@index([homeTeamId])
@@ -299,6 +401,7 @@ model Match {
 model MatchEvent {
   id              String         @id @default(uuid())
   matchId         String
+  eslId           String?        @unique
   type            MatchEventType
   minute          Int
   playerId        String?
@@ -632,6 +735,7 @@ enum MatchEventType {
   ASSIST
   YELLOW_CARD
   RED_CARD
+  OWN_GOAL
   MVP
 }
 
