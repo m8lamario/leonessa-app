@@ -5,11 +5,12 @@ import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
+import { getMatchdayRound } from "../lib/scoring-engine";
 import { recordActivity } from "./social-service";
-import { FORMATION_LIMITS, MARKET } from "../constants/fanta";
+import { MARKET, STARTER_LIMITS, BENCH_LIMITS, TEAM_SIZE } from "../constants/fanta";
 import type { FantasyRole } from "../types";
 
-const fantasyRoles = Object.keys(FORMATION_LIMITS) as FantasyRole[];
+const fantasyRoles = Object.keys(STARTER_LIMITS) as FantasyRole[];
 
 async function recordMarketActivity(title: string) {
   try {
@@ -45,6 +46,10 @@ export type PlayerMarketDto = {
 
 export type MarketDashboardDto = {
   status: SerializedMarketStatus;
+  lineup: {
+    round: number;
+    confirmedAt: string | null;
+  };
   team: {
     id: string;
     name: string;
@@ -58,8 +63,17 @@ export type MarketDashboardDto = {
       name: string;
       school: string;
       role: string;
+      status: "STARTER" | "BENCH";
+      benchOrder: number | null;
       isCaptain: boolean;
       value: number;
+      totalPoints: number;
+    }>;
+    vacancies: Array<{
+      id: string;
+      role: string;
+      status: "STARTER" | "BENCH";
+      benchOrder: number | null;
     }>;
   } | null;
   pool: PlayerMarketDto[];
@@ -110,7 +124,10 @@ export async function getMarketStatus(now = new Date()): Promise<MarketStatusDto
   return { open: now < closesAt, closesAt, nextKickoff: nextMatch.startAt };
 }
 
-async function ensureCurrentMatchday(transaction: Prisma.TransactionClient, now = new Date()) {
+export async function ensureCurrentMatchday(
+  transaction: Prisma.TransactionClient,
+  now = new Date(),
+) {
   const match = await transaction.match.findFirst({
     where: {
       deletedAt: null,
@@ -121,16 +138,23 @@ async function ensureCurrentMatchday(transaction: Prisma.TransactionClient, now 
     select: { startAt: true },
   });
   const startAt = match?.startAt ?? now;
-  const round = Number(
-    `${startAt.getUTCFullYear()}${String(startAt.getUTCMonth() + 1).padStart(2, "0")}${String(
-      startAt.getUTCDate(),
-    ).padStart(2, "0")}`,
-  );
+  const round = getMatchdayRound(startAt);
   return transaction.fantasyMatchday.upsert({
     where: { round },
     create: { round, startedAt: startAt, completedAt: null },
     update: {},
   });
+}
+
+export async function clearCurrentLineupConfirmation(
+  transaction: Prisma.TransactionClient,
+  fantasyTeamId: string,
+) {
+  const matchday = await ensureCurrentMatchday(transaction);
+  await transaction.fantasyLineupConfirmation.deleteMany({
+    where: { fantasyTeamId, matchdayId: matchday.id },
+  });
+  return matchday;
 }
 
 async function ensureTransfers(
@@ -152,23 +176,40 @@ async function assertMarketOpen() {
   }
 }
 
-function assertFormationValid(
-  selections: Array<{ role: string }>,
-  delta: { removedRole: string | null; addedRole: string | null },
+function assertRosterValid(
+  selections: Array<{ role: string; status: string }>,
+  delta?: {
+    removed?: { role: string; status: string } | null;
+    added?: { role: string; status: string } | null;
+  },
 ) {
-  const counts: Record<string, number> = {};
-  for (const role of fantasyRoles) counts[role] = 0;
-  for (const selection of selections) {
-    counts[selection.role] = (counts[selection.role] ?? 0) + 1;
+  const working = selections.map((selection) => ({ ...selection }));
+  if (delta?.removed) {
+    const index = working.findIndex(
+      (selection) =>
+        selection.role === delta.removed!.role && selection.status === delta.removed!.status,
+    );
+    if (index >= 0) working.splice(index, 1);
   }
-  if (delta.removedRole) counts[delta.removedRole] -= 1;
-  if (delta.addedRole) counts[delta.addedRole] = (counts[delta.addedRole] ?? 0) + 1;
+  if (delta?.added) working.push(delta.added);
 
+  if (working.length !== TEAM_SIZE) {
+    throw new AppError("BAD_REQUEST", "La rosa deve contenere 15 giocatori.", 400);
+  }
+  const starters = working.filter((selection) => selection.status === "STARTER");
+  const bench = working.filter((selection) => selection.status === "BENCH");
   for (const role of fantasyRoles) {
-    if (counts[role] !== FORMATION_LIMITS[role]) {
+    if (starters.filter((selection) => selection.role === role).length !== STARTER_LIMITS[role]) {
       throw new AppError(
         "BAD_REQUEST",
-        `La formazione richiede ${FORMATION_LIMITS[role]} ${role.toLowerCase()}.`,
+        `I titolari richiedono ${STARTER_LIMITS[role]} ${role.toLowerCase()}.`,
+        400,
+      );
+    }
+    if (bench.filter((selection) => selection.role === role).length !== BENCH_LIMITS[role]) {
+      throw new AppError(
+        "BAD_REQUEST",
+        `Le riserve richiedono ${BENCH_LIMITS[role]} ${role.toLowerCase()}.`,
         400,
       );
     }
@@ -216,6 +257,9 @@ export async function buyPlayer(userId: string, playerId: string, replacementPla
         ) as FantasyRole;
         const matchday = await ensureCurrentMatchday(transaction);
         const transfers = await ensureTransfers(transaction, team.id, matchday.id);
+        await transaction.fantasyLineupConfirmation.deleteMany({
+          where: { fantasyTeamId: team.id, matchdayId: matchday.id },
+        });
         const transferCount = transfers.freeTransfers + transfers.paidTransfers;
         const isFree = transferCount < MARKET.freeTransfersPerMatchday;
         const transferFee = isFree ? 0 : MARKET.paidTransferCostLp;
@@ -230,11 +274,23 @@ export async function buyPlayer(userId: string, playerId: string, replacementPla
         if (replacement.role !== role) {
           throw new AppError("BAD_REQUEST", "Il sostituto deve avere lo stesso ruolo.", 400);
         }
-        assertFormationValid(team.players, { removedRole: replacement.role, addedRole: role });
+        assertRosterValid(team.players, {
+          removed: { role: replacement.role, status: replacement.status },
+          added: { role, status: replacement.status },
+        });
 
+        const wasCaptain = replacement.isCaptain;
         await transaction.fantasyTeamPlayer.delete({ where: { id: replacement.id } });
         await transaction.fantasyTeamPlayer.create({
-          data: { fantasyTeamId: team.id, playerId, role, purchaseCost: player.fantasyValue },
+          data: {
+            fantasyTeamId: team.id,
+            playerId,
+            role,
+            status: replacement.status,
+            benchOrder: replacement.benchOrder,
+            purchaseCost: player.fantasyValue,
+            isCaptain: wasCaptain && replacement.status === "STARTER",
+          },
         });
         await transaction.fantasyTeam.update({
           where: { id: team.id },
@@ -303,13 +359,16 @@ export async function sellPlayer(userId: string, playerId: string, replacementPl
       if (replacement.fantasyRole !== selection.role) {
         throw new AppError("BAD_REQUEST", "Il sostituto deve avere lo stesso ruolo.", 400);
       }
-      assertFormationValid(team.players, {
-        removedRole: selection.role,
-        addedRole: replacement.fantasyRole,
+      assertRosterValid(team.players, {
+        removed: { role: selection.role, status: selection.status },
+        added: { role: replacement.fantasyRole, status: selection.status },
       });
 
       const matchday = await ensureCurrentMatchday(transaction);
       const transfers = await ensureTransfers(transaction, team.id, matchday.id);
+      await transaction.fantasyLineupConfirmation.deleteMany({
+        where: { fantasyTeamId: team.id, matchdayId: matchday.id },
+      });
       const transferCount = transfers.freeTransfers + transfers.paidTransfers;
       const isFree = transferCount < MARKET.freeTransfersPerMatchday;
 
@@ -319,8 +378,10 @@ export async function sellPlayer(userId: string, playerId: string, replacementPl
           fantasyTeamId: team.id,
           playerId: replacement.id,
           role: selection.role,
+          status: selection.status,
+          benchOrder: selection.benchOrder,
           purchaseCost: replacement.fantasyValue,
-          isCaptain: selection.isCaptain,
+          isCaptain: selection.isCaptain && selection.status === "STARTER",
         },
       });
       const budgetDelta = player.fantasyValue - replacement.fantasyValue;
@@ -346,6 +407,127 @@ export async function sellPlayer(userId: string, playerId: string, replacementPl
   );
 }
 
+/**
+ * Opens a temporary role-preserving slot. The transfer is counted when the slot
+ * is filled, matching the single-change accounting used by the existing market.
+ */
+export async function sellPlayerToVacancy(userId: string, playerId: string) {
+  await assertMarketOpen();
+
+  return prisma.$transaction(
+    async (transaction) => {
+      const team = await transaction.fantasyTeam.findUnique({
+        where: { userId },
+        include: {
+          players: { include: { player: { select: { fantasyValue: true } } } },
+          lineupVacancies: true,
+        },
+      });
+      if (!team) throw new AppError("NOT_FOUND", "Squadra fantasy non trovata.", 404);
+      if (team.lineupVacancies.length > 0) {
+        throw new AppError(
+          "CONFLICT",
+          "Completa prima lo slot vuoto già aperto nella tua formazione.",
+          409,
+        );
+      }
+
+      const selection = team.players.find((item) => item.playerId === playerId);
+      if (!selection) throw new AppError("NOT_FOUND", "Giocatore non in rosa.", 404);
+
+      await transaction.fantasyTeamPlayer.delete({ where: { id: selection.id } });
+      const vacancy = await transaction.fantasyLineupVacancy.create({
+        data: {
+          fantasyTeamId: team.id,
+          role: selection.role,
+          status: selection.status,
+          benchOrder: selection.benchOrder,
+        },
+      });
+      await transaction.fantasyTeam.update({
+        where: { id: team.id },
+        data: { budgetLp: { increment: selection.player.fantasyValue } },
+      });
+      await clearCurrentLineupConfirmation(transaction, team.id);
+
+      logger.info({ userId, playerId, vacancyId: vacancy.id }, "Market sale opened lineup vacancy");
+      return { vacancyId: vacancy.id, budgetLp: team.budgetLp + selection.player.fantasyValue };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  );
+}
+
+export async function buyPlayerIntoVacancy(userId: string, playerId: string, vacancyId: string) {
+  await assertMarketOpen();
+
+  return prisma.$transaction(
+    async (transaction) => {
+      const team = await transaction.fantasyTeam.findUnique({
+        where: { userId },
+        include: { players: true, lineupVacancies: true },
+      });
+      if (!team) throw new AppError("NOT_FOUND", "Squadra fantasy non trovata.", 404);
+
+      const vacancy = team.lineupVacancies.find((item) => item.id === vacancyId);
+      if (!vacancy) throw new AppError("NOT_FOUND", "Slot vuoto non trovato.", 404);
+      if (team.players.some((selection) => selection.playerId === playerId)) {
+        throw new AppError("CONFLICT", "Il giocatore è già in rosa.", 409);
+      }
+
+      const player = await transaction.teamMember.findFirst({
+        where: { id: playerId, role: "PLAYER", leftAt: null, user: { deletedAt: null } },
+        select: { id: true, fantasyRole: true, fantasyValue: true },
+      });
+      if (!player) throw new AppError("NOT_FOUND", "Giocatore non disponibile.", 404);
+      if (player.fantasyRole !== vacancy.role) {
+        throw new AppError("BAD_REQUEST", "Il giocatore deve avere il ruolo dello slot.", 400);
+      }
+
+      const matchday = await ensureCurrentMatchday(transaction);
+      const transfers = await ensureTransfers(transaction, team.id, matchday.id);
+      const transferCount = transfers.freeTransfers + transfers.paidTransfers;
+      const isFree = transferCount < MARKET.freeTransfersPerMatchday;
+      const transferFee = isFree ? 0 : MARKET.paidTransferCostLp;
+      const cost = player.fantasyValue + transferFee;
+      if (team.budgetLp < cost) {
+        throw new AppError("BAD_REQUEST", "Budget LP insufficiente.", 400);
+      }
+
+      await transaction.fantasyLineupVacancy.delete({ where: { id: vacancy.id } });
+      await transaction.fantasyTeamPlayer.create({
+        data: {
+          fantasyTeamId: team.id,
+          playerId: player.id,
+          role: vacancy.role,
+          status: vacancy.status,
+          benchOrder: vacancy.benchOrder,
+          purchaseCost: player.fantasyValue,
+          isCaptain: false,
+        },
+      });
+      await transaction.fantasyTeam.update({
+        where: { id: team.id },
+        data: { budgetLp: { decrement: cost } },
+      });
+      await transaction.fantasyTeamTransfer.update({
+        where: { id: transfers.id },
+        data: {
+          freeTransfers: { increment: isFree ? 1 : 0 },
+          paidTransfers: { increment: isFree ? 0 : 1 },
+        },
+      });
+      await transaction.fantasyLineupConfirmation.deleteMany({
+        where: { fantasyTeamId: team.id, matchdayId: matchday.id },
+      });
+
+      await recordMarketActivity(`Ha acquistato ${playerId} per completare la formazione`);
+      logger.info({ userId, playerId, vacancyId, free: isFree }, "Market vacancy buy completed");
+      return { budgetLp: team.budgetLp - cost, free: isFree, vacancyId };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  );
+}
+
 export async function changeCaptain(userId: string, playerId: string) {
   await assertMarketOpen();
 
@@ -360,7 +542,12 @@ export async function changeCaptain(userId: string, playerId: string) {
     if (!team.players.some((selection) => selection.playerId === playerId)) {
       throw new AppError("BAD_REQUEST", "Il capitano deve essere in rosa.", 400);
     }
+    const target = team.players.find((selection) => selection.playerId === playerId);
+    if (!target || target.status !== "STARTER") {
+      throw new AppError("BAD_REQUEST", "Il capitano deve essere un titolare.", 400);
+    }
 
+    await clearCurrentLineupConfirmation(transaction, team.id);
     await transaction.fantasyTeamPlayer.updateMany({
       where: { fantasyTeamId: team.id },
       data: { isCaptain: false },
@@ -378,6 +565,13 @@ export async function changeCaptain(userId: string, playerId: string) {
 
 export async function getMarketDashboard(userId: string): Promise<MarketDashboardDto> {
   const [status, team] = await Promise.all([getMarketStatus(), getFantasyTeamWithSquad(userId)]);
+  const round = getMatchdayRound(status.nextKickoff ?? new Date());
+  const confirmation = team
+    ? await prisma.fantasyLineupConfirmation.findFirst({
+        where: { fantasyTeamId: team.id, matchday: { round } },
+        select: { confirmedAt: true },
+      })
+    : null;
 
   const openPool = await prisma.teamMember.findMany({
     where: { role: "PLAYER", leftAt: null, user: { deletedAt: null } },
@@ -451,6 +645,7 @@ export async function getMarketDashboard(userId: string): Promise<MarketDashboar
       closesAt: status.closesAt?.toISOString() ?? null,
       nextKickoff: status.nextKickoff?.toISOString() ?? null,
     },
+    lineup: { round, confirmedAt: confirmation?.confirmedAt.toISOString() ?? null },
     team,
     pool: all,
     trending: { rising, falling },
@@ -476,6 +671,7 @@ export async function getFantasyTeamWithSquad(userId: string) {
           player: {
             select: {
               fantasyValue: true,
+              fantasyStat: { select: { totalPoints: true } },
               user: { select: { name: true, surname: true } },
               team: { select: { school: { select: { shortName: true } } } },
             },
@@ -483,6 +679,7 @@ export async function getFantasyTeamWithSquad(userId: string) {
         },
       },
       transfers: { orderBy: { createdAt: "desc" }, take: 1 },
+      lineupVacancies: { orderBy: { createdAt: "asc" } },
     },
   });
   if (!team) return null;
@@ -503,8 +700,17 @@ export async function getFantasyTeamWithSquad(userId: string) {
         "Giocatore",
       school: selection.player.team.school.shortName,
       role: selection.role,
+      status: selection.status,
+      benchOrder: selection.benchOrder,
       isCaptain: selection.isCaptain,
       value: selection.player.fantasyValue,
+      totalPoints: selection.player.fantasyStat?.totalPoints ?? 0,
+    })),
+    vacancies: team.lineupVacancies.map((vacancy) => ({
+      id: vacancy.id,
+      role: vacancy.role,
+      status: vacancy.status,
+      benchOrder: vacancy.benchOrder,
     })),
   };
 }

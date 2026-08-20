@@ -2,10 +2,34 @@ import "server-only";
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { assertControlCenterEnabled, SCORING_RULES } from "./control-center-service";
+import {
+  getMatchdayRound,
+  getPlayerBasePoints,
+  type ScorableMatch,
+} from "../lib/scoring-engine";
+import { assertControlCenterEnabled } from "./control-center-service";
 import { applyMatchdayValueAdjustments, valueDeltaFromPoints } from "./value-engine";
 
 const SANDBOX_SLUG = "leonessa-cup-sandbox";
+
+function toScorableMatch(match: {
+  homeTeamId: string;
+  awayTeamId: string;
+  homeScore: number;
+  awayScore: number;
+  events: Array<{ playerId: string | null; type: string }>;
+}): ScorableMatch {
+  return {
+    homeTeamId: match.homeTeamId,
+    awayTeamId: match.awayTeamId,
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    events: match.events.map((event) => ({
+      playerId: event.playerId,
+      type: event.type,
+    })),
+  };
+}
 
 export async function closeSandboxMatchday(matchId: string) {
   assertControlCenterEnabled();
@@ -34,11 +58,12 @@ export async function closeSandboxMatchday(matchId: string) {
         },
         include: { events: true },
       });
+      const round = getMatchdayRound(start);
       const matchday = await tx.fantasyMatchday.upsert({
-        where: { round: Number(start.toISOString().slice(0, 10).replaceAll("-", "")) },
+        where: { round },
         update: { completedAt: new Date() },
         create: {
-          round: Number(start.toISOString().slice(0, 10).replaceAll("-", "")),
+          round,
           startedAt: start,
           completedAt: new Date(),
         },
@@ -59,21 +84,7 @@ export async function closeSandboxMatchday(matchId: string) {
         let total = 0;
         for (const current of matches) {
           if (![current.homeTeamId, current.awayTeamId].includes(player.teamId)) continue;
-          const home = current.homeTeamId === player.teamId;
-          const own = home ? current.homeScore : current.awayScore;
-          const opponent = home ? current.awayScore : current.homeScore;
-          total += current.events
-            .filter((event) => event.playerId === player.id)
-            .reduce(
-              (sum, event) => sum + (SCORING_RULES[event.type as keyof typeof SCORING_RULES] ?? 0),
-              0,
-            );
-          total += own > opponent ? SCORING_RULES.WIN : own === opponent ? SCORING_RULES.DRAW : 0;
-          if (
-            opponent === 0 &&
-            (player.fantasyRole === "PORTIERE" || player.fantasyRole === "DIFENSORE")
-          )
-            total += SCORING_RULES.CLEAN_SHEET;
+          total += getPlayerBasePoints(toScorableMatch(current), player);
         }
         points.set(player.id, total);
       }

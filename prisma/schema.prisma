@@ -45,24 +45,27 @@ model User {
   emailVerifications  EmailVerificationDelivery[]
   fantasyTeam         FantasyTeam?
   fantasyAchievements FantasyAchievement[]
-  sandboxAuditLogs   SandboxAuditLog[]
+  sandboxAuditLogs    SandboxAuditLog[]
 
   @@index([schoolId])
   @@index([deletedAt])
 }
 
 model FantasyTeam {
-  id          String                @id @default(cuid())
-  userId      String                @unique
-  name        String
-  budgetLp    Int                   @default(500)
-  totalPoints Int                   @default(0)
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  players     FantasyTeamPlayer[]
-  scores      FantasyScore[]
-  transfers   FantasyTeamTransfer[]
+  id                  String                      @id @default(cuid())
+  userId              String                      @unique
+  name                String
+  budgetLp            Int                         @default(500)
+  totalPoints         Int                         @default(0)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+  user                User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  players             FantasyTeamPlayer[]
+  scores              FantasyScore[]
+  transfers           FantasyTeamTransfer[]
+  substitutions       FantasySubstitution[]
+  lineupVacancies     FantasyLineupVacancy[]
+  lineupConfirmations FantasyLineupConfirmation[]
 }
 
 model FantasyActivity {
@@ -76,15 +79,15 @@ model FantasyActivity {
 }
 
 model SandboxAuditLog {
-  id          String   @id @default(cuid())
-  adminId     String
-  action      String
-  entityType  String
-  entityId    String?
-  before      Json?
-  after       Json?
-  createdAt   DateTime @default(now())
-  admin       User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([adminId, createdAt])
@@ -102,14 +105,15 @@ model FantasyAchievement {
 }
 
 model FantasyMatchday {
-  id             String                @id @default(cuid())
-  round          Int                   @unique
-  startedAt      DateTime?
-  completedAt    DateTime?
-  valueUpdatedAt DateTime?
-  createdAt      DateTime              @default(now())
-  scores         FantasyScore[]
-  transfers      FantasyTeamTransfer[]
+  id                  String                      @id @default(cuid())
+  round               Int                         @unique
+  startedAt           DateTime?
+  completedAt         DateTime?
+  valueUpdatedAt      DateTime?
+  createdAt           DateTime                    @default(now())
+  scores              FantasyScore[]
+  transfers           FantasyTeamTransfer[]
+  lineupConfirmations FantasyLineupConfirmation[]
 }
 
 model FantasyTeamTransfer {
@@ -173,18 +177,66 @@ model FantasyProcessedMatch {
 }
 
 model FantasyTeamPlayer {
-  id            String      @id @default(cuid())
+  id            String              @id @default(cuid())
   fantasyTeamId String
   playerId      String
   role          String
-  purchaseCost  Int         @default(0)
-  isCaptain     Boolean     @default(false)
-  createdAt     DateTime    @default(now())
-  fantasyTeam   FantasyTeam @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
-  player        TeamMember  @relation(fields: [playerId], references: [id], onDelete: Restrict)
+  status        FantasyLineupStatus @default(STARTER)
+  benchOrder    Int?
+  purchaseCost  Int                 @default(0)
+  isCaptain     Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  fantasyTeam   FantasyTeam         @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  player        TeamMember          @relation(fields: [playerId], references: [id], onDelete: Restrict)
 
   @@unique([fantasyTeamId, playerId])
   @@index([playerId])
+  @@index([fantasyTeamId, status])
+}
+
+model FantasyLineupVacancy {
+  id            String              @id @default(cuid())
+  fantasyTeamId String
+  role          String
+  status        FantasyLineupStatus
+  benchOrder    Int?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  fantasyTeam   FantasyTeam         @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+
+  @@unique([fantasyTeamId, role, status])
+  @@index([fantasyTeamId, status])
+}
+
+model FantasyLineupConfirmation {
+  id            String          @id @default(cuid())
+  fantasyTeamId String
+  matchdayId    String
+  confirmedAt   DateTime        @default(now())
+  fantasyTeam   FantasyTeam     @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  matchday      FantasyMatchday @relation(fields: [matchdayId], references: [id], onDelete: Cascade)
+
+  @@unique([fantasyTeamId, matchdayId])
+  @@index([matchdayId])
+}
+
+model FantasySubstitution {
+  id            String      @id @default(cuid())
+  fantasyTeamId String
+  matchId       String
+  playerOutId   String
+  playerInId    String
+  reason        String
+  sequence      Int
+  createdAt     DateTime    @default(now())
+  fantasyTeam   FantasyTeam @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  match         Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerOut     TeamMember  @relation("FantasySubstitutionOut", fields: [playerOutId], references: [id], onDelete: Restrict)
+  playerIn      TeamMember  @relation("FantasySubstitutionIn", fields: [playerInId], references: [id], onDelete: Restrict)
+
+  @@unique([fantasyTeamId, matchId, playerOutId])
+  @@index([matchId])
+  @@index([fantasyTeamId, matchId])
 }
 
 model EmailVerificationDelivery {
@@ -359,6 +411,8 @@ model TeamMember {
   fantasySelections FantasyTeamPlayer[]
   fantasyStat       FantasyPlayerStat?
   valueHistory      FantasyPlayerValueHistory[]
+  substitutionsOut  FantasySubstitution[]       @relation("FantasySubstitutionOut")
+  substitutionsIn   FantasySubstitution[]       @relation("FantasySubstitutionIn")
   team              Team                        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user              User                        @relation(fields: [userId], references: [id])
 
@@ -406,6 +460,7 @@ model Match {
   homeTeam              Team                   @relation("HomeTeam", fields: [homeTeamId], references: [id])
   events                MatchEvent[]
   fantasyProcessedMatch FantasyProcessedMatch?
+  fantasySubstitutions  FantasySubstitution[]
 
   @@index([competitionId, startAt])
   @@index([homeTeamId])
@@ -706,6 +761,11 @@ enum UserRoleType {
   SCHOOL_REP
   ORGANIZER
   ADMIN
+}
+
+enum FantasyLineupStatus {
+  STARTER
+  BENCH
 }
 
 enum EmailVerificationDeliveryKind {

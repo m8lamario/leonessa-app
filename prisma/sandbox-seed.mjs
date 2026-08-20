@@ -223,7 +223,7 @@ async function generatePlayers(schools, teams, random) {
 async function generateFantasyTeams(users, players, random) {
   const teams = [];
   for (const user of users) {
-    // Pick 11 distinct players maintaining formation: 1 GK, 4 DEF, 3 MID, 3 ATT.
+    // Pick 15 distinct players: 11 starters (1-4-3-3) + 4 bench (1 per role).
     const gk = players.filter((p) => p.fantasyRole === "PORTIERE");
     const def = players.filter((p) => p.fantasyRole === "DIFENSORE");
     const mid = players.filter((p) => p.fantasyRole === "CENTROCAMPISTA");
@@ -236,14 +236,22 @@ async function generateFantasyTeams(users, players, random) {
       return player;
     };
     const used = new Set();
-    const roster = [pickUnique(gk, used)];
-    for (let i = 0; i < 4; i++) roster.push(pickUnique(def, used));
-    for (let i = 0; i < 3; i++) roster.push(pickUnique(mid, used));
-    for (let i = 0; i < 3; i++) roster.push(pickUnique(att, used));
+    const starters = [pickUnique(gk, used)];
+    for (let i = 0; i < 4; i++) starters.push(pickUnique(def, used));
+    for (let i = 0; i < 3; i++) starters.push(pickUnique(mid, used));
+    for (let i = 0; i < 3; i++) starters.push(pickUnique(att, used));
+    const bench = [
+      pickUnique(gk, used),
+      pickUnique(def, used),
+      pickUnique(mid, used),
+      pickUnique(att, used),
+    ];
 
-    const uniqueRoster = roster.filter(Boolean);
+    const uniqueStarters = starters.filter(Boolean);
+    const uniqueBench = bench.filter(Boolean);
+    const uniqueRoster = [...uniqueStarters, ...uniqueBench];
 
-    const captain = uniqueRoster[Math.floor(random() * uniqueRoster.length)];
+    const captain = uniqueStarters[Math.floor(random() * uniqueStarters.length)];
     const cost = uniqueRoster.reduce((sum, p) => sum + p.fantasyValue, 0);
 
     const team = await prisma.fantasyTeam.upsert({
@@ -251,20 +259,35 @@ async function generateFantasyTeams(users, players, random) {
       update: { budgetLp: 500 - cost + 100 },
       create: {
         userId: user.id,
-        name: `Sandbox ${user.name} Eleven`,
+        name: `Sandbox ${user.name} Fifteen`,
         budgetLp: Math.max(0, 500 - cost),
       },
     });
 
     await prisma.fantasyTeamPlayer.deleteMany({ where: { fantasyTeamId: team.id } });
-    for (const player of uniqueRoster) {
+    for (const player of uniqueStarters) {
       await prisma.fantasyTeamPlayer.create({
         data: {
           fantasyTeamId: team.id,
           playerId: player.id,
           role: player.fantasyRole,
+          status: "STARTER",
+          benchOrder: null,
           purchaseCost: player.fantasyValue,
           isCaptain: player.id === captain.id,
+        },
+      });
+    }
+    for (const [index, player] of uniqueBench.entries()) {
+      await prisma.fantasyTeamPlayer.create({
+        data: {
+          fantasyTeamId: team.id,
+          playerId: player.id,
+          role: player.fantasyRole,
+          status: "BENCH",
+          benchOrder: index,
+          purchaseCost: player.fantasyValue,
+          isCaptain: false,
         },
       });
     }
@@ -358,6 +381,9 @@ async function cleanupSandboxData() {
 
   await prisma.fantasyAchievement.deleteMany({ where: { userId: { in: sandboxUserIds } } });
   await prisma.fantasyScore.deleteMany({ where: { fantasyTeamId: { in: sandboxFantasyTeamIds } } });
+  await prisma.fantasySubstitution.deleteMany({
+    where: { fantasyTeamId: { in: sandboxFantasyTeamIds } },
+  });
   await prisma.fantasyTeamTransfer.deleteMany({
     where: { fantasyTeamId: { in: sandboxFantasyTeamIds } },
   });

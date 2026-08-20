@@ -49,6 +49,8 @@ type MarketData = {
       name: string;
       school: string;
       role: string;
+      status: "STARTER" | "BENCH";
+      benchOrder: number | null;
       isCaptain: boolean;
       value: number;
     }>;
@@ -85,6 +87,7 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
     role: string;
     name: string;
   } | null>(null);
+  const [swapStarterId, setSwapStarterId] = useState<string | null>(null);
 
   const isOpen = market.status.open;
 
@@ -98,6 +101,13 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
   }, [market.pool, query, role]);
 
   if (!market.team) return null;
+
+  const starters = market.team.squad
+    .filter((player) => player.status === "STARTER")
+    .sort((a, b) => a.role.localeCompare(b.role));
+  const bench = market.team.squad
+    .filter((player) => player.status === "BENCH")
+    .sort((a, b) => (a.benchOrder ?? 99) - (b.benchOrder ?? 99));
 
   async function act(path: "buy" | "sell" | "captain", playerId: string, replacementPlayerId = "") {
     if (!isOpen) return;
@@ -116,6 +126,62 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
       }
       setNotice(path === "captain" ? "Capitano aggiornato." : "Sostituzione completata.");
       setReplacementRequest(null);
+      window.location.reload();
+    } catch {
+      setNotice("Errore di rete. Riprova.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function swapFormation(starterPlayerId: string, benchPlayerId: string) {
+    if (!isOpen) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      const response = await fetch("/api/fanta/formation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "swap", starterPlayerId, benchPlayerId }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setNotice(body.message ?? "Cambio formazione non riuscito.");
+        return;
+      }
+      setNotice("Formazione aggiornata (nessun cambio mercato consumato).");
+      setSwapStarterId(null);
+      window.location.reload();
+    } catch {
+      setNotice("Errore di rete. Riprova.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function moveBench(playerId: string, direction: -1 | 1) {
+    if (!isOpen) return;
+    const ids = bench.map((player) => player.playerId);
+    const index = ids.indexOf(playerId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= ids.length) return;
+    const next = [...ids];
+    const [moved] = next.splice(index, 1);
+    next.splice(target, 0, moved!);
+    setBusy(true);
+    setNotice(null);
+    try {
+      const response = await fetch("/api/fanta/formation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reorder-bench", orderedBenchPlayerIds: next }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setNotice(body.message ?? "Riordino panchina non riuscito.");
+        return;
+      }
+      setNotice("Ordine panchina aggiornato.");
       window.location.reload();
     } catch {
       setNotice("Errore di rete. Riprova.");
@@ -212,10 +278,10 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
             <p className={styles.kicker}>La tua rosa</p>
             <h2 id="squad-title">Titolari</h2>
           </div>
-          <span>{market.team.squad.length}/11</span>
+          <span>{starters.length}/11</span>
         </div>
         <div className={styles.squadGrid}>
-          {market.team.squad.map((player) => (
+          {starters.map((player) => (
             <article className={styles.squadCard} key={player.id}>
               <div className={styles.squadTop}>
                 <span className={styles.squadRole}>{roleLabels[player.role] ?? player.role}</span>
@@ -244,6 +310,22 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
                   >
                     Vendi
                   </button>
+                  <button
+                    className={
+                      swapStarterId === player.playerId
+                        ? styles.captainButton
+                        : styles.formationButton
+                    }
+                    disabled={busy}
+                    onClick={() =>
+                      setSwapStarterId((current) =>
+                        current === player.playerId ? null : player.playerId,
+                      )
+                    }
+                    type="button"
+                  >
+                    {swapStarterId === player.playerId ? "Annulla swap" : "↔ Riserva"}
+                  </button>
                   {player.isCaptain ? (
                     <span className={styles.captainTag}>
                       <Crown size={12} /> Capitano
@@ -252,7 +334,7 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
                     <button
                       className={styles.captainButton}
                       disabled={busy}
-                      onClick={() => act("captain", player.playerId)}
+                      onClick={() => void act("captain", player.playerId)}
                       type="button"
                     >
                       Capitano
@@ -262,6 +344,87 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
               )}
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className={styles.section} aria-labelledby="bench-title">
+        <div className={styles.sectionHeading}>
+          <div>
+            <p className={styles.kicker}>Panchina</p>
+            <h2 id="bench-title">Riserve</h2>
+          </div>
+          <span>{bench.length}/4</span>
+        </div>
+        {swapStarterId && (
+          <p className={styles.notice} role="status">
+            Seleziona la riserva dello stesso ruolo per lo swap (non consuma cambi mercato).
+          </p>
+        )}
+        <div className={styles.squadGrid}>
+          {bench.map((player, index) => {
+            const swapStarter = swapStarterId
+              ? starters.find((item) => item.playerId === swapStarterId)
+              : null;
+            const canSwap = Boolean(swapStarter && swapStarter.role === player.role);
+            return (
+              <article className={styles.squadCard} key={player.id}>
+                <div className={styles.squadTop}>
+                  <span className={styles.squadRole}>
+                    #{index + 1} · {roleLabels[player.role] ?? player.role}
+                  </span>
+                </div>
+                <strong>{player.name}</strong>
+                <small>
+                  {player.school} · {player.value} LP
+                </small>
+                {isOpen && (
+                  <div className={styles.squadActions}>
+                    <button
+                      className={styles.sellButton}
+                      disabled={busy}
+                      onClick={() =>
+                        setReplacementRequest({
+                          action: "sell",
+                          playerId: player.playerId,
+                          role: player.role,
+                          name: player.name,
+                        })
+                      }
+                      type="button"
+                    >
+                      Vendi
+                    </button>
+                    <button
+                      className={styles.formationButton}
+                      disabled={busy || index === 0}
+                      onClick={() => void moveBench(player.playerId, -1)}
+                      type="button"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      className={styles.formationButton}
+                      disabled={busy || index === bench.length - 1}
+                      onClick={() => void moveBench(player.playerId, 1)}
+                      type="button"
+                    >
+                      ↓
+                    </button>
+                    {swapStarterId && (
+                      <button
+                        className={styles.captainButton}
+                        disabled={busy || !canSwap}
+                        onClick={() => void swapFormation(swapStarterId, player.playerId)}
+                        type="button"
+                      >
+                        Entra
+                      </button>
+                    )}
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -395,7 +558,7 @@ function MarketStatusCard({ status }: { status: MarketWindow }) {
             ? status.closesAt
               ? `Chiude ${new Date(status.closesAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`
               : "Aperto fino al prossimo turno"
-            : "Riapre al termine della giornata"}
+            : "Formazione e mercato bloccati fino a fine giornata"}
         </small>
       </div>
     </section>

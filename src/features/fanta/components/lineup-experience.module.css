@@ -1,0 +1,682 @@
+.experience {
+  display: grid;
+  gap: 14px;
+}
+
+.header,
+.budget,
+.statusOpen,
+.statusClosed,
+.benchHeading,
+.confirmation,
+.confirmation > div,
+.actionSheetHeader,
+.actionSheetHeader > div,
+.panelHeading,
+.poolTitle,
+.promoteReserve {
+  display: flex;
+  align-items: center;
+}
+
+.header,
+.benchHeading,
+.confirmation,
+.panelHeading {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header {
+  padding-top: 4px;
+}
+
+.header h2,
+.benchHeading h3,
+.panelHeading h3 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.header h2 {
+  font-size: clamp(2.15rem, 10vw, 3.25rem);
+  line-height: 0.88;
+}
+
+.kicker {
+  margin: 0 0 6px;
+  color: #9cb2ff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.budget {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.budget span,
+.statusOpen small,
+.statusClosed small,
+.dragHint,
+.confirmation small,
+.actionSheetHeader small,
+.choiceList small {
+  color: var(--color-text-secondary);
+}
+
+.budget span {
+  font-size: 0.7rem;
+}
+
+.budget strong {
+  font-size: 0.9rem;
+}
+
+.statusOpen,
+.statusClosed {
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 12px;
+}
+
+.statusOpen {
+  border: 1px solid rgb(34 197 94 / 42%);
+  background: rgb(34 197 94 / 12%);
+  color: #9ee3b3;
+}
+
+.statusClosed {
+  border: 1px solid rgb(198 204 218 / 18%);
+  background: rgb(255 255 255 / 5%);
+  color: var(--color-text-secondary);
+}
+
+.statusOpen div,
+.statusClosed div,
+.confirmation span,
+.actionSheetHeader div div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statusOpen strong,
+.statusClosed strong {
+  color: var(--color-text);
+  font-size: 0.83rem;
+}
+
+.statusOpen small,
+.statusClosed small {
+  font-size: 0.68rem;
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgb(80 120 255 / 48%);
+  border-radius: 10px;
+  background: rgb(48 92 255 / 14%);
+  color: #d4ddff;
+  font-size: 0.78rem;
+}
+
+.pitch {
+  position: relative;
+  display: flex;
+  min-height: 440px;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 10px;
+  overflow: hidden;
+  padding: 30px 10px 14px;
+  border: 1px solid rgb(159 214 177 / 35%);
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 13%,
+      rgb(255 255 255 / 8%) 13.3% 13.8%,
+      transparent 14.1%
+    ),
+    linear-gradient(90deg, transparent 49.5%, rgb(255 255 255 / 14%) 50%, transparent 50.5%),
+    linear-gradient(180deg, transparent 49.5%, rgb(255 255 255 / 16%) 50%, transparent 50.5%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 3%) 0 16.666%, transparent 16.666% 33.333%),
+    linear-gradient(180deg, #176a4b, #0d4d38);
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 20%);
+}
+
+.pitch::before,
+.pitch::after {
+  position: absolute;
+  left: 50%;
+  width: 62%;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 17%);
+  border-bottom: 0;
+  transform: translateX(-50%);
+  content: "";
+  pointer-events: none;
+}
+
+.pitch::before {
+  top: 0;
+  border-radius: 0 0 80px 80px;
+}
+
+.pitch::after {
+  bottom: 0;
+  border-radius: 80px 80px 0 0;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.formationLabel {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 1;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgb(4 35 26 / 72%);
+  color: #c8f1d3;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  transform: translateX(-50%);
+}
+
+.pitchRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 78px;
+  justify-content: center;
+  gap: 8px;
+}
+
+.playerCard,
+.emptySlot,
+.unavailableSlot {
+  width: min(28vw, 112px);
+  min-height: 78px;
+  border-radius: 13px;
+}
+
+.playerCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 8px 4px;
+  border: 1px solid rgb(255 255 255 / 27%);
+  background: linear-gradient(155deg, rgb(15 33 80 / 95%), rgb(7 17 49 / 94%));
+  box-shadow: 0 7px 16px rgb(0 0 0 / 22%);
+  color: var(--color-text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.playerCard:disabled {
+  cursor: wait;
+}
+
+.playerCard strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerCard small {
+  color: #b7c7ff;
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.avatar {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #7391ff, #3152cf);
+  color: #fff;
+  font-family: var(--font-family-display);
+  font-size: 1rem;
+}
+
+.captainBadge {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid #ffe396;
+  border-radius: 50%;
+  background: #f7c948;
+  color: #4c3900;
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.cardStats {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 2px;
+  color: #e8edff;
+  font-size: 0.52rem;
+}
+
+.cardStats i {
+  color: #aabaff;
+  font-style: normal;
+}
+
+.emptySlot,
+.emptyBenchSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px dashed rgb(255 255 255 / 52%);
+  background: rgb(5 42 30 / 34%);
+  color: #e7f9eb;
+  cursor: pointer;
+}
+
+.emptySlot span {
+  max-width: 8ch;
+  font-size: 0.61rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.emptySlot:disabled,
+.emptyBenchSlot:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.unavailableSlot {
+  border: 1px dashed rgb(255 255 255 / 17%);
+  background: rgb(5 42 30 / 15%);
+}
+
+.benchSection {
+  padding: 14px;
+  border: 1px solid rgb(198 204 218 / 18%);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgb(19 30 82 / 86%), rgb(6 15 51 / 94%));
+}
+
+.benchHeading {
+  margin-bottom: 10px;
+}
+
+.benchHeading h3,
+.panelHeading h3 {
+  font-size: 1.42rem;
+}
+
+.benchHeading > span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.bench {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.benchCard,
+.benchCardDragging,
+.emptyBenchSlot {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 88px;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 3px;
+  border-radius: 10px;
+  color: var(--color-text);
+  text-align: center;
+  touch-action: none;
+}
+
+.benchCard {
+  border: 1px solid rgb(255 255 255 / 18%);
+  background: rgb(255 255 255 / 6%);
+  cursor: grab;
+}
+
+.benchCard:active {
+  cursor: grabbing;
+}
+
+.benchCardDragging {
+  border: 1px solid #a9bdff;
+  background: rgb(48 92 255 / 37%);
+  cursor: grabbing;
+  opacity: 0.7;
+  transform: scale(0.97);
+}
+
+.benchNumber {
+  color: #bfcaff;
+  font-size: 0.58rem;
+  font-weight: 900;
+}
+
+.benchName {
+  width: 100%;
+  overflow: hidden;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.benchCard small {
+  color: var(--color-text-secondary);
+  font-size: 0.53rem;
+}
+
+.benchCard b {
+  color: #a3e7b7;
+  font-size: 0.62rem;
+}
+
+.benchOrderActions {
+  position: absolute;
+  right: 2px;
+  bottom: 3px;
+  display: flex;
+  gap: 1px;
+}
+
+.benchOrderActions button {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 11%);
+  color: #d8e0ff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.emptyBenchSlot {
+  border: 1px dashed rgb(255 255 255 / 40%);
+  background: rgb(255 255 255 / 4%);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.dragHint {
+  margin: 9px 0 0;
+  font-size: 0.67rem;
+  text-align: center;
+}
+
+.selectionPanel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgb(156 178 255 / 38%);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgb(38 60 145 / 50%), rgb(7 18 57 / 95%));
+}
+
+.panelHeading button,
+.actionSheetHeader > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 8%);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.choiceList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.choiceList button {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid rgb(255 255 255 / 17%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 7%);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.choiceList button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.choiceList span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.choiceList b {
+  overflow: hidden;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.choiceList small {
+  overflow: hidden;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.choiceList strong {
+  color: #bfcaff;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.promoteReserve {
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  border: 1px solid rgb(34 197 94 / 42%);
+  border-radius: 10px;
+  background: rgb(34 197 94 / 13%);
+  color: #b7f1c8;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.poolTitle {
+  gap: 6px;
+  margin: 2px 0 -4px;
+  color: #bfcaff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.confirmation {
+  padding: 13px;
+  border: 1px solid rgb(247 201 72 / 32%);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgb(247 201 72 / 13%), rgb(247 201 72 / 4%));
+}
+
+.confirmation > div {
+  gap: 9px;
+  color: #f7c948;
+}
+
+.confirmation strong {
+  color: var(--color-text);
+  font-size: 0.78rem;
+}
+
+.confirmation small {
+  font-size: 0.63rem;
+}
+
+.confirmation button {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid rgb(247 201 72 / 56%);
+  border-radius: 9px;
+  background: #f7c948;
+  color: #4c3900;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.confirmation button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.actionSheet {
+  position: fixed;
+  z-index: 20;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: max(10px, env(safe-area-inset-left));
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid rgb(198 204 218 / 24%);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgb(25 40 100 / 98%), rgb(6 15 51 / 99%));
+  box-shadow: 0 20px 50px rgb(0 0 0 / 50%);
+}
+
+.actionSheetHeader {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.actionSheetHeader > div {
+  gap: 9px;
+}
+
+.actionSheetHeader strong {
+  font-size: 0.9rem;
+}
+
+.actionSheetHeader small {
+  font-size: 0.68rem;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.actionGrid a,
+.actionGrid button {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgb(255 255 255 / 17%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 7%);
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.actionGrid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.actionGrid .sellAction {
+  border-color: rgb(248 113 113 / 42%);
+  background: rgb(220 38 38 / 13%);
+  color: #ffc0c0;
+}
+
+@media (min-width: 700px) {
+  .pitch {
+    min-height: 510px;
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+
+  .playerCard,
+  .emptySlot,
+  .unavailableSlot {
+    width: 120px;
+    min-height: 92px;
+  }
+
+  .pitchRow {
+    min-height: 92px;
+    gap: 16px;
+  }
+
+  .bench {
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playerCard,
+  .benchCard,
+  .benchCardDragging,
+  .emptySlot,
+  .emptyBenchSlot {
+    transition: none;
+  }
+}

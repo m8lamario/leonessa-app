@@ -1,8 +1,11 @@
 import "server-only";
 
+import { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { grantAchievement, recordActivity } from "@/features/fanta/server/social-service";
+import { processMatch } from "@/features/fanta/server/scoring-sync";
 import { ACHIEVEMENTS } from "@/features/fanta/achievements";
 
 const LEONESSA_SLUG = "leonessa-cup-sandbox";
@@ -33,6 +36,7 @@ export async function simulateMatchday() {
   let goals = 0;
   const assists = 0;
   let yellows = 0;
+  const createdMatchIds: string[] = [];
 
   for (let i = 0; i < rounds; i++) {
     const home = teams[i];
@@ -52,6 +56,7 @@ export async function simulateMatchday() {
         awayScore,
       },
     });
+    createdMatchIds.push(match.id);
 
     const players = await prisma.teamMember.findMany({
       where: { teamId: { in: [home.id, away.id] }, role: "PLAYER", leftAt: null },
@@ -75,7 +80,7 @@ export async function simulateMatchday() {
     }
   }
 
-  await runScoringOnLatest();
+  await scoreSandboxMatches(createdMatchIds);
 
   await recordActivity({
     type: "big_points",
@@ -86,64 +91,25 @@ export async function simulateMatchday() {
   return { rounds, goals, assists, yellows };
 }
 
-async function runScoringOnLatest() {
-  const competition = await prisma.competition.findUnique({ where: { slug: LEONESSA_SLUG } });
-  if (!competition) return;
-  const matchday = await prisma.fantasyMatchday.upsert({
-    where: { round: Number(new Date().toISOString().slice(0, 10).replaceAll("-", "")) },
-    update: { completedAt: new Date() },
-    create: {
-      round: Number(new Date().toISOString().slice(0, 10).replaceAll("-", "")),
-      startedAt: new Date(),
-      completedAt: new Date(),
-    },
-  });
-  const teams = await prisma.fantasyTeam.findMany({ include: { players: true } });
-  for (const team of teams) {
-    let points = 0;
-    for (const selection of team.players) {
-      const stat = await prisma.fantasyPlayerStat.findUnique({
-        where: { playerId: selection.playerId },
-      });
-      const events = await prisma.matchEvent.count({
-        where: { playerId: selection.playerId, match: { competitionId: competition.id } },
-      });
-      const playerPoints = (stat?.totalPoints ?? 0) + events * 25;
-      points += selection.isCaptain ? Math.round(playerPoints * 1.5) : playerPoints;
-      await prisma.fantasyPlayerStat.upsert({
-        where: { playerId: selection.playerId },
-        update: { matches: { increment: 1 }, totalPoints: { increment: events * 25 } },
-        create: { playerId: selection.playerId, matches: 1, totalPoints: events * 25 },
-      });
-      const player = await prisma.teamMember.findUnique({
-        where: { id: selection.playerId },
-        select: { fantasyValue: true },
-      });
-      if (player) {
-        const delta = events >= 2 ? 5 : events === 1 ? 2 : 0;
-        const newValue = Math.max(5, Math.min(150, player.fantasyValue + delta));
-        if (newValue !== player.fantasyValue) {
-          await prisma.teamMember.update({
-            where: { id: selection.playerId },
-            data: { fantasyValue: newValue },
-          });
-          await prisma.fantasyPlayerValueHistory.create({
-            data: {
-              playerId: selection.playerId,
-              oldValue: player.fantasyValue,
-              newValue,
-              reason: "Prestazione Sandbox",
-            },
-          });
-        }
-      }
-    }
-    await prisma.fantasyScore.upsert({
-      where: { fantasyTeamId_matchdayId: { fantasyTeamId: team.id, matchdayId: matchday.id } },
-      update: { points },
-      create: { fantasyTeamId: team.id, matchdayId: matchday.id, points },
+/** Persist newly simulated matches through the shared production scoring engine. */
+async function scoreSandboxMatches(matchIds: string[]) {
+  for (const matchId of matchIds) {
+    const match = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: { events: true },
     });
-    await prisma.fantasyTeam.update({ where: { id: team.id }, data: { totalPoints: points } });
+    if (!match || match.status !== "FINISHED") continue;
+
+    try {
+      await prisma.$transaction((transaction) => processMatch(transaction, match), {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        continue;
+      }
+      throw error;
+    }
   }
 }
 
@@ -294,6 +260,7 @@ export async function resetSandbox() {
   await prisma.notification.deleteMany({ where: { userId: { in: userIds } } });
   await prisma.fantasyAchievement.deleteMany({ where: { userId: { in: userIds } } });
   await prisma.fantasyScore.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
+  await prisma.fantasySubstitution.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
   await prisma.fantasyTeamTransfer.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
   await prisma.fantasyTeamPlayer.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
   await prisma.fantasyTeam.deleteMany({ where: { id: { in: fantasyTeamIds } } });

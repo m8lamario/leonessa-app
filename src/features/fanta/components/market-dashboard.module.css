@@ -260,7 +260,8 @@
   margin-top: 6px;
 }
 .sellButton,
-.captainButton {
+.captainButton,
+.formationButton {
   min-height: 32px;
   padding: 0 10px;
   border-radius: 8px;
@@ -278,8 +279,14 @@
   background: rgb(247 201 72 / 14%);
   color: #ffe3a3;
 }
+.formationButton {
+  border: 1px solid rgb(140 180 255 / 45%);
+  background: rgb(80 120 255 / 14%);
+  color: #c5d6ff;
+}
 .sellButton:disabled,
-.captainButton:disabled {
+.captainButton:disabled,
+.formationButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

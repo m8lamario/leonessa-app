@@ -1,39 +1,47 @@
 import Link from "next/link";
-import { ArrowUpRight, Crown, Store, Trophy } from "lucide-react";
+import { ArrowUpRight, Store, Trophy } from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
 import styles from "./fanta-dashboard.module.css";
+import { LineupExperience, type LineupExperienceData } from "./lineup-experience";
+
+type RosterPlayer = {
+  id: string;
+  name: string;
+  school: string;
+  role: string;
+  status: "STARTER" | "BENCH";
+  benchOrder: number | null;
+  isCaptain: boolean;
+  totalPoints: number;
+  matchPoints: number;
+  goals: number;
+  assists: number;
+};
 
 type DashboardData = {
   team: { id: string; name: string; budgetLp: number; totalPoints: number };
   position: number;
   lastMatchPoints: number;
-  roster: Array<{
-    id: string;
-    name: string;
-    school: string;
-    role: string;
-    isCaptain: boolean;
-    totalPoints: number;
-    matchPoints: number;
-    goals: number;
-    assists: number;
-  }>;
+  roster: RosterPlayer[];
+  starters: RosterPlayer[];
+  bench: RosterPlayer[];
   ranking: Array<{ position: number; name: string; points: number; isCurrent: boolean }>;
   upcomingMatches: Array<{ id: string; home: string; away: string; startAt: string }>;
   discoveries: Array<{ id: string; label: string; name: string; school: string; value: number }>;
 };
 
-type FantaDashboardProps = { dashboard: DashboardData | null };
+type FantaDashboardProps = { dashboard: DashboardData | null; lineup: LineupExperienceData | null };
 
-const formationOrder = ["ATTACCANTE", "CENTROCAMPISTA", "DIFENSORE", "PORTIERE"];
-
-export function FantaDashboard({ dashboard }: FantaDashboardProps) {
+export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
   if (!dashboard) {
     return <EmptyDashboard />;
   }
 
-  const involvedPlayers = dashboard.roster.length;
+  const starters =
+    dashboard.starters ?? dashboard.roster.filter((player) => player.status === "STARTER");
+  const bench = dashboard.bench ?? dashboard.roster.filter((player) => player.status === "BENCH");
+  const involvedPlayers = starters.length + bench.length;
 
   return (
     <PageContainer className={styles.page}>
@@ -68,35 +76,7 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
         </dl>
       </section>
 
-      <section className={styles.section} aria-labelledby="formation-title">
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.kicker}>La tua formazione</p>
-            <h2 id="formation-title">Undici in campo</h2>
-          </div>
-          <span>{dashboard.roster.length}/11</span>
-        </div>
-        <div className={styles.pitch}>
-          {formationOrder.map((role) => (
-            <div className={styles.pitchRow} key={role}>
-              {dashboard.roster
-                .filter((player) => player.role === role)
-                .map((player) => (
-                  <article className={styles.pitchPlayer} key={player.id}>
-                    <span className={styles.playerPoint}>{player.totalPoints}</span>
-                    {player.isCaptain && (
-                      <Crown aria-label="Capitano" className={styles.captain} size={15} />
-                    )}
-                    <strong>{player.name}</strong>
-                    <small>
-                      {player.school} · {role.slice(0, 3)}
-                    </small>
-                  </article>
-                ))}
-            </div>
-          ))}
-        </div>
-      </section>
+      {lineup && <LineupExperience lineup={lineup} />}
 
       <section className={styles.section} aria-labelledby="performance-title">
         <div className={styles.sectionHeading}>
@@ -107,7 +87,7 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
           <span>Dati reali</span>
         </div>
         <div className={styles.performanceList}>
-          {dashboard.roster.slice(0, 5).map((player) => (
+          {starters.slice(0, 5).map((player) => (
             <article className={styles.performanceCard} key={player.id}>
               <div>
                 <strong>{player.name}</strong>
@@ -125,7 +105,7 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
 
       <section className={styles.nextMatch} aria-labelledby="next-match-title">
         <p className={styles.kicker}>Prossima giornata Leonessa Cup</p>
-        <h2 id="next-match-title">{involvedPlayers} giocatori pronti</h2>
+        <h2 id="next-match-title">{involvedPlayers} giocatori in rosa</h2>
         {dashboard.upcomingMatches.length ? (
           <>
             <p>Inizio al prossimo fischio d&apos;inizio.</p>
@@ -146,7 +126,7 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
         <div>
           <p className={styles.kicker}>Mercato</p>
           <h2 id="market-title">{dashboard.team.budgetLp} LP disponibili</h2>
-          <p>Gestisci la tua squadra nel mercato.</p>
+          <p>Gestisci rosa e formazione nel mercato.</p>
         </div>
         <Link className={styles.marketButton} href="/fanta/market">
           <Store aria-hidden="true" size={18} /> Vai al mercato

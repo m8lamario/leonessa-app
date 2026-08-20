@@ -12,7 +12,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const team = await createFantasyTeam(user.id, {
       name: typeof body.name === "string" ? body.name : "",
-      playerIds: Array.isArray(body.playerIds) ? body.playerIds : [],
+      starterIds: Array.isArray(body.starterIds) ? body.starterIds : [],
+      benchIds: Array.isArray(body.benchIds) ? body.benchIds : [],
       captainId: typeof body.captainId === "string" ? body.captainId : "",
     });
 

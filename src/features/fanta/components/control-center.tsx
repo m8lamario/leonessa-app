@@ -385,6 +385,19 @@ export function FantaControlCenter({ initialData }: { initialData: Data }) {
       {breakdown && (
         <section className={styles.section}>
           <h2>Scoring Inspector</h2>
+          {breakdown.substitutions?.length > 0 && (
+            <div className={styles.breakdown}>
+              <h3>Sostituzioni registrate</h3>
+              {breakdown.substitutions.map((sub: any) => (
+                <div className={styles.breakdownRow} key={sub.id}>
+                  <b>{sub.fantasyTeamName}</b>
+                  <span>
+                    #{sub.sequence} {sub.playerOutName} → {sub.playerInName} ({sub.reason})
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
           <div className={styles.breakdown}>
             {breakdown.players?.map((player: any) => (
               <div className={styles.breakdownRow} key={player.playerId}>
@@ -392,6 +405,16 @@ export function FantaControlCenter({ initialData }: { initialData: Data }) {
                 <span>
                   Eventi {player.eventPoints} + risultato {player.resultPoints} + clean sheet{" "}
                   {player.cleanSheet} × capitano {player.captainCount ? "1.5" : "1"}
+                  {player.lineup?.length
+                    ? ` · lineup ${player.lineup
+                        .map(
+                          (entry: any) =>
+                            `${entry.status}${entry.isCaptain ? " C" : ""}${
+                              entry.benchOrder != null ? `#${entry.benchOrder}` : ""
+                            }`,
+                        )
+                        .join(", ")}`
+                    : ""}
                 </span>
                 <strong>{player.finalPoints}</strong>
               </div>

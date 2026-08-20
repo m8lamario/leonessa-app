@@ -5,13 +5,15 @@ export {
   getFantasyTeamByUserId,
   hasFantasyTeam,
 } from "./fanta-service";
-export { getFantasyScoringStatus, syncFantasyScoring } from "./scoring-sync";
-export type { FantasyScoringSyncResult } from "./scoring-sync";
+export { getFantasyScoringStatus, processMatch, syncFantasyScoring } from "./scoring-sync";
+export type { FantasyScoringSyncResult, ProcessMatchOptions } from "./scoring-sync";
 export {
   buyPlayer,
+  buyPlayerIntoVacancy,
   changeCaptain,
   getMarketDashboard,
   getMarketStatus,
+  sellPlayerToVacancy,
   sellPlayer,
 } from "./market-service";
 export type { MarketDashboardDto, MarketStatusDto, PlayerMarketDto } from "./market-service";
@@ -32,9 +34,15 @@ export {
   getTeamInspector,
   updateMatchEvent,
 } from "./control-center-service";
-export { SCORING_RULES } from "./control-center-service";
+export { SCORING, SCORING_RULES } from "../lib/scoring-engine";
 export { recalculateSandbox, resetSandboxMatchScenario } from "./sandbox-recalc-service";
 export { closeSandboxMatchday } from "./sandbox-close-day-service";
+export {
+  confirmFormation,
+  promoteBenchToVacancy,
+  reorderBench,
+  swapStarterWithBench,
+} from "./formation-service";
 export type {
   AchievementDto,
   ActivityDto,

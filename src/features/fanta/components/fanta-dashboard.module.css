@@ -415,6 +415,45 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.benchList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.benchCard {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgb(198 204 218 / 16%);
+  border-radius: 12px;
+  background: rgb(10 18 48 / 72%);
+}
+.benchOrder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgb(48 92 255 / 22%);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.benchCard strong {
+  display: block;
+  font-size: 0.92rem;
+}
+.benchCard small {
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+}
+.benchHint {
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
 .pitchPlayer small {
   font-size: 0.58rem;
 }
@@ -699,6 +738,20 @@
   justify-content: space-between;
   gap: 2px;
   margin: 22px 0 8px;
+}
+.stepperCompact {
+  gap: 1px;
+  margin: 16px 0 8px;
+}
+.stepperCompact .step,
+.stepperCompact .stepActive {
+  font-size: 0.48rem;
+}
+.stepperCompact .step i,
+.stepperCompact .stepActive i {
+  width: 18px;
+  height: 18px;
+  font-size: 0.62rem;
 }
 .step,
 .stepActive {
@@ -1060,6 +1113,15 @@
   justify-content: center;
   gap: 6px;
   margin-top: 17px;
+}
+.finalRoster strong {
+  width: 100%;
+  margin-top: 6px;
+  color: #9cb2ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .finalRoster span {
   padding: 5px 8px;

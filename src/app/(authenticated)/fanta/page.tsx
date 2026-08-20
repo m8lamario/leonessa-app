@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
 import { FantaDashboard } from "@/features/fanta";
-import { getFantasyDashboardData } from "@/features/fanta/server";
+import { getFantasyDashboardData, getMarketDashboard } from "@/features/fanta/server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,10 @@ export default async function FantaPage() {
     redirect("/onboarding");
   }
 
-  const dashboard = await getFantasyDashboardData(user.id);
+  const [dashboard, lineup] = await Promise.all([
+    getFantasyDashboardData(user.id),
+    getMarketDashboard(user.id),
+  ]);
 
-  return <FantaDashboard dashboard={dashboard} />;
+  return <FantaDashboard dashboard={dashboard} lineup={lineup.team ? lineup : null} />;
 }

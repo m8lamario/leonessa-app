@@ -3,19 +3,15 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { isSandboxMode } from "@/lib/sandbox";
 import { AppError } from "@/utils/errors";
+import {
+  SCORING_RULES,
+  getPlayerMatchBreakdown,
+  type ScorableMatch,
+} from "../lib/scoring-engine";
 
 const SANDBOX_SLUG = "leonessa-cup-sandbox";
 
-export const SCORING_RULES = {
-  GOAL: 100,
-  ASSIST: 50,
-  YELLOW_CARD: -20,
-  RED_CARD: -50,
-  OWN_GOAL: -70,
-  WIN: 20,
-  DRAW: 5,
-  CLEAN_SHEET: 30,
-} as const;
+export { SCORING_RULES };
 
 export function assertControlCenterEnabled() {
   if (!isSandboxMode()) {
@@ -216,9 +212,37 @@ export async function getScoringInspector(matchId: string) {
     include: {
       user: { select: { name: true, surname: true } },
       fantasyStat: true,
-      fantasySelections: { select: { fantasyTeamId: true, isCaptain: true } },
+      fantasySelections: {
+        select: {
+          fantasyTeamId: true,
+          isCaptain: true,
+          role: true,
+          status: true,
+          benchOrder: true,
+        },
+      },
     },
   });
+  const substitutions = await prisma.fantasySubstitution.findMany({
+    where: { matchId },
+    orderBy: [{ fantasyTeamId: "asc" }, { sequence: "asc" }],
+    include: {
+      fantasyTeam: { select: { id: true, name: true } },
+      playerOut: { include: { user: { select: { name: true, surname: true } } } },
+      playerIn: { include: { user: { select: { name: true, surname: true } } } },
+    },
+  });
+  const scorable: ScorableMatch = {
+    homeTeamId: match.homeTeamId,
+    awayTeamId: match.awayTeamId,
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    events: match.events.map((event) => ({
+      playerId: event.playerId,
+      type: event.type,
+    })),
+  };
+
   return {
     match: {
       id: match.id,
@@ -228,45 +252,58 @@ export async function getScoringInspector(matchId: string) {
       awayScore: match.awayScore,
     },
     rules: SCORING_RULES,
+    substitutions: substitutions.map((substitution) => ({
+      id: substitution.id,
+      fantasyTeamId: substitution.fantasyTeamId,
+      fantasyTeamName: substitution.fantasyTeam.name,
+      playerOutId: substitution.playerOutId,
+      playerOutName:
+        [substitution.playerOut.user.name, substitution.playerOut.user.surname]
+          .filter(Boolean)
+          .join(" ") || "Giocatore",
+      playerInId: substitution.playerInId,
+      playerInName:
+        [substitution.playerIn.user.name, substitution.playerIn.user.surname]
+          .filter(Boolean)
+          .join(" ") || "Giocatore",
+      reason: substitution.reason,
+      sequence: substitution.sequence,
+    })),
     players: players.map((player) => {
-      const events = match.events.filter((event) => event.playerId === player.id);
-      const eventPoints = events.reduce(
-        (sum, event) => sum + (SCORING_RULES[event.type as keyof typeof SCORING_RULES] ?? 0),
-        0,
+      const captainSelection = player.fantasySelections.find(
+        (selection) => selection.isCaptain && selection.status === "STARTER",
       );
-      const isHome = player.teamId === match.homeTeamId;
-      const ownScore = isHome ? match.homeScore : match.awayScore;
-      const opponentScore = isHome ? match.awayScore : match.homeScore;
-      const resultPoints =
-        ownScore > opponentScore
-          ? SCORING_RULES.WIN
-          : ownScore === opponentScore
-            ? SCORING_RULES.DRAW
-            : 0;
-      const cleanSheet =
-        opponentScore === 0 &&
-        (player.fantasyRole === "PORTIERE" || player.fantasyRole === "DIFENSORE")
-          ? SCORING_RULES.CLEAN_SHEET
-          : 0;
-      const basePoints = eventPoints + resultPoints + cleanSheet;
-      const captainCount = player.fantasySelections.filter(
-        (selection) => selection.isCaptain,
-      ).length;
+      const fieldedRole = captainSelection?.role ?? player.fantasyRole;
+      const scored = getPlayerMatchBreakdown(scorable, player, {
+        role: fieldedRole,
+        isCaptain: Boolean(captainSelection),
+      });
       return {
         playerId: player.id,
         name: [player.user.name, player.user.surname].filter(Boolean).join(" ") || "Giocatore",
-        role: player.fantasyRole,
-        events: events.map((event) => ({
-          type: event.type,
-          minute: event.minute,
-          points: SCORING_RULES[event.type as keyof typeof SCORING_RULES] ?? 0,
+        role: scored.role,
+        lineup: player.fantasySelections.map((selection) => ({
+          fantasyTeamId: selection.fantasyTeamId,
+          status: selection.status,
+          benchOrder: selection.benchOrder,
+          isCaptain: selection.isCaptain,
         })),
-        eventPoints,
-        resultPoints,
-        cleanSheet,
-        basePoints,
-        captainCount,
-        finalPoints: captainCount > 0 ? Math.round(basePoints * 1.5) : basePoints,
+        events: scored.events.map((event, index) => {
+          const source = match.events.filter((item) => item.playerId === player.id)[index];
+          return {
+            type: event.type,
+            minute: source?.minute ?? 0,
+            points: event.points,
+          };
+        }),
+        eventPoints: scored.eventPoints,
+        resultPoints: scored.resultPoints,
+        cleanSheet: scored.cleanSheetPoints,
+        basePoints: scored.basePoints,
+        captainCount: player.fantasySelections.filter(
+          (selection) => selection.isCaptain && selection.status === "STARTER",
+        ).length,
+        finalPoints: scored.finalPoints,
         stat: player.fantasyStat,
       };
     }),
@@ -296,30 +333,63 @@ export async function getTeamInspector(teamId: string) {
     include: {
       user: { select: { name: true, surname: true } },
       players: {
+        orderBy: [{ status: "asc" }, { benchOrder: "asc" }],
         include: {
           player: {
             include: { user: { select: { name: true, surname: true } }, fantasyStat: true },
           },
         },
       },
+      substitutions: {
+        orderBy: [{ createdAt: "desc" }, { sequence: "asc" }],
+        take: 50,
+        include: {
+          match: {
+            select: {
+              id: true,
+              startAt: true,
+              homeTeam: { select: { name: true } },
+              awayTeam: { select: { name: true } },
+            },
+          },
+          playerOut: { include: { user: { select: { name: true, surname: true } } } },
+          playerIn: { include: { user: { select: { name: true, surname: true } } } },
+        },
+      },
       scores: { orderBy: { createdAt: "desc" }, take: 20 },
     },
   });
   if (!team) throw new AppError("NOT_FOUND", "Fantasy Team non trovata.", 404);
-  return team;
+  return {
+    ...team,
+    starters: team.players.filter((player) => player.status === "STARTER"),
+    bench: team.players.filter((player) => player.status === "BENCH"),
+  };
 }
 
 export async function getAnomalies() {
   const anomalies: Array<{ area: string; message: string; recordId?: string }> = [];
   const teams = await prisma.fantasyTeam.findMany({ include: { players: true } });
   for (const team of teams) {
-    if (team.players.length !== 11)
+    if (team.players.length !== 15)
       anomalies.push({
         area: "teams",
         message: `${team.name}: ${team.players.length} giocatori`,
         recordId: team.id,
       });
-    if (team.players.filter((player) => player.isCaptain).length !== 1)
+    if (team.players.filter((player) => player.status === "STARTER").length !== 11)
+      anomalies.push({
+        area: "teams",
+        message: `${team.name}: titolari != 11`,
+        recordId: team.id,
+      });
+    if (team.players.filter((player) => player.status === "BENCH").length !== 4)
+      anomalies.push({
+        area: "teams",
+        message: `${team.name}: riserve != 4`,
+        recordId: team.id,
+      });
+    if (team.players.filter((player) => player.isCaptain && player.status === "STARTER").length !== 1)
       anomalies.push({
         area: "teams",
         message: `${team.name}: capitano non valido`,

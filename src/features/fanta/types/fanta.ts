@@ -1,10 +1,14 @@
 export type FantasyRole = "PORTIERE" | "DIFENSORE" | "CENTROCAMPISTA" | "ATTACCANTE";
 
+export type FantasyLineupStatus = "STARTER" | "BENCH";
+
 export type FantasyTeamPlayer = {
   id: string;
   fantasyTeamId: string;
   playerId: string;
   role: FantasyRole | string;
+  status: FantasyLineupStatus;
+  benchOrder: number | null;
   purchaseCost: number;
   isCaptain: boolean;
   createdAt: Date;
@@ -31,5 +35,8 @@ export type FantasyTeam = {
 };
 
 export type FantasyTeamSummary = Omit<FantasyTeam, "players"> & {
-  players: Pick<FantasyTeamPlayer, "id" | "playerId" | "role" | "isCaptain">[];
+  players: Pick<
+    FantasyTeamPlayer,
+    "id" | "playerId" | "role" | "status" | "benchOrder" | "isCaptain"
+  >[];
 };

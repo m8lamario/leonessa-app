@@ -288,9 +288,7 @@ Utilizzare il modello già presente nel progetto dove possibile.
 
 # Ordine delle riserve
 
-La V1 non richiede una panchina ordinata globalmente.
-
-Ogni riserva è associata al proprio ruolo:
+Ogni riserva resta associata al proprio ruolo:
 
 ```text
 POR
@@ -299,7 +297,7 @@ CEN
 ATT
 ```
 
-Questo rende il comportamento deterministico.
+Inoltre ogni riserva ha un `benchOrder` (0–3) modificabile a mercato aperto, utile per UI e per la `sequence` delle sostituzioni future. L'auto-substitution per ruolo continua a selezionare la riserva dello stesso ruolo (una sola per ruolo in V1).
 
 ---
 
@@ -817,7 +815,7 @@ Il piano è completato quando:
 
 ✅ Il punteggio viene calcolato sul giocatore effettivamente entrato
 
-✅ Il Control Center permette di simulare le assenze
+✅ Il Control Center mostra titolari, riserve e sostituzioni registrate (senza inventare assenze finché non c’è un provider)
 
 ✅ Il sistema registra le sostituzioni
 
@@ -849,3 +847,62 @@ a:
 mantenendo comunque una logica semplice.
 
 La panchina non deve trasformare il Fanta in un gestionale complesso: deve principalmente proteggere l'utente dall'assenza di un giocatore e aggiungere una piccola componente strategica nella costruzione della rosa.
+
+---
+
+# Decisioni applicative (2026-08-20)
+
+Queste decisioni integrano e precisano il piano. In caso di conflitto prevalgono su sezioni precedenti.
+
+## 1. Partecipazione
+
+- Non introdurre un sistema manuale per registrare chi ha giocato.
+- Non usare il criterio `nessun MatchEvent = non ha giocato`.
+- Implementare le 4 riserve, `STARTER`/`BENCH`, ordine panchina e gestione formazione.
+- L'auto-substitution deve essere **predisposta** (resolver + persistenza `FantasySubstitution`) ma deve ricevere un segnale di partecipazione da un provider esterno.
+- Se il provider non è disponibile (`null`), **nessuna** sostituzione automatica viene applicata: si calcolano solo i titolari.
+- Quando in futuro ESL (o altra fonte) fornirà dati affidabili, basterà collegare il provider senza rifare il sistema.
+
+## 2. Persistenza
+
+Modello dedicato:
+
+```prisma
+model FantasySubstitution {
+  fantasyTeamId
+  matchId
+  playerOutId
+  playerInId
+  reason
+  sequence
+}
+```
+
+- La formazione originale resta su `FantasyTeamPlayer` (`STARTER`/`BENCH`).
+- Le sostituzioni rappresentano le variazioni effettive per match.
+- Idempotenza: la stessa sostituzione non deve essere creata due volte per la stessa squadra/match/playerOut.
+
+## 3. Blocco formazione
+
+- Usare il lock mercato già esistente (chiusura 30 minuti prima del kickoff).
+- Non creare un secondo sistema di lock.
+- A mercato chiuso sono bloccati: buy/sell, cambio titolare↔riserva, ordine riserve, capitano.
+
+## 4. Modifica formazione
+
+A mercato aperto, senza consumare un trasferimento di mercato, l'utente può:
+
+- spostare giocatori tra titolari e riserve;
+- modificare l'ordine delle 4 riserve;
+
+sempre mantenendo `11 STARTER + 4 BENCH` e i limiti per ruolo.
+
+## 5. Posseduto vs schierato
+
+Fuori scope in questa fase. Nessuna distinzione aggiuntiva oltre a `FantasyTeamPlayer` e `STARTER`/`BENCH`.
+
+## 6. Control Center
+
+- Mostrare titolari, riserve e sostituzioni registrate.
+- Non simulare assenze inventando partecipazione finché non esiste un provider.
+- L'inspector deve poter mostrare le sostituzioni effettive quando presenti.

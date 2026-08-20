@@ -5,15 +5,16 @@ import { Prisma } from "@prisma/client";
 import { awardLPInTransaction } from "@/features/rewards/server/reward-engine";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
-import { FORMATION_LIMITS, FANTA_CREATION_REWARD, INITIAL_BUDGET } from "../constants/fanta";
+import { FANTA_CREATION_REWARD, INITIAL_BUDGET, TEAM_SIZE, STARTER_SIZE, BENCH_SIZE, STARTER_LIMITS, BENCH_LIMITS } from "../constants/fanta";
 import { grantAchievement, recordActivity } from "./social-service";
 import type { FantasyRole } from "../types";
 
-const fantasyRoles = Object.keys(FORMATION_LIMITS) as FantasyRole[];
+const fantasyRoles = Object.keys(STARTER_LIMITS) as FantasyRole[];
 
 export type CreateFantasyTeamInput = {
   name: string;
-  playerIds: string[];
+  starterIds: string[];
+  benchIds: string[];
   captainId: string;
 };
 
@@ -112,12 +113,20 @@ export async function getFantasyDashboardData(userId: string) {
       [entry.player.user.name, entry.player.user.surname].filter(Boolean).join(" ") || "Giocatore",
     school: entry.player.team.school.shortName,
     role: entry.role,
+    status: entry.status,
+    benchOrder: entry.benchOrder,
     isCaptain: entry.isCaptain,
     totalPoints: entry.player.fantasyStat?.totalPoints ?? 0,
     matchPoints: entry.player.fantasyStat?.totalPoints ?? 0,
     goals: entry.player.fantasyStat?.goals ?? 0,
     assists: entry.player.fantasyStat?.assists ?? 0,
   }));
+  const starters = roster
+    .filter((player) => player.status === "STARTER")
+    .sort((a, b) => a.role.localeCompare(b.role));
+  const bench = roster
+    .filter((player) => player.status === "BENCH")
+    .sort((a, b) => (a.benchOrder ?? 99) - (b.benchOrder ?? 99));
 
   const mostSelected = [...featuredPlayers].sort(
     (a, b) => b._count.fantasySelections - a._count.fantasySelections,
@@ -147,6 +156,8 @@ export async function getFantasyDashboardData(userId: string) {
     position: position || rankingTeams.length + 1,
     lastMatchPoints: latestScore?.points ?? 0,
     roster,
+    starters,
+    bench,
     ranking: rankingTeams.map((item, index) => ({
       position: index + 1,
       name: item.userId === userId ? "Tu" : item.name,
@@ -207,14 +218,21 @@ function validateInput(
   if (name.length < 3 || name.length > 30) {
     throw new AppError("BAD_REQUEST", "Il nome squadra deve contenere da 3 a 30 caratteri.", 400);
   }
-  if (input.playerIds.length !== 11 || new Set(input.playerIds).size !== 11) {
-    throw new AppError("BAD_REQUEST", "Devi selezionare 11 giocatori.", 400);
+  if (input.starterIds.length !== STARTER_SIZE || new Set(input.starterIds).size !== STARTER_SIZE) {
+    throw new AppError("BAD_REQUEST", "Devi selezionare 11 titolari.", 400);
   }
-  if (!input.captainId || !input.playerIds.includes(input.captainId)) {
-    throw new AppError("BAD_REQUEST", "Devi selezionare un capitano.", 400);
+  if (input.benchIds.length !== BENCH_SIZE || new Set(input.benchIds).size !== BENCH_SIZE) {
+    throw new AppError("BAD_REQUEST", "Devi selezionare 4 riserve.", 400);
+  }
+  const allIds = [...input.starterIds, ...input.benchIds];
+  if (new Set(allIds).size !== TEAM_SIZE) {
+    throw new AppError("BAD_REQUEST", "Non ci possono essere duplicati tra titolari e riserve.", 400);
+  }
+  if (!input.captainId || !input.starterIds.includes(input.captainId)) {
+    throw new AppError("BAD_REQUEST", "Il capitano deve essere uno degli 11 titolari.", 400);
   }
 
-  const selected = input.playerIds.map((id) => players.find((player) => player.id === id));
+  const selected = allIds.map((id) => players.find((player) => player.id === id));
   if (selected.some((player) => !player)) {
     throw new AppError("BAD_REQUEST", "Uno o più giocatori non sono disponibili.", 400);
   }
@@ -224,18 +242,29 @@ function validateInput(
     throw new AppError("BAD_REQUEST", "Budget insufficiente.", 400);
   }
 
+  const starters = input.starterIds.map((id) => players.find((player) => player.id === id)!);
+  const bench = input.benchIds.map((id) => players.find((player) => player.id === id)!);
+
   for (const role of fantasyRoles) {
-    const count = selected.filter((player) => player?.fantasyRole === role).length;
-    if (count !== FORMATION_LIMITS[role]) {
+    const starterCount = starters.filter((player) => player.fantasyRole === role).length;
+    if (starterCount !== STARTER_LIMITS[role]) {
       throw new AppError(
         "BAD_REQUEST",
-        `La formazione richiede ${FORMATION_LIMITS[role]} ${role.toLowerCase()}.`,
+        `I titolari richiedono ${STARTER_LIMITS[role]} ${role.toLowerCase()}.`,
+        400,
+      );
+    }
+    const benchCount = bench.filter((player) => player.fantasyRole === role).length;
+    if (benchCount !== BENCH_LIMITS[role]) {
+      throw new AppError(
+        "BAD_REQUEST",
+        `Le riserve richiedono ${BENCH_LIMITS[role]} ${role.toLowerCase()}.`,
         400,
       );
     }
   }
 
-  return { name, selected, cost };
+  return { name, starters, bench, cost };
 }
 
 export async function createFantasyTeam(userId: string, input: CreateFantasyTeamInput) {
@@ -249,28 +278,41 @@ export async function createFantasyTeam(userId: string, input: CreateFantasyTeam
         throw new AppError("CONFLICT", "Hai già creato una squadra fantasy.", 409);
       }
 
+      const allIds = [...input.starterIds, ...input.benchIds];
       const available = await transaction.teamMember.findMany({
         where: {
-          id: { in: input.playerIds },
+          id: { in: allIds },
           role: "PLAYER",
           leftAt: null,
           user: { deletedAt: null },
         },
         select: { id: true, fantasyRole: true, fantasyValue: true },
       });
-      const { name, selected, cost } = validateInput(input, available);
+      const { name, starters, bench, cost } = validateInput(input, available);
       const team = await transaction.fantasyTeam.create({
         data: {
           userId,
           name,
           budgetLp: INITIAL_BUDGET - cost,
           players: {
-            create: selected.map((player) => ({
-              playerId: player!.id,
-              role: player!.fantasyRole,
-              purchaseCost: player!.fantasyValue,
-              isCaptain: player!.id === input.captainId,
-            })),
+            create: [
+              ...starters.map((player) => ({
+                playerId: player.id,
+                role: player.fantasyRole,
+                status: "STARTER" as const,
+                benchOrder: null,
+                purchaseCost: player.fantasyValue,
+                isCaptain: player.id === input.captainId,
+              })),
+              ...bench.map((player, index) => ({
+                playerId: player.id,
+                role: player.fantasyRole,
+                status: "BENCH" as const,
+                benchOrder: index,
+                purchaseCost: player.fantasyValue,
+                isCaptain: false,
+              })),
+            ],
           },
         },
         include: { players: true },

@@ -5,7 +5,15 @@ import { Check, ChevronLeft, Crown, Search, Shield, Sparkles, Users } from "luci
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { CAPTAIN_MULTIPLIER, FORMATION_LIMITS, INITIAL_BUDGET } from "../constants/fanta";
+import {
+  BENCH_LIMITS,
+  BENCH_SIZE,
+  CAPTAIN_MULTIPLIER,
+  INITIAL_BUDGET,
+  STARTER_LIMITS,
+  STARTER_SIZE,
+  TEAM_SIZE,
+} from "../constants/fanta";
 import type { FantasyPlayer, FantasyRole } from "../types";
 import styles from "./fanta-dashboard.module.css";
 
@@ -15,20 +23,30 @@ const roleLabels: Record<FantasyRole, string> = {
   CENTROCAMPISTA: "Centrocampisti",
   ATTACCANTE: "Attaccanti",
 };
-const roleForStep: Partial<Record<number, FantasyRole>> = {
-  2: "PORTIERE",
-  3: "DIFENSORE",
-  4: "CENTROCAMPISTA",
-  5: "ATTACCANTE",
-};
-const steps = ["Identità", "Portiere", "Difensori", "Centrocampo", "Attacco", "Capitano", "Pronti"];
+
+type StepKind = "name" | "starter" | "bench" | "captain" | "ready";
+
+const steps: Array<{ label: string; kind: StepKind; role?: FantasyRole }> = [
+  { label: "Nome", kind: "name" },
+  { label: "POR", kind: "starter", role: "PORTIERE" },
+  { label: "DIF", kind: "starter", role: "DIFENSORE" },
+  { label: "CEN", kind: "starter", role: "CENTROCAMPISTA" },
+  { label: "ATT", kind: "starter", role: "ATTACCANTE" },
+  { label: "POR+", kind: "bench", role: "PORTIERE" },
+  { label: "DIF+", kind: "bench", role: "DIFENSORE" },
+  { label: "CEN+", kind: "bench", role: "CENTROCAMPISTA" },
+  { label: "ATT+", kind: "bench", role: "ATTACCANTE" },
+  { label: "Cap", kind: "captain" },
+  { label: "OK", kind: "ready" },
+];
 
 export function TeamBuilder() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [players, setPlayers] = useState<FantasyPlayer[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [starters, setStarters] = useState<string[]>([]);
+  const [bench, setBench] = useState<string[]>([]);
   const [captainId, setCaptainId] = useState("");
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
@@ -54,61 +72,97 @@ export function TeamBuilder() {
     };
   }, []);
 
-  const selectedPlayers = useMemo(
+  const current = steps[step]!;
+  const allSelected = useMemo(() => new Set([...starters, ...bench]), [starters, bench]);
+  const starterPlayers = useMemo(
     () =>
-      selected
+      starters
         .map((id) => players.find((player) => player.id === id))
         .filter(Boolean) as FantasyPlayer[],
-    [players, selected],
+    [players, starters],
   );
-  const spent = selectedPlayers.reduce((total, player) => total + player.fantasyValue, 0);
+  const benchPlayers = useMemo(
+    () =>
+      bench
+        .map((id) => players.find((player) => player.id === id))
+        .filter(Boolean) as FantasyPlayer[],
+    [players, bench],
+  );
+  const spent = [...starterPlayers, ...benchPlayers].reduce(
+    (total, player) => total + player.fantasyValue,
+    0,
+  );
   const remaining = INITIAL_BUDGET - spent;
-  const activeRole = roleForStep[step];
-  const rolePlayers = players.filter(
-    (player) =>
-      player.role === activeRole &&
-      `${player.name} ${player.school}`.toLowerCase().includes(search.toLowerCase()),
-  );
-  const selectedForRole = activeRole
-    ? selectedPlayers.filter((player) => player.role === activeRole)
-    : [];
+  const activeRole = current.role;
+  const limit =
+    current.kind === "starter" && activeRole
+      ? STARTER_LIMITS[activeRole]
+      : current.kind === "bench" && activeRole
+        ? BENCH_LIMITS[activeRole]
+        : 0;
+  const selectedForStep =
+    current.kind === "starter" && activeRole
+      ? starterPlayers.filter((player) => player.role === activeRole)
+      : current.kind === "bench" && activeRole
+        ? benchPlayers.filter((player) => player.role === activeRole)
+        : [];
+  const rolePlayers = players.filter((player) => {
+    if (player.role !== activeRole) return false;
+    if (current.kind === "starter" && bench.includes(player.id)) return false;
+    if (current.kind === "bench" && starters.includes(player.id)) return false;
+    return `${player.name} ${player.school}`.toLowerCase().includes(search.toLowerCase());
+  });
 
   function togglePlayer(player: FantasyPlayer) {
     setError("");
-    if (selected.includes(player.id)) {
-      setSelected((current) => current.filter((id) => id !== player.id));
+    const inStarters = starters.includes(player.id);
+    const inBench = bench.includes(player.id);
+    if (inStarters || inBench) {
+      setStarters((currentIds) => currentIds.filter((id) => id !== player.id));
+      setBench((currentIds) => currentIds.filter((id) => id !== player.id));
       if (captainId === player.id) setCaptainId("");
       return;
     }
-    if (selectedForRole.length >= FORMATION_LIMITS[player.role]) {
-      setError(`Hai già scelto tutti i ${roleLabels[player.role].toLowerCase()}.`);
+    if (allSelected.has(player.id)) return;
+    if (selectedForStep.length >= limit) {
+      setError(
+        current.kind === "bench"
+          ? `Hai già la riserva ${roleLabels[player.role].toLowerCase()}.`
+          : `Hai già scelto tutti i titolari ${roleLabels[player.role].toLowerCase()}.`,
+      );
       return;
     }
     if (remaining < player.fantasyValue) {
       setError("Budget insufficiente per questo giocatore.");
       return;
     }
-    setSelected((current) => [...current, player.id]);
+    if (current.kind === "starter") {
+      setStarters((currentIds) => [...currentIds, player.id]);
+    } else if (current.kind === "bench") {
+      setBench((currentIds) => [...currentIds, player.id]);
+    }
   }
 
   function next() {
     setError("");
-    if (step === 1 && (name.trim().length < 3 || name.trim().length > 30)) {
+    if (current.kind === "name" && (name.trim().length < 3 || name.trim().length > 30)) {
       setError("Scegli un nome da 3 a 30 caratteri per la tua squadra.");
       return;
     }
-    if (activeRole && selectedForRole.length !== FORMATION_LIMITS[activeRole]) {
+    if ((current.kind === "starter" || current.kind === "bench") && selectedForStep.length !== limit) {
       setError(
-        `Completa questo reparto: servono ${FORMATION_LIMITS[activeRole]} ${roleLabels[activeRole].toLowerCase()}.`,
+        current.kind === "bench"
+          ? `Seleziona 1 riserva ${roleLabels[activeRole!].toLowerCase()}.`
+          : `Completa i titolari: servono ${limit} ${roleLabels[activeRole!].toLowerCase()}.`,
       );
       return;
     }
-    if (step === 6 && !captainId) {
-      setError("Scegli il giocatore che guiderà la tua squadra.");
+    if (current.kind === "captain" && !captainId) {
+      setError("Scegli il capitano tra i titolari.");
       return;
     }
     setSearch("");
-    setStep((current) => Math.min(7, current + 1));
+    setStep((currentStep) => Math.min(steps.length - 1, currentStep + 1));
   }
 
   async function save() {
@@ -118,7 +172,7 @@ export function TeamBuilder() {
       const response = await fetch("/api/fanta/team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, playerIds: selected, captainId }),
+        body: JSON.stringify({ name, starterIds: starters, benchIds: bench, captainId }),
       });
       const data = (await response.json()) as { message?: string };
       if (!response.ok) throw new Error(data.message ?? "Impossibile salvare la squadra.");
@@ -142,20 +196,21 @@ export function TeamBuilder() {
             <b>{remaining}</b> LP
           </span>
           <span>
-            <b>{selected.length}</b>/11 <Users aria-hidden="true" size={14} />
+            <b>{starters.length + bench.length}</b>/{TEAM_SIZE} <Users aria-hidden="true" size={14} />
           </span>
         </div>
       </header>
-      <nav className={styles.stepper} aria-label="Progresso creazione squadra">
-        {steps.map((label, index) => (
-          <div className={index + 1 <= step ? styles.stepActive : styles.step} key={label}>
-            <i>{index + 1 < step ? <Check aria-hidden="true" size={12} /> : index + 1}</i>
-            <span>{label}</span>
+
+      <nav className={`${styles.stepper} ${styles.stepperCompact}`} aria-label="Progresso creazione squadra">
+        {steps.map((item, index) => (
+          <div className={index <= step ? styles.stepActive : styles.step} key={item.label}>
+            <i>{index < step ? <Check aria-hidden="true" size={12} /> : index + 1}</i>
+            <span>{item.label}</span>
           </div>
         ))}
       </nav>
       <div className={styles.stepProgress}>
-        <span style={{ width: `${(step / steps.length) * 100}%` }} />
+        <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
 
       <AnimatePresence mode="wait">
@@ -167,27 +222,31 @@ export function TeamBuilder() {
           key={step}
           transition={{ duration: 0.22, ease: "easeOut" }}
         >
-          {step === 1 && <NameStep name={name} onChange={setName} />}
-          {activeRole && (
+          {current.kind === "name" && <NameStep name={name} onChange={setName} />}
+          {(current.kind === "starter" || current.kind === "bench") && activeRole && (
             <PlayerStep
+              kind={current.kind}
+              limit={limit}
+              onSearch={setSearch}
+              onToggle={togglePlayer}
               players={rolePlayers}
               role={activeRole}
               search={search}
-              selected={selected}
-              selectedCount={selectedForRole.length}
-              onSearch={setSearch}
-              onToggle={togglePlayer}
+              selectedIds={allSelected}
+              selectedCount={selectedForStep.length}
+              stepNumber={step + 1}
             />
           )}
-          {step === 6 && (
-            <CaptainStep captainId={captainId} players={selectedPlayers} onSelect={setCaptainId} />
+          {current.kind === "captain" && (
+            <CaptainStep captainId={captainId} onSelect={setCaptainId} players={starterPlayers} />
           )}
-          {step === 7 && (
+          {current.kind === "ready" && (
             <FinalStep
+              bench={benchPlayers}
               captainId={captainId}
               name={name}
-              players={selectedPlayers}
               remaining={remaining}
+              starters={starterPlayers}
             />
           )}
         </m.div>
@@ -198,29 +257,30 @@ export function TeamBuilder() {
           {error}
         </p>
       )}
+
       <footer className={styles.builderFooter}>
         <button
-          aria-label={step > 1 ? "Torna allo step precedente" : "Torna alla dashboard Fanta"}
+          aria-label={step > 0 ? "Torna allo step precedente" : "Torna alla dashboard Fanta"}
           className={styles.backButton}
           onClick={() => {
             setError("");
-            if (step === 1) {
+            if (step === 0) {
               router.push("/fanta");
             } else {
-              setStep((current) => current - 1);
+              setStep((currentStep) => currentStep - 1);
             }
           }}
           type="button"
         >
-          <ChevronLeft aria-hidden="true" size={20} /> {step > 1 ? "Indietro" : "Esci"}
+          <ChevronLeft aria-hidden="true" size={20} /> {step > 0 ? "Indietro" : "Esci"}
         </button>
         <button
           className={styles.continueButton}
           disabled={saving}
-          onClick={step === 7 ? () => void save() : next}
+          onClick={current.kind === "ready" ? () => void save() : next}
           type="button"
         >
-          {step === 7
+          {current.kind === "ready"
             ? saving
               ? "La squadra entra in campo..."
               : "Conferma la squadra"
@@ -233,7 +293,7 @@ export function TeamBuilder() {
 
 function NameStep({ name, onChange }: { name: string; onChange: (name: string) => void }) {
   return (
-    <div className={styles.pageContainer}>
+    <div>
       <div className={styles.sceneIcon}>
         <Sparkles aria-hidden="true" size={30} />
       </div>
@@ -258,37 +318,46 @@ function NameStep({ name, onChange }: { name: string; onChange: (name: string) =
     </div>
   );
 }
+
 function PlayerStep({
+  kind,
+  limit,
   players,
   role,
   search,
-  selected,
+  selectedIds,
   selectedCount,
+  stepNumber,
   onSearch,
   onToggle,
 }: {
+  kind: "starter" | "bench";
+  limit: number;
   players: FantasyPlayer[];
   role: FantasyRole;
   search: string;
-  selected: string[];
+  selectedIds: Set<string>;
   selectedCount: number;
+  stepNumber: number;
   onSearch: (search: string) => void;
   onToggle: (player: FantasyPlayer) => void;
 }) {
-  const needed = FORMATION_LIMITS[role];
   return (
     <>
       <p className={styles.sceneEyebrow}>
-        Passo {Object.entries(roleForStep).find(([, value]) => value === role)?.[0]} · Costruisci il
-        reparto
+        Passo {stepNumber} · {kind === "bench" ? "Panchina" : "Titolari"}
       </p>
       <h1 id="builder-title">
-        Scegli {needed === 1 ? "il tuo" : "i tuoi"} {roleLabels[role].toLowerCase()}
+        {kind === "bench"
+          ? `Riserva ${roleLabels[role].toLowerCase()}`
+          : `Scegli ${limit === 1 ? "il tuo" : "i tuoi"} ${roleLabels[role].toLowerCase()}`}
       </h1>
       <div className={styles.roleCounter}>
-        <span>{roleLabels[role]}</span>
+        <span>
+          {kind === "bench" ? "PANCHINA" : "TITOLARI"} · {roleLabels[role]}
+        </span>
         <b>
-          {selectedCount}/{needed}
+          {selectedCount}/{limit}
         </b>
       </div>
       <label className={styles.searchField}>
@@ -302,7 +371,7 @@ function PlayerStep({
       </label>
       <div className={styles.playerDeck}>
         {players.map((player) => {
-          const chosen = selected.includes(player.id);
+          const chosen = selectedIds.has(player.id);
           return (
             <m.button
               animate={chosen ? { scale: [1, 1.025, 1] } : { scale: 1 }}
@@ -331,6 +400,7 @@ function PlayerStep({
     </>
   );
 }
+
 function CaptainStep({
   captainId,
   players,
@@ -345,9 +415,9 @@ function CaptainStep({
       <div className={styles.sceneIcon}>
         <Crown aria-hidden="true" size={30} />
       </div>
-      <p className={styles.sceneEyebrow}>Passo 6 · Il leader</p>
+      <p className={styles.sceneEyebrow}>Passo 10 · Il leader</p>
       <h1 id="builder-title">Chi indossa la fascia?</h1>
-      <p className={styles.sceneLead}>Il suo bonus sarà x{CAPTAIN_MULTIPLIER}.</p>
+      <p className={styles.sceneLead}>Solo tra i titolari. Bonus x{CAPTAIN_MULTIPLIER}.</p>
       <div className={styles.captainDeck}>
         {players.map((player) => (
           <button
@@ -367,29 +437,35 @@ function CaptainStep({
     </>
   );
 }
+
 function FinalStep({
   captainId,
   name,
-  players,
+  starters,
+  bench,
   remaining,
 }: {
   captainId: string;
   name: string;
-  players: FantasyPlayer[];
+  starters: FantasyPlayer[];
+  bench: FantasyPlayer[];
   remaining: number;
 }) {
-  const captain = players.find((player) => player.id === captainId);
+  const captain = starters.find((player) => player.id === captainId);
   return (
     <div className={styles.finalReveal}>
       <div className={styles.finalCrest}>
         <Shield aria-hidden="true" size={44} />
       </div>
-      <p className={styles.sceneEyebrow}>Passo 7 · Squadra completa</p>
+      <p className={styles.sceneEyebrow}>Passo 11 · Squadra completa</p>
       <h1 id="builder-title">{name}</h1>
-      <p className={styles.sceneLead}>La tua formazione è pronta per la Cup.</p>
+      <p className={styles.sceneLead}>11 titolari + 4 riserve, pronti per la Cup.</p>
       <div className={styles.finalScore}>
         <span>
-          <b>11</b> giocatori
+          <b>
+            {STARTER_SIZE}+{BENCH_SIZE}
+          </b>{" "}
+          rosa
         </span>
         <span>
           <b>{remaining}</b> LP rimasti
@@ -399,11 +475,16 @@ function FinalStep({
         </span>
       </div>
       <div className={styles.finalRoster}>
-        {players.map((player) => (
+        <strong>Titolari</strong>
+        {starters.map((player) => (
           <span key={player.id}>
             {player.id === captainId ? "👑 " : ""}
             {player.name}
           </span>
+        ))}
+        <strong>Panchina</strong>
+        {bench.map((player) => (
+          <span key={player.id}>{player.name}</span>
         ))}
       </div>
     </div>
