@@ -16,9 +16,17 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 
 import * as haptics from "@/shared/lib/haptics/haptics";
+import { networkErrorMessage, readApiErrorMessage } from "../lib/market-feedback";
+import {
+  BUDGET_INSUFFICIENT_LABEL,
+  evaluateSellToVacancy,
+  getRealTransferCost,
+  getTransfersUsed,
+} from "../lib/transfer-cost";
+import { validateEditableLineup } from "../lib/lineup-validation";
 import type { FantasyRole } from "../types";
 import styles from "./lineup-experience.module.css";
 
@@ -55,6 +63,8 @@ export type LineupExperienceData = {
     id: string;
     name: string;
     budgetLp: number;
+    freeTransfers?: number;
+    paidTransfers?: number;
     squad: LineupPlayer[];
     vacancies: LineupVacancy[];
   } | null;
@@ -92,16 +102,27 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
   const reduceMotion = useReducedMotion();
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [noticeKind, setNoticeKind] = useState<"success" | "error">("success");
   const [selected, setSelected] = useState<SelectedPlayer | null>(null);
   const [swapStarter, setSwapStarter] = useState<LineupPlayer | null>(null);
   const [activeVacancy, setActiveVacancy] = useState<LineupVacancy | null>(null);
-  const [draggingBenchId, setDraggingBenchId] = useState<string | null>(null);
+  const [drag, setDrag] = useState<{
+    benchPlayerId: string;
+    role: string;
+    hoverId: string | null;
+    hoverValid: boolean | null;
+  } | null>(null);
   const pointerStart = useRef<{ id: string; x: number; y: number } | null>(null);
   const didDrag = useRef(false);
+  const ghostRef = useRef<HTMLDivElement>(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const lastPointer = useRef({ x: 0, y: 0 });
+  const dragSize = useRef({ width: 84, height: 88 });
 
   const team = lineup.team;
   const players = team?.squad ?? noPlayers;
   const vacancies = team?.vacancies ?? noVacancies;
+  const transfersUsed = getTransfersUsed(team?.freeTransfers ?? 0, team?.paidTransfers ?? 0);
   const starters = useMemo(
     () => players.filter((player) => player.status === "STARTER"),
     [players],
@@ -113,11 +134,31 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
         .sort((a, b) => (a.benchOrder ?? 99) - (b.benchOrder ?? 99)),
     [players],
   );
-  const captain = starters.find((player) => player.isCaptain);
-  const isValid =
-    starters.length === 11 && bench.length === 4 && vacancies.length === 0 && Boolean(captain);
+  const draggingPlayer = drag
+    ? (bench.find((player) => player.playerId === drag.benchPlayerId) ?? null)
+    : null;
+  const draggingIndex = draggingPlayer
+    ? bench.findIndex((player) => player.playerId === draggingPlayer.playerId)
+    : -1;
+  const lineupCheck = validateEditableLineup(
+    players.map((player) => ({
+      role: player.role,
+      status: player.status,
+      isCaptain: player.isCaptain,
+    })),
+    vacancies.map((vacancy) => ({ role: vacancy.role, status: vacancy.status })),
+  );
+  const isValid = lineupCheck.valid;
   const isOpen = lineup.status.open;
   const confirmed = Boolean(lineup.lineup.confirmedAt);
+
+  useLayoutEffect(() => {
+    if (!drag || !ghostRef.current) return;
+    const ghost = ghostRef.current;
+    ghost.style.width = `${dragSize.current.width}px`;
+    ghost.style.height = `${dragSize.current.height}px`;
+    ghost.style.transform = `translate3d(${lastPointer.current.x - dragOffset.current.x}px, ${lastPointer.current.y - dragOffset.current.y}px, 0)`;
+  }, [drag?.benchPlayerId]);
 
   async function request(
     body: Record<string, string | string[]>,
@@ -132,9 +173,10 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const payload = (await response.json()) as { message?: string };
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setNotice(payload.message ?? "Operazione non riuscita. Riprova.");
+        setNoticeKind("error");
+        setNotice(readApiErrorMessage(payload));
         void haptics.error();
         return;
       }
@@ -142,11 +184,13 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
       setSelected(null);
       setSwapStarter(null);
       setActiveVacancy(null);
+      setNoticeKind("success");
       setNotice(successMessage);
       void haptics.success();
       router.refresh();
-    } catch {
-      setNotice("Errore di rete. Riprova.");
+    } catch (error) {
+      setNoticeKind("error");
+      setNotice(networkErrorMessage(error));
       void haptics.error();
     } finally {
       setBusy(false);
@@ -171,9 +215,37 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
     );
   }
 
-  function handleBenchPointerDown(event: PointerEvent<HTMLDivElement>, playerId: string) {
+  function resolveDropTarget(clientX: number, clientY: number) {
+    const target = document
+      .elementFromPoint(clientX, clientY)
+      ?.closest<HTMLElement>("[data-drop-id]");
+    if (!target) return null;
+    return {
+      id: target.dataset.dropId ?? "",
+      role: target.dataset.dropRole ?? "",
+      kind: (target.dataset.dropKind ?? "") as "starter" | "vacancy" | "",
+    };
+  }
+
+  function moveGhost(clientX: number, clientY: number) {
+    lastPointer.current = { x: clientX, y: clientY };
+    const ghost = ghostRef.current;
+    if (!ghost) return;
+    ghost.style.width = `${dragSize.current.width}px`;
+    ghost.style.height = `${dragSize.current.height}px`;
+    ghost.style.transform = `translate3d(${clientX - dragOffset.current.x}px, ${clientY - dragOffset.current.y}px, 0)`;
+  }
+
+  function handleBenchPointerDown(event: PointerEvent<HTMLDivElement>, player: LineupPlayer) {
     if (!isOpen || busy) return;
-    pointerStart.current = { id: playerId, x: event.clientX, y: event.clientY };
+    const rect = event.currentTarget.getBoundingClientRect();
+    dragOffset.current = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+    dragSize.current = { width: rect.width, height: rect.height };
+    lastPointer.current = { x: event.clientX, y: event.clientY };
+    pointerStart.current = { id: player.playerId, x: event.clientX, y: event.clientY };
     didDrag.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -182,28 +254,83 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
     const start = pointerStart.current;
     if (!start) return;
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) < 8) return;
-    didDrag.current = true;
-    setDraggingBenchId(start.id);
+
+    const benchPlayer = bench.find((player) => player.playerId === start.id);
+    if (!benchPlayer) return;
+
+    const drop = resolveDropTarget(event.clientX, event.clientY);
+    const hoverValid = drop ? drop.role === benchPlayer.role : null;
+    const hoverId = drop?.id ?? null;
+    lastPointer.current = { x: event.clientX, y: event.clientY };
+
+    if (!didDrag.current) {
+      didDrag.current = true;
+      setDrag({
+        benchPlayerId: benchPlayer.playerId,
+        role: benchPlayer.role,
+        hoverId,
+        hoverValid,
+      });
+      void haptics.selection();
+      return;
+    }
+
+    moveGhost(event.clientX, event.clientY);
+    setDrag((current) => {
+      if (!current) return current;
+      if (current.hoverId === hoverId && current.hoverValid === hoverValid) return current;
+      return { ...current, hoverId, hoverValid };
+    });
   }
 
   function handleBenchPointerUp(event: PointerEvent<HTMLDivElement>) {
     const start = pointerStart.current;
     pointerStart.current = null;
-    setDraggingBenchId(null);
+    setDrag(null);
     if (!start || !didDrag.current) return;
 
-    const target = document
-      .elementFromPoint(event.clientX, event.clientY)
-      ?.closest<HTMLElement>("[data-starter-player-id]");
-    const starterPlayerId = target?.dataset.starterPlayerId;
     const benchPlayer = bench.find((player) => player.playerId === start.id);
-    const starter = starters.find((player) => player.playerId === starterPlayerId);
-    if (starter && benchPlayer && starter.role === benchPlayer.role) {
-      swap(starter.playerId, benchPlayer.playerId);
-    } else {
-      setNotice("Puoi scambiare solo giocatori con lo stesso ruolo.");
+    const drop = resolveDropTarget(event.clientX, event.clientY);
+    if (!benchPlayer || !drop) {
+      setNotice("Trascina la riserva su un titolare dello stesso ruolo.");
       void haptics.warning();
+      return;
     }
+
+    if (drop.role !== benchPlayer.role) {
+      setNotice("Puoi scambiare solo giocatori con lo stesso ruolo.");
+      void haptics.error();
+      return;
+    }
+
+    if (drop.kind === "starter") {
+      swap(drop.id, benchPlayer.playerId);
+      return;
+    }
+
+    if (drop.kind === "vacancy") {
+      void request(
+        {
+          action: "promote-bench",
+          benchPlayerId: benchPlayer.playerId,
+          vacancyId: drop.id,
+        },
+        `${benchPlayer.name} entra tra i titolari.`,
+      );
+    }
+  }
+
+  function handleBenchPointerCancel() {
+    pointerStart.current = null;
+    setDrag(null);
+  }
+
+  function dropClass(dropId: string, dropRole: string) {
+    if (!drag) return undefined;
+    if (drag.hoverId === dropId) {
+      return drag.hoverValid ? styles.dropValid : styles.dropInvalid;
+    }
+    return dropRole === drag.role ? styles.dropCompatible : styles.dropIncompatible;
   }
 
   if (!team) return null;
@@ -247,13 +374,16 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
       </div>
 
       {notice && (
-        <p className={styles.notice} role="status">
+        <p className={noticeKind === "error" ? styles.noticeError : styles.notice} role="status">
           {notice}
         </p>
       )}
 
       <LayoutGroup>
-        <div className={styles.pitch} aria-label="Formazione 4-3-3">
+        <div
+          className={drag ? `${styles.pitch} ${styles.pitchDragging}` : styles.pitch}
+          aria-label="Formazione 4-3-3"
+        >
           <div className={styles.formationLabel}>4-3-3</div>
           {formation.map(({ role, count }) => {
             const rolePlayers = starters.filter((player) => player.role === role);
@@ -267,8 +397,12 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                   if (player) {
                     return (
                       <m.button
-                        className={styles.playerCard}
-                        data-starter-player-id={player.playerId}
+                        className={[styles.playerCard, dropClass(player.playerId, player.role)]
+                          .filter(Boolean)
+                          .join(" ")}
+                        data-drop-id={player.playerId}
+                        data-drop-kind="starter"
+                        data-drop-role={player.role}
                         disabled={busy}
                         key={player.id}
                         layout={!reduceMotion}
@@ -289,6 +423,9 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                     return (
                       <EmptySlot
                         disabled={!isOpen || busy}
+                        dropClassName={dropClass(vacancy.id, vacancy.role)}
+                        dropId={vacancy.id}
+                        dropKind="vacancy"
                         key={vacancy.id}
                         onClick={() => setActiveVacancy(vacancy)}
                         role={vacancy.role}
@@ -320,7 +457,9 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
             {bench.map((player, index) => (
               <m.div
                 className={
-                  draggingBenchId === player.playerId ? styles.benchCardDragging : styles.benchCard
+                  drag?.benchPlayerId === player.playerId
+                    ? styles.benchCardPlaceholder
+                    : styles.benchCard
                 }
                 key={player.id}
                 layout={!reduceMotion}
@@ -337,7 +476,8 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                     setSelected(player);
                   }
                 }}
-                onPointerDown={(event) => handleBenchPointerDown(event, player.playerId)}
+                onPointerCancel={handleBenchPointerCancel}
+                onPointerDown={(event) => handleBenchPointerDown(event, player)}
                 onPointerMove={handleBenchPointerMove}
                 onPointerUp={handleBenchPointerUp}
                 role="button"
@@ -347,7 +487,7 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                 <span className={styles.benchName}>{player.name}</span>
                 <small>{roleLabels[player.role] ?? player.role}</small>
                 <b>{player.totalPoints}</b>
-                {isOpen && (
+                {isOpen && drag?.benchPlayerId !== player.playerId && (
                   <span className={styles.benchOrderActions} aria-label="Cambia priorità riserva">
                     <button
                       aria-label="Alza priorità"
@@ -386,8 +526,12 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
               ))}
           </div>
           {isOpen && (
-            <p className={styles.dragHint}>
-              Trascina una riserva su un titolare dello stesso ruolo.
+            <p className={drag?.hoverValid === false ? styles.dragHintInvalid : styles.dragHint}>
+              {drag
+                ? drag.hoverValid === false
+                  ? "Ruolo non compatibile"
+                  : "Rilascia sullo slot compatibile"
+                : "Trascina una riserva su un titolare dello stesso ruolo."}
             </p>
           )}
         </section>
@@ -468,27 +612,39 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
           <div className={styles.choiceList}>
             {lineup.pool
               .filter((player) => player.role === activeVacancy.role && !player.owned)
-              .map((player) => (
-                <button
-                  disabled={busy || !isOpen || player.fantasyValue > team.budgetLp}
-                  key={player.id}
-                  onClick={() =>
-                    void request(
-                      { action: "buy-vacancy", playerId: player.id, vacancyId: activeVacancy.id },
-                      `${player.name} è entrato in rosa.`,
-                    )
-                  }
-                  type="button"
-                >
-                  <span>
-                    <b>{player.name}</b>
-                    <small>
-                      {player.school} · {roleLabels[player.role]}
-                    </small>
-                  </span>
-                  <strong>{player.fantasyValue} LP</strong>
-                </button>
-              ))}
+              .map((player) => {
+                const cost = getRealTransferCost(player.fantasyValue, transfersUsed);
+                const unaffordable = cost.total > team.budgetLp;
+                return (
+                  <button
+                    className={unaffordable ? styles.choiceUnaffordable : undefined}
+                    disabled={busy || !isOpen || unaffordable}
+                    key={player.id}
+                    onClick={() => {
+                      if (unaffordable) {
+                        setNoticeKind("error");
+                        setNotice(BUDGET_INSUFFICIENT_LABEL);
+                        return;
+                      }
+                      void request(
+                        { action: "buy-vacancy", playerId: player.id, vacancyId: activeVacancy.id },
+                        `${player.name} è entrato in rosa.`,
+                      );
+                    }}
+                    type="button"
+                  >
+                    <span>
+                      <b>{player.name}</b>
+                      <small>
+                        {player.school} · {roleLabels[player.role]}
+                        {cost.fee > 0 ? ` · +${cost.fee} comm.` : ""}
+                        {unaffordable ? ` · ${BUDGET_INSUFFICIENT_LABEL}` : ""}
+                      </small>
+                    </span>
+                    <strong>{unaffordable ? BUDGET_INSUFFICIENT_LABEL : `${cost.total} LP`}</strong>
+                  </button>
+                );
+              })}
           </div>
         </section>
       )}
@@ -512,8 +668,8 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
               {confirmed
                 ? "Pronta per la giornata."
                 : isValid
-                  ? "11 titolari + 4 riserve"
-                  : "Non puoi confermare con slot vuoti."}
+                  ? `${starters.length} titolari + ${bench.length} riserve`
+                  : (lineupCheck.message ?? "Completa 11 titolari e almeno 1 riserva.")}
             </small>
           </span>
         </div>
@@ -590,12 +746,40 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
               <button
                 className={styles.sellAction}
                 disabled={!isOpen || busy}
-                onClick={() =>
+                onClick={() => {
+                  if (!team) return;
+                  const decision = evaluateSellToVacancy({
+                    selling: {
+                      playerId: selected.playerId,
+                      role: selected.role,
+                      status: selected.status,
+                      value: selected.value,
+                    },
+                    squad: players.map((player) => ({
+                      playerId: player.playerId,
+                      role: player.role,
+                      status: player.status,
+                      value: player.value,
+                    })),
+                    marketPlayers: lineup.pool.map((player) => ({
+                      id: player.id,
+                      role: player.role,
+                      fantasyValue: player.fantasyValue,
+                    })),
+                    budgetLp: team.budgetLp,
+                    transfersUsed,
+                  });
+                  if (!decision.allowed) {
+                    setNoticeKind("error");
+                    setNotice(decision.message);
+                    void haptics.error();
+                    return;
+                  }
                   void request(
                     { action: "sell", playerId: selected.playerId },
                     `${selected.name} è stato venduto: completa lo slot.`,
-                  )
-                }
+                  );
+                }}
                 type="button"
               >
                 <X size={17} /> Vendi
@@ -604,6 +788,27 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
           </m.div>
         )}
       </AnimatePresence>
+
+      {draggingPlayer && (
+        <div
+          aria-hidden="true"
+          className={
+            drag?.hoverValid === false
+              ? styles.dragGhostInvalid
+              : drag?.hoverValid
+                ? styles.dragGhostValid
+                : styles.dragGhost
+          }
+          ref={ghostRef}
+        >
+          <span className={styles.benchNumber}>
+            {draggingIndex >= 0 ? `R${draggingIndex + 1}` : "R"}
+          </span>
+          <span className={styles.benchName}>{draggingPlayer.name}</span>
+          <small>{roleLabels[draggingPlayer.role] ?? draggingPlayer.role}</small>
+          <b>{draggingPlayer.totalPoints}</b>
+        </div>
+      )}
     </section>
   );
 }
@@ -631,18 +836,29 @@ function EmptySlot({
   role,
   disabled,
   compact = false,
+  dropId,
+  dropKind,
+  dropClassName,
   onClick,
 }: {
   role: string;
   disabled: boolean;
   compact?: boolean;
+  dropId?: string;
+  dropKind?: "starter" | "vacancy";
+  dropClassName?: string;
   onClick: () => void;
 }) {
   const reduceMotion = useReducedMotion();
 
   return (
     <m.button
-      className={compact ? styles.emptyBenchSlot : styles.emptySlot}
+      className={[compact ? styles.emptyBenchSlot : styles.emptySlot, dropClassName]
+        .filter(Boolean)
+        .join(" ")}
+      data-drop-id={dropId}
+      data-drop-kind={dropKind}
+      data-drop-role={role}
       disabled={disabled}
       layout={!reduceMotion}
       onClick={onClick}

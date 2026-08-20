@@ -1,19 +1,31 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowDownRight,
   ArrowUpRight,
   Crown,
   LockKeyhole,
+  Plus,
   Search,
   Store,
   TrendingDown,
   TrendingUp,
+  X,
 } from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
+import { networkErrorMessage, readApiErrorMessage } from "../lib/market-feedback";
+import {
+  BUDGET_INSUFFICIENT_LABEL,
+  canAffordNetTransfer,
+  evaluateSellToVacancy,
+  getRealTransferCost,
+  getTransferFee,
+  getTransfersUsed,
+} from "../lib/transfer-cost";
 import styles from "./market-dashboard.module.css";
 
 type MarketWindow = {
@@ -34,6 +46,25 @@ type PlayerDto = {
   badge: "trending" | "falling" | "deal" | "top" | null;
 };
 
+type SquadPlayer = {
+  id: string;
+  playerId: string;
+  name: string;
+  school: string;
+  role: string;
+  status: "STARTER" | "BENCH";
+  benchOrder: number | null;
+  isCaptain: boolean;
+  value: number;
+};
+
+type Vacancy = {
+  id: string;
+  role: string;
+  status: "STARTER" | "BENCH";
+  benchOrder: number | null;
+};
+
 type MarketData = {
   status: MarketWindow;
   team: {
@@ -43,17 +74,8 @@ type MarketData = {
     totalPoints: number;
     freeTransfers: number;
     paidTransfers: number;
-    squad: Array<{
-      id: string;
-      playerId: string;
-      name: string;
-      school: string;
-      role: string;
-      status: "STARTER" | "BENCH";
-      benchOrder: number | null;
-      isCaptain: boolean;
-      value: number;
-    }>;
+    squad: SquadPlayer[];
+    vacancies: Vacancy[];
   } | null;
   pool: PlayerDto[];
   trending: { rising: PlayerDto[]; falling: PlayerDto[] };
@@ -69,6 +91,12 @@ type MarketData = {
 
 type MarketDashboardProps = { market: MarketData };
 
+type BuyModalState = {
+  playerId: string;
+  role: string;
+  name: string;
+};
+
 const roleLabels: Record<string, string> = {
   PORTIERE: "POR",
   DIFENSORE: "DIF",
@@ -76,20 +104,34 @@ const roleLabels: Record<string, string> = {
   ATTACCANTE: "ATT",
 };
 
+const ROLE_FILTERS = ["ALL", "PORTIERE", "DIFENSORE", "CENTROCAMPISTA", "ATTACCANTE"] as const;
+
+function readFocusRoleFromUrl(): string {
+  if (typeof window === "undefined") return "ALL";
+  const role = new URLSearchParams(window.location.search).get("role");
+  if (role && ROLE_FILTERS.includes(role as (typeof ROLE_FILTERS)[number])) return role;
+  return "ALL";
+}
+
+function initialRole(market: MarketData): string {
+  const fromUrl = readFocusRoleFromUrl();
+  if (fromUrl !== "ALL") return fromUrl;
+  return market.team?.vacancies[0]?.role ?? "ALL";
+}
+
 export function MarketDashboard({ market }: MarketDashboardProps) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
-  const [role, setRole] = useState<string>("ALL");
-  const [notice, setNotice] = useState<string | null>(null);
+  const [role, setRole] = useState(() => initialRole(market));
+  const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [replacementRequest, setReplacementRequest] = useState<{
-    action: "buy" | "sell";
-    playerId: string;
-    role: string;
-    name: string;
-  } | null>(null);
-  const [swapStarterId, setSwapStarterId] = useState<string | null>(null);
+  const [buyModal, setBuyModal] = useState<BuyModalState | null>(null);
+  const browseRef = useRef<HTMLElement | null>(null);
+  const didAutoFocus = useRef(false);
 
   const isOpen = market.status.open;
+  const vacancies = market.team?.vacancies ?? [];
+  const openVacancy = vacancies[0] ?? null;
 
   const pool = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -100,95 +142,213 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
     });
   }, [market.pool, query, role]);
 
+  useEffect(() => {
+    if (didAutoFocus.current) return;
+    const shouldFocus =
+      readFocusRoleFromUrl() !== "ALL" ||
+      window.location.hash === "#browse" ||
+      Boolean(openVacancy);
+    if (!shouldFocus) return;
+    didAutoFocus.current = true;
+    requestAnimationFrame(() => {
+      browseRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [openVacancy]);
+
+  useEffect(() => {
+    if (!buyModal) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) setBuyModal(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [buyModal, busy]);
+
   if (!market.team) return null;
 
-  const starters = market.team.squad
+  const team = market.team;
+  const transfersUsed = getTransfersUsed(team.freeTransfers, team.paidTransfers);
+  const nextFee = getTransferFee(transfersUsed);
+  const squadForSale = team.squad.map((player) => ({
+    playerId: player.playerId,
+    role: player.role,
+    status: player.status,
+    value: player.value,
+  }));
+  const marketForSale = market.pool.map((player) => ({
+    id: player.id,
+    role: player.role,
+    fantasyValue: player.fantasyValue,
+  }));
+
+  const starters = team.squad
     .filter((player) => player.status === "STARTER")
     .sort((a, b) => a.role.localeCompare(b.role));
-  const bench = market.team.squad
+  const starterVacancies = vacancies.filter((vacancy) => vacancy.status === "STARTER");
+  const bench = team.squad
     .filter((player) => player.status === "BENCH")
     .sort((a, b) => (a.benchOrder ?? 99) - (b.benchOrder ?? 99));
+  const benchVacancies = vacancies.filter((vacancy) => vacancy.status === "BENCH");
 
-  async function act(path: "buy" | "sell" | "captain", playerId: string, replacementPlayerId = "") {
+  function focusBrowse(nextRole: string) {
+    setRole(nextRole);
+    requestAnimationFrame(() => {
+      browseRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  async function postJson(url: string, body: Record<string, unknown>) {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(readApiErrorMessage(payload));
+    }
+    return payload;
+  }
+
+  async function refreshMarket(successNotice: string) {
+    setNotice({ kind: "success", text: successNotice });
+    router.refresh();
+  }
+
+  async function setCaptain(playerId: string) {
     if (!isOpen) return;
     setBusy(true);
     setNotice(null);
     try {
-      const response = await fetch(`/api/fanta/market/${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, replacementPlayerId }),
-      });
-      const body = await response.json();
-      if (!response.ok) {
-        setNotice(body.message ?? "Operazione non riuscita.");
-        return;
-      }
-      setNotice(path === "captain" ? "Capitano aggiornato." : "Sostituzione completata.");
-      setReplacementRequest(null);
-      window.location.reload();
-    } catch {
-      setNotice("Errore di rete. Riprova.");
+      await postJson("/api/fanta/market/captain", { playerId, replacementPlayerId: "" });
+      await refreshMarket("Capitano aggiornato.");
+    } catch (error) {
+      setNotice({ kind: "error", text: networkErrorMessage(error) });
     } finally {
       setBusy(false);
     }
   }
 
-  async function swapFormation(starterPlayerId: string, benchPlayerId: string) {
+  async function sellToVacancy(player: SquadPlayer) {
     if (!isOpen) return;
+    const decision = evaluateSellToVacancy({
+      selling: {
+        playerId: player.playerId,
+        role: player.role,
+        status: player.status,
+        value: player.value,
+      },
+      squad: squadForSale,
+      marketPlayers: marketForSale,
+      budgetLp: team.budgetLp,
+      transfersUsed,
+    });
+    if (!decision.allowed) {
+      setNotice({ kind: "error", text: decision.message });
+      return;
+    }
     setBusy(true);
     setNotice(null);
     try {
-      const response = await fetch("/api/fanta/formation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "swap", starterPlayerId, benchPlayerId }),
-      });
-      const body = await response.json();
-      if (!response.ok) {
-        setNotice(body.message ?? "Cambio formazione non riuscito.");
-        return;
-      }
-      setNotice("Formazione aggiornata (nessun cambio mercato consumato).");
-      setSwapStarterId(null);
-      window.location.reload();
-    } catch {
-      setNotice("Errore di rete. Riprova.");
+      await postJson("/api/fanta/formation", { action: "sell", playerId: player.playerId });
+      focusBrowse(player.role);
+      await refreshMarket("Giocatore venduto. Scegli un sostituto.");
+    } catch (error) {
+      setNotice({ kind: "error", text: networkErrorMessage(error) });
     } finally {
       setBusy(false);
     }
   }
 
-  async function moveBench(playerId: string, direction: -1 | 1) {
+  async function buyIntoVacancy(playerId: string, vacancyId: string) {
     if (!isOpen) return;
-    const ids = bench.map((player) => player.playerId);
-    const index = ids.indexOf(playerId);
-    const target = index + direction;
-    if (index < 0 || target < 0 || target >= ids.length) return;
-    const next = [...ids];
-    const [moved] = next.splice(index, 1);
-    next.splice(target, 0, moved!);
     setBusy(true);
     setNotice(null);
     try {
-      const response = await fetch("/api/fanta/formation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reorder-bench", orderedBenchPlayerIds: next }),
+      await postJson("/api/fanta/formation", {
+        action: "buy-vacancy",
+        playerId,
+        vacancyId,
       });
-      const body = await response.json();
-      if (!response.ok) {
-        setNotice(body.message ?? "Riordino panchina non riuscito.");
-        return;
-      }
-      setNotice("Ordine panchina aggiornato.");
-      window.location.reload();
-    } catch {
-      setNotice("Errore di rete. Riprova.");
+      setRole("ALL");
+      await refreshMarket("Acquisto completato.");
+    } catch (error) {
+      setNotice({ kind: "error", text: networkErrorMessage(error) });
     } finally {
       setBusy(false);
     }
   }
+
+  async function buyWithReplacement(playerId: string, replacementPlayerId: string) {
+    if (!isOpen) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      await postJson("/api/fanta/market/buy", { playerId, replacementPlayerId });
+      setBuyModal(null);
+      await refreshMarket("Sostituzione completata.");
+    } catch (error) {
+      setNotice({ kind: "error", text: networkErrorMessage(error) });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function isPlayerAffordable(player: PlayerDto) {
+    const cost = getRealTransferCost(player.fantasyValue, transfersUsed).total;
+    if (openVacancy) {
+      if (openVacancy.role !== player.role) return true;
+      return team.budgetLp >= cost;
+    }
+    const sameRole = team.squad.filter((member) => member.role === player.role);
+    if (sameRole.length === 0) return false;
+    return sameRole.some((member) =>
+      canAffordNetTransfer(team.budgetLp, player.fantasyValue, member.value, transfersUsed),
+    );
+  }
+
+  function handleBuyClick(player: PlayerDto) {
+    if (!isOpen || busy || player.owned) return;
+
+    if (!isPlayerAffordable(player)) {
+      setNotice({ kind: "error", text: BUDGET_INSUFFICIENT_LABEL });
+      return;
+    }
+
+    if (openVacancy) {
+      if (openVacancy.role !== player.role) {
+        setNotice({
+          kind: "error",
+          text: `Hai uno slot ${roleLabels[openVacancy.role] ?? openVacancy.role} vuoto: completa quello prima.`,
+        });
+        focusBrowse(openVacancy.role);
+        return;
+      }
+      void buyIntoVacancy(player.id, openVacancy.id);
+      return;
+    }
+
+    setBuyModal({
+      playerId: player.id,
+      role: player.role,
+      name: player.name,
+    });
+  }
+
+  const modalCandidates = buyModal
+    ? team.squad.filter((player) => player.role === buyModal.role)
+    : [];
+  const modalBuyCost = buyModal
+    ? getRealTransferCost(
+        market.pool.find((player) => player.id === buyModal.playerId)?.fantasyValue ?? 0,
+        transfersUsed,
+      )
+    : null;
 
   return (
     <PageContainer className={styles.page}>
@@ -197,78 +357,30 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
           <p className={styles.kicker}>Fanta Leonessa · Mercato</p>
           <h1>Mercato</h1>
         </div>
-        <div className={styles.headerStat}>
-          <span>Budget</span>
-          <strong>{market.team.budgetLp} LP</strong>
-        </div>
       </header>
 
       <MarketStatusCard status={market.status} />
 
       {notice && (
-        <p className={styles.notice} role="status">
-          {notice}
+        <p className={notice.kind === "error" ? styles.noticeError : styles.notice} role="status">
+          {notice.text}
         </p>
-      )}
-
-      {replacementRequest && (
-        <section className={styles.replacementCard} aria-label="Scegli il giocatore da sostituire">
-          <div>
-            <p className={styles.kicker}>Sostituzione obbligatoria</p>
-            <h2>
-              {replacementRequest.action === "buy" ? "Chi vuoi sostituire?" : "Chi vuoi inserire?"}
-            </h2>
-            <p>Ruolo: {roleLabels[replacementRequest.role] ?? replacementRequest.role}</p>
-          </div>
-          <div className={styles.replacementOptions}>
-            {(replacementRequest.action === "buy"
-              ? market.team.squad.filter((player) => player.role === replacementRequest.role)
-              : market.pool.filter(
-                  (player) => player.role === replacementRequest.role && !player.owned,
-                )
-            ).map((player) => {
-              const id = "playerId" in player ? player.playerId : player.id;
-              return (
-                <button
-                  className={styles.replacementOption}
-                  disabled={busy}
-                  key={id}
-                  onClick={() =>
-                    void act(replacementRequest.action, replacementRequest.playerId, id)
-                  }
-                  type="button"
-                >
-                  <strong>{player.name}</strong>
-                  <small>
-                    {player.school} · {"value" in player ? player.value : player.fantasyValue} LP
-                  </small>
-                </button>
-              );
-            })}
-          </div>
-          <button
-            className={styles.cancelReplacement}
-            onClick={() => setReplacementRequest(null)}
-            type="button"
-          >
-            Annulla
-          </button>
-        </section>
       )}
 
       <section className={styles.walletCard} aria-label="Risorse disponibili">
         <div className={styles.walletMain}>
           <p className={styles.kicker}>A tua disposizione</p>
           <strong className={styles.budget}>
-            {market.team.budgetLp.toLocaleString("it-IT")} LP
+            {team.budgetLp.toLocaleString("it-IT")} LP
           </strong>
           <small>
-            {market.team.freeTransfers} / 2 cambi gratuiti · {market.team.paidTransfers} a pagamento
+            {team.freeTransfers} / 2 cambi gratuiti · {team.paidTransfers} a pagamento
+            {nextFee > 0 ? " · prossimo cambio +10 LP" : ""}
           </small>
         </div>
         <div className={styles.walletPoints}>
           <span>Punti totali</span>
-          <b>{market.team.totalPoints.toLocaleString("it-IT")}</b>
+          <b>{team.totalPoints.toLocaleString("it-IT")}</b>
         </div>
       </section>
 
@@ -278,71 +390,28 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
             <p className={styles.kicker}>La tua rosa</p>
             <h2 id="squad-title">Titolari</h2>
           </div>
-          <span>{starters.length}/11</span>
+          <span>
+            {starters.length}/11
+            {starterVacancies.length > 0 ? ` · ${starterVacancies.length} vuoti` : ""}
+          </span>
         </div>
-        <div className={styles.squadGrid}>
+        <div className={styles.squadList}>
           {starters.map((player) => (
-            <article className={styles.squadCard} key={player.id}>
-              <div className={styles.squadTop}>
-                <span className={styles.squadRole}>{roleLabels[player.role] ?? player.role}</span>
-                {player.isCaptain && (
-                  <Crown aria-label="Capitano" className={styles.crown} size={15} />
-                )}
-              </div>
-              <strong>{player.name}</strong>
-              <small>
-                {player.school} · {player.value} LP
-              </small>
-              {isOpen && (
-                <div className={styles.squadActions}>
-                  <button
-                    className={styles.sellButton}
-                    disabled={busy}
-                    onClick={() =>
-                      setReplacementRequest({
-                        action: "sell",
-                        playerId: player.playerId,
-                        role: player.role,
-                        name: player.name,
-                      })
-                    }
-                    type="button"
-                  >
-                    Vendi
-                  </button>
-                  <button
-                    className={
-                      swapStarterId === player.playerId
-                        ? styles.captainButton
-                        : styles.formationButton
-                    }
-                    disabled={busy}
-                    onClick={() =>
-                      setSwapStarterId((current) =>
-                        current === player.playerId ? null : player.playerId,
-                      )
-                    }
-                    type="button"
-                  >
-                    {swapStarterId === player.playerId ? "Annulla swap" : "↔ Riserva"}
-                  </button>
-                  {player.isCaptain ? (
-                    <span className={styles.captainTag}>
-                      <Crown size={12} /> Capitano
-                    </span>
-                  ) : (
-                    <button
-                      className={styles.captainButton}
-                      disabled={busy}
-                      onClick={() => void act("captain", player.playerId)}
-                      type="button"
-                    >
-                      Capitano
-                    </button>
-                  )}
-                </div>
-              )}
-            </article>
+            <SquadCard
+              key={player.id}
+              busy={busy}
+              isOpen={isOpen}
+              player={player}
+              onCaptain={() => void setCaptain(player.playerId)}
+              onSell={() => void sellToVacancy(player)}
+            />
+          ))}
+          {starterVacancies.map((vacancy) => (
+            <EmptySlotCard
+              key={vacancy.id}
+              role={vacancy.role}
+              onAdd={() => focusBrowse(vacancy.role)}
+            />
           ))}
         </div>
       </section>
@@ -353,82 +422,38 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
             <p className={styles.kicker}>Panchina</p>
             <h2 id="bench-title">Riserve</h2>
           </div>
-          <span>{bench.length}/4</span>
+          <span>
+            {bench.length}/4
+            {benchVacancies.length > 0 ? ` · ${benchVacancies.length} vuoti` : ""}
+          </span>
         </div>
-        {swapStarterId && (
-          <p className={styles.notice} role="status">
-            Seleziona la riserva dello stesso ruolo per lo swap (non consuma cambi mercato).
-          </p>
-        )}
-        <div className={styles.squadGrid}>
-          {bench.map((player, index) => {
-            const swapStarter = swapStarterId
-              ? starters.find((item) => item.playerId === swapStarterId)
-              : null;
-            const canSwap = Boolean(swapStarter && swapStarter.role === player.role);
-            return (
-              <article className={styles.squadCard} key={player.id}>
-                <div className={styles.squadTop}>
-                  <span className={styles.squadRole}>
-                    #{index + 1} · {roleLabels[player.role] ?? player.role}
-                  </span>
-                </div>
-                <strong>{player.name}</strong>
-                <small>
-                  {player.school} · {player.value} LP
-                </small>
-                {isOpen && (
-                  <div className={styles.squadActions}>
-                    <button
-                      className={styles.sellButton}
-                      disabled={busy}
-                      onClick={() =>
-                        setReplacementRequest({
-                          action: "sell",
-                          playerId: player.playerId,
-                          role: player.role,
-                          name: player.name,
-                        })
-                      }
-                      type="button"
-                    >
-                      Vendi
-                    </button>
-                    <button
-                      className={styles.formationButton}
-                      disabled={busy || index === 0}
-                      onClick={() => void moveBench(player.playerId, -1)}
-                      type="button"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      className={styles.formationButton}
-                      disabled={busy || index === bench.length - 1}
-                      onClick={() => void moveBench(player.playerId, 1)}
-                      type="button"
-                    >
-                      ↓
-                    </button>
-                    {swapStarterId && (
-                      <button
-                        className={styles.captainButton}
-                        disabled={busy || !canSwap}
-                        onClick={() => void swapFormation(swapStarterId, player.playerId)}
-                        type="button"
-                      >
-                        Entra
-                      </button>
-                    )}
-                  </div>
-                )}
-              </article>
-            );
-          })}
+        <div className={styles.squadList}>
+          {bench.map((player) => (
+            <SquadCard
+              key={player.id}
+              busy={busy}
+              isOpen={isOpen}
+              player={player}
+              showCaptain={false}
+              onSell={() => void sellToVacancy(player)}
+            />
+          ))}
+          {benchVacancies.map((vacancy) => (
+            <EmptySlotCard
+              key={vacancy.id}
+              role={vacancy.role}
+              onAdd={() => focusBrowse(vacancy.role)}
+            />
+          ))}
         </div>
       </section>
 
-      <section className={styles.section} aria-labelledby="browse-title">
+      <section
+        className={styles.section}
+        aria-labelledby="browse-title"
+        id="browse"
+        ref={browseRef}
+      >
         <div className={styles.sectionHeading}>
           <div>
             <p className={styles.kicker}>Acquista</p>
@@ -436,6 +461,13 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
           </div>
           <Store aria-hidden="true" size={20} />
         </div>
+
+        {openVacancy && (
+          <p className={styles.vacancyHint} role="status">
+            Slot {roleLabels[openVacancy.role] ?? openVacancy.role} da riempire · filtro già
+            impostato
+          </p>
+        )}
 
         <div className={styles.controls}>
           <label className={styles.searchField}>
@@ -447,7 +479,7 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
             />
           </label>
           <div className={styles.roleFilter}>
-            {["ALL", "PORTIERE", "DIFENSORE", "CENTROCAMPISTA", "ATTACCANTE"].map((r) => (
+            {ROLE_FILTERS.map((r) => (
               <button
                 className={role === r ? styles.roleActive : undefined}
                 key={r}
@@ -461,22 +493,22 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
         </div>
 
         <div className={styles.playerList}>
-          {pool.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              isOpen={isOpen}
-              busy={busy}
-              onBuy={() =>
-                setReplacementRequest({
-                  action: "buy",
-                  playerId: player.id,
-                  role: player.role,
-                  name: player.name,
-                })
-              }
-            />
-          ))}
+          {pool.map((player) => {
+            const cost = getRealTransferCost(player.fantasyValue, transfersUsed);
+            const unaffordable = !player.owned && !isPlayerAffordable(player);
+            return (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                isOpen={isOpen}
+                busy={busy}
+                cost={cost.total}
+                fee={cost.fee}
+                unaffordable={unaffordable}
+                onBuy={() => handleBuyClick(player)}
+              />
+            );
+          })}
           {pool.length === 0 && <p className={styles.emptyPool}>Nessun giocatore trovato.</p>}
         </div>
       </section>
@@ -538,7 +570,171 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
           })}
         </div>
       </section>
+
+      {buyModal && (
+        <div
+          className={styles.modalBackdrop}
+          onClick={() => !busy && setBuyModal(null)}
+          role="presentation"
+        >
+          <div
+            aria-labelledby="buy-modal-title"
+            aria-modal="true"
+            className={styles.modal}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+          >
+            <button
+              aria-label="Chiudi"
+              className={styles.modalClose}
+              disabled={busy}
+              onClick={() => setBuyModal(null)}
+              type="button"
+            >
+              <X size={18} />
+            </button>
+            <h2 id="buy-modal-title">Rosa completa</h2>
+            <p className={styles.modalCopy}>
+              Per acquistare <strong>{buyModal.name}</strong> devi prima scegliere quale giocatore
+              vendere.
+              {modalBuyCost && modalBuyCost.fee > 0
+                ? ` Costo reale: ${modalBuyCost.total} LP (valore ${modalBuyCost.playerValue} + commissione ${modalBuyCost.fee}).`
+                : modalBuyCost
+                  ? ` Costo: ${modalBuyCost.total} LP.`
+                  : ""}
+            </p>
+            <p className={styles.modalRole}>
+              Ruolo: {roleLabels[buyModal.role] ?? buyModal.role}
+            </p>
+            <div className={styles.modalOptions}>
+              {modalCandidates.map((player) => {
+                const canSwap =
+                  !modalBuyCost ||
+                  canAffordNetTransfer(
+                    team.budgetLp,
+                    modalBuyCost.playerValue,
+                    player.value,
+                    transfersUsed,
+                  );
+                return (
+                  <button
+                    className={styles.modalOption}
+                    disabled={busy || !canSwap}
+                    key={player.id}
+                    onClick={() => {
+                      if (!canSwap) {
+                        setNotice({ kind: "error", text: BUDGET_INSUFFICIENT_LABEL });
+                        return;
+                      }
+                      void buyWithReplacement(buyModal.playerId, player.playerId);
+                    }}
+                    type="button"
+                  >
+                    <span className={styles.squadRole}>
+                      {roleLabels[player.role] ?? player.role}
+                    </span>
+                    <div className={styles.modalOptionMain}>
+                      <strong>{player.name}</strong>
+                      <small>
+                        {player.school} · {player.value} LP
+                        {player.status === "BENCH" ? " · Riserva" : ""}
+                        {player.isCaptain ? " · Capitano" : ""}
+                        {!canSwap ? ` · ${BUDGET_INSUFFICIENT_LABEL}` : ""}
+                      </small>
+                    </div>
+                    <span className={styles.modalSelectLabel}>
+                      {canSwap ? "Seleziona" : BUDGET_INSUFFICIENT_LABEL}
+                    </span>
+                  </button>
+                );
+              })}
+              {modalCandidates.length === 0 && (
+                <p className={styles.emptyPool}>Nessun giocatore dello stesso ruolo in rosa.</p>
+              )}
+            </div>
+            <button
+              className={styles.modalCancel}
+              disabled={busy}
+              onClick={() => setBuyModal(null)}
+              type="button"
+            >
+              Annulla
+            </button>
+          </div>
+        </div>
+      )}
     </PageContainer>
+  );
+}
+
+function SquadCard({
+  player,
+  isOpen,
+  busy,
+  onSell,
+  onCaptain,
+  showCaptain = true,
+}: {
+  player: SquadPlayer;
+  isOpen: boolean;
+  busy: boolean;
+  onSell: () => void;
+  onCaptain?: () => void;
+  showCaptain?: boolean;
+}) {
+  return (
+    <article className={styles.squadCard}>
+      <div className={styles.squadBody}>
+        <div className={styles.squadIdentity}>
+          <span className={styles.squadRole}>{roleLabels[player.role] ?? player.role}</span>
+          <div className={styles.squadText}>
+            <strong>
+              {player.name}
+              {player.isCaptain && (
+                <Crown aria-label="Capitano" className={styles.crownInline} size={13} />
+              )}
+            </strong>
+            <small>
+              {player.school} · {player.value} LP
+            </small>
+          </div>
+        </div>
+        {isOpen && (
+          <div className={styles.squadActions}>
+            <button className={styles.sellButton} disabled={busy} onClick={onSell} type="button">
+              Vendi
+            </button>
+            {showCaptain &&
+              (player.isCaptain ? (
+                <span className={styles.captainTag}>
+                  <Crown size={12} /> Cap.
+                </span>
+              ) : (
+                <button
+                  className={styles.captainButton}
+                  disabled={busy}
+                  onClick={onCaptain}
+                  type="button"
+                >
+                  Capitano
+                </button>
+              ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function EmptySlotCard({ role, onAdd }: { role: string; onAdd: () => void }) {
+  return (
+    <button className={styles.emptySlotCard} onClick={onAdd} type="button">
+      <span className={styles.squadRole}>{roleLabels[role] ?? role}</span>
+      <span className={styles.emptySlotMain}>
+        <Plus aria-hidden="true" size={18} />
+        <strong>Aggiungi giocatore</strong>
+      </span>
+    </button>
   );
 }
 
@@ -569,58 +765,72 @@ function PlayerCard({
   player,
   isOpen,
   busy,
+  cost,
+  fee,
+  unaffordable,
   onBuy,
 }: {
   player: PlayerDto;
   isOpen: boolean;
   busy: boolean;
+  cost: number;
+  fee: number;
+  unaffordable: boolean;
   onBuy: () => void;
 }) {
   const badgeLabel: Record<string, string> = {
-    trending: "📈 In crescita",
-    falling: "📉 In calo",
-    deal: "💎 Affare",
-    top: "🔥 Molto acquistato",
+    trending: "📈",
+    falling: "📉",
+    deal: "💎",
+    top: "🔥",
   };
   return (
-    <article className={player.owned ? styles.playerOwned : styles.playerCard}>
-      <div className={styles.playerHead}>
-        <span className={styles.avatar}>{player.name.slice(0, 1)}</span>
-        <div className={styles.playerMain}>
-          <Link className={styles.playerLink} href={`/player/${player.id}` as never}>
-            {player.name}
-          </Link>
-          <small>
-            {player.school} · {roleLabels[player.role] ?? player.role}
-          </small>
-        </div>
-      </div>
-      <div className={styles.playerChange}>
-        {player.change !== 0 && (
-          <>
-            {player.change > 0 ? (
-              <ArrowUpRight aria-hidden="true" size={14} />
-            ) : (
-              <ArrowDownRight aria-hidden="true" size={14} />
-            )}
-            <b className={player.change > 0 ? styles.positive : styles.negative}>
+    <article
+      className={
+        player.owned
+          ? styles.playerOwned
+          : unaffordable
+            ? styles.playerUnaffordable
+            : styles.playerCard
+      }
+    >
+      <span className={styles.poolRole}>{roleLabels[player.role] ?? player.role}</span>
+      <div className={styles.playerMain}>
+        <Link className={styles.playerLink} href={`/player/${player.id}` as never}>
+          {player.name}
+        </Link>
+        <small>
+          {player.school} · {player.fantasyValue} LP
+          {fee > 0 ? ` + ${fee} comm.` : ""}
+          {player.change !== 0 && (
+            <span className={player.change > 0 ? styles.positive : styles.negative}>
+              {" "}
               {player.change > 0 ? "+" : ""}
               {player.change}
-            </b>
-          </>
-        )}
+            </span>
+          )}
+          {player.badge && ` · ${badgeLabel[player.badge]}`}
+        </small>
+        {unaffordable && <small className={styles.unaffordableReason}>{BUDGET_INSUFFICIENT_LABEL}</small>}
       </div>
-      {player.badge && <span className={styles.dealBadge}>{badgeLabel[player.badge]}</span>}
+      <div className={styles.playerChange}>
+        {player.change !== 0 &&
+          (player.change > 0 ? (
+            <ArrowUpRight aria-hidden="true" size={14} />
+          ) : (
+            <ArrowDownRight aria-hidden="true" size={14} />
+          ))}
+      </div>
       {player.owned ? (
         <span className={styles.ownedTag}>In rosa</span>
       ) : (
         <button
           className={styles.buyButton}
-          disabled={!isOpen || busy}
+          disabled={!isOpen || busy || unaffordable}
           onClick={onBuy}
           type="button"
         >
-          {player.fantasyValue} LP · Acquista
+          {unaffordable ? BUDGET_INSUFFICIENT_LABEL : `${cost} LP`}
         </button>
       )}
     </article>

@@ -1,7 +1,11 @@
 export const INITIAL_BUDGET = 500;
 export const STARTER_SIZE = 11;
-export const BENCH_SIZE = 4;
-export const TEAM_SIZE = STARTER_SIZE + BENCH_SIZE;
+export const MIN_BENCH_SIZE = 1;
+export const MAX_BENCH_SIZE = 4;
+/** Maximum bench slots (1 per role). */
+export const BENCH_SIZE = MAX_BENCH_SIZE;
+export const MIN_TEAM_SIZE = STARTER_SIZE + MIN_BENCH_SIZE;
+export const TEAM_SIZE = STARTER_SIZE + MAX_BENCH_SIZE;
 export const CAPTAIN_MULTIPLIER = 1.5;
 export const AUTO_SUB_REASON = "AUTO_ABSENT_STARTER";
 

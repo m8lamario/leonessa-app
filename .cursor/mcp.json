@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "contextstream": {
+      "headers": {
+        "X-ContextStream-API-Key": "cbiq_ac7Mgu9QyctVtIOTyexhpFW4-a0ZcNa7jYDOlu-Aqlg",
+        "X-ContextStream-Auto-Hide-Integrations": "true",
+        "X-ContextStream-Client": "cursor",
+        "X-ContextStream-Consolidated": "true",
+        "X-ContextStream-Context-Pack-Enabled": "true",
+        "X-ContextStream-Hook-Transcripts-Enabled": "true",
+        "X-ContextStream-Installation-Id": "fce149c0-f15d-49c9-b441-5639915ea153",
+        "X-ContextStream-Managed-Config-Version": "2",
+        "X-ContextStream-Output-Format": "compact",
+        "X-ContextStream-Progressive-Mode": "false",
+        "X-ContextStream-Project-Id": "9b6c8d10-c7a9-41ab-a422-05adaa449212",
+        "X-ContextStream-Router-Mode": "false",
+        "X-ContextStream-Search-Limit": "15",
+        "X-ContextStream-Search-Max-Chars": "2400",
+        "X-ContextStream-Teaching-Version": "harness_teaching_v4",
+        "X-ContextStream-Toolset": "complete",
+        "X-ContextStream-Transcripts-Enabled": "true",
+        "X-ContextStream-Workspace-Id": "eb18c5df-148c-46e6-a27a-d497ded1b066"
+      },
+      "type": "http",
+      "url": "https://mcp.contextstream.io/mcp?default_context_mode=fast"
+    }
+  }
+}

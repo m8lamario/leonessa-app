@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { awardLPInTransaction } from "@/features/rewards/server/reward-engine";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
-import { FANTA_CREATION_REWARD, INITIAL_BUDGET, TEAM_SIZE, STARTER_SIZE, BENCH_SIZE, STARTER_LIMITS, BENCH_LIMITS } from "../constants/fanta";
+import { FANTA_CREATION_REWARD, INITIAL_BUDGET, MIN_BENCH_SIZE, MAX_BENCH_SIZE, STARTER_SIZE, STARTER_LIMITS, BENCH_LIMITS } from "../constants/fanta";
 import { grantAchievement, recordActivity } from "./social-service";
 import type { FantasyRole } from "../types";
 
@@ -221,11 +221,14 @@ function validateInput(
   if (input.starterIds.length !== STARTER_SIZE || new Set(input.starterIds).size !== STARTER_SIZE) {
     throw new AppError("BAD_REQUEST", "Devi selezionare 11 titolari.", 400);
   }
-  if (input.benchIds.length !== BENCH_SIZE || new Set(input.benchIds).size !== BENCH_SIZE) {
-    throw new AppError("BAD_REQUEST", "Devi selezionare 4 riserve.", 400);
+  if (input.benchIds.length < MIN_BENCH_SIZE || input.benchIds.length > MAX_BENCH_SIZE) {
+    throw new AppError("BAD_REQUEST", "Devi selezionare da 1 a 4 riserve.", 400);
+  }
+  if (new Set(input.benchIds).size !== input.benchIds.length) {
+    throw new AppError("BAD_REQUEST", "Non ci possono essere riserve duplicate.", 400);
   }
   const allIds = [...input.starterIds, ...input.benchIds];
-  if (new Set(allIds).size !== TEAM_SIZE) {
+  if (new Set(allIds).size !== allIds.length) {
     throw new AppError("BAD_REQUEST", "Non ci possono essere duplicati tra titolari e riserve.", 400);
   }
   if (!input.captainId || !input.starterIds.includes(input.captainId)) {
@@ -255,10 +258,10 @@ function validateInput(
       );
     }
     const benchCount = bench.filter((player) => player.fantasyRole === role).length;
-    if (benchCount !== BENCH_LIMITS[role]) {
+    if (benchCount > BENCH_LIMITS[role]) {
       throw new AppError(
         "BAD_REQUEST",
-        `Le riserve richiedono ${BENCH_LIMITS[role]} ${role.toLowerCase()}.`,
+        `Le riserve ammettono al massimo ${BENCH_LIMITS[role]} ${role.toLowerCase()}.`,
         400,
       );
     }

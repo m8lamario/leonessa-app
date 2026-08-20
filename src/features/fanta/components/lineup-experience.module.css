@@ -126,6 +126,18 @@
   background: rgb(48 92 255 / 14%);
   color: #d4ddff;
   font-size: 0.78rem;
+  white-space: pre-line;
+}
+
+.noticeError {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 120 120 / 55%);
+  border-radius: 10px;
+  background: rgb(160 32 45 / 22%);
+  color: #ffd6d6;
+  font-size: 0.78rem;
+  white-space: pre-line;
 }
 
 .pitch {
@@ -227,6 +239,44 @@
 
 .playerCard:disabled {
   cursor: wait;
+}
+
+.dropCompatible {
+  border-color: rgb(74 222 128 / 70%);
+  box-shadow: 0 0 0 2px rgb(34 197 94 / 28%);
+}
+
+.dropValid {
+  border-color: #4ade80;
+  background: linear-gradient(155deg, rgb(22 101 52 / 88%), rgb(7 17 49 / 94%));
+  box-shadow:
+    0 0 0 3px rgb(34 197 94 / 55%),
+    0 8px 18px rgb(0 0 0 / 28%);
+  transform: scale(1.04);
+}
+
+.dropIncompatible {
+  opacity: 0.42;
+  filter: grayscale(0.35);
+}
+
+.dropInvalid {
+  border-color: #f87171;
+  background: linear-gradient(155deg, rgb(127 29 29 / 88%), rgb(7 17 49 / 94%));
+  box-shadow:
+    0 0 0 3px rgb(239 68 68 / 55%),
+    0 8px 18px rgb(0 0 0 / 28%);
+  transform: scale(1.04);
+}
+
+.pitchDragging .playerCard,
+.pitchDragging .emptySlot {
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    opacity 120ms ease,
+    transform 120ms ease,
+    background 120ms ease;
 }
 
 .playerCard strong {
@@ -351,7 +401,7 @@
 }
 
 .benchCard,
-.benchCardDragging,
+.benchCardPlaceholder,
 .emptyBenchSlot {
   position: relative;
   display: grid;
@@ -377,12 +427,91 @@
   cursor: grabbing;
 }
 
-.benchCardDragging {
-  border: 1px solid #a9bdff;
-  background: rgb(48 92 255 / 37%);
+.benchCardPlaceholder {
+  border: 1px dashed rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 3%);
+  color: transparent;
   cursor: grabbing;
-  opacity: 0.7;
-  transform: scale(0.97);
+}
+
+.benchCardPlaceholder > * {
+  visibility: hidden;
+}
+
+.dragGhost,
+.dragGhostValid,
+.dragGhostInvalid {
+  position: fixed;
+  z-index: 40;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 84px;
+  min-height: 88px;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 3px;
+  border-radius: 10px;
+  color: var(--color-text);
+  text-align: center;
+  pointer-events: none;
+  will-change: transform;
+  box-shadow: 0 14px 28px rgb(0 0 0 / 42%);
+}
+
+.dragGhost {
+  border: 1px solid #a9bdff;
+  background: linear-gradient(155deg, rgb(48 92 255 / 72%), rgb(15 33 80 / 96%));
+}
+
+.dragGhostValid {
+  border: 1px solid #4ade80;
+  background: linear-gradient(155deg, rgb(22 101 52 / 88%), rgb(15 33 80 / 96%));
+  box-shadow:
+    0 0 0 3px rgb(34 197 94 / 45%),
+    0 14px 28px rgb(0 0 0 / 42%);
+}
+
+.dragGhostInvalid {
+  border: 1px solid #f87171;
+  background: linear-gradient(155deg, rgb(127 29 29 / 88%), rgb(15 33 80 / 96%));
+  box-shadow:
+    0 0 0 3px rgb(239 68 68 / 45%),
+    0 14px 28px rgb(0 0 0 / 42%);
+}
+
+.dragGhost .benchNumber,
+.dragGhostValid .benchNumber,
+.dragGhostInvalid .benchNumber {
+  color: #bfcaff;
+  font-size: 0.58rem;
+  font-weight: 900;
+}
+
+.dragGhost .benchName,
+.dragGhostValid .benchName,
+.dragGhostInvalid .benchName {
+  width: 100%;
+  overflow: hidden;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dragGhost small,
+.dragGhostValid small,
+.dragGhostInvalid small {
+  color: var(--color-text-secondary);
+  font-size: 0.53rem;
+}
+
+.dragGhost b,
+.dragGhostValid b,
+.dragGhostInvalid b {
+  color: #a3e7b7;
+  font-size: 0.62rem;
 }
 
 .benchNumber {
@@ -444,6 +573,14 @@
   text-align: center;
 }
 
+.dragHintInvalid {
+  margin: 9px 0 0;
+  color: #ffb3b3;
+  font-size: 0.67rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .selectionPanel {
   display: grid;
   gap: 12px;
@@ -490,6 +627,10 @@
 .choiceList button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
+}
+
+.choiceUnaffordable {
+  filter: grayscale(0.72) brightness(0.62);
 }
 
 .choiceList span {
@@ -674,9 +815,12 @@
 @media (prefers-reduced-motion: reduce) {
   .playerCard,
   .benchCard,
-  .benchCardDragging,
+  .benchCardPlaceholder,
   .emptySlot,
-  .emptyBenchSlot {
+  .emptyBenchSlot,
+  .dropValid,
+  .dropInvalid {
     transition: none;
+    transform: none;
   }
 }

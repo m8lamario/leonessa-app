@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "contextstream": {
+      "type": "http",
+      "url": "https://mcp.contextstream.io/mcp?default_context_mode=fast",
+      "headers": {
+        "X-ContextStream-Toolset": "complete",
+        "X-ContextStream-Output-Format": "compact",
+        "X-ContextStream-Search-Limit": "15",
+        "X-ContextStream-Search-Max-Chars": "2400",
+        "X-ContextStream-Transcripts-Enabled": "true",
+        "X-ContextStream-Consolidated": "true"
+      }
+    }
+  }
+}

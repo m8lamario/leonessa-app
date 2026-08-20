@@ -1,0 +1,15 @@
+{
+  "workspace_id": "eb18c5df-148c-46e6-a27a-d497ded1b066",
+  "workspace_name": "Mario's Workspace",
+  "project_id": "9b6c8d10-c7a9-41ab-a422-05adaa449212",
+  "project_name": "leonessa-app",
+  "associated_at": "2026-08-20T17:00:41.412Z",
+  "version": "0.4.82",
+  "configured_editors": [
+    "cursor"
+  ],
+  "context_pack": false,
+  "api_url": "https://api.contextstream.io",
+  "updated_at": "2026-08-20T17:00:56.425Z",
+  "indexing_enabled": true
+}

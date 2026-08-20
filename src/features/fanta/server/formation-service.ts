@@ -2,16 +2,12 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
-import { BENCH_SIZE, STARTER_LIMITS, BENCH_LIMITS } from "../constants/fanta";
-import { validateEditableLineup } from "../lib/lineup-validation";
-import type { FantasyRole } from "../types";
+import { validateEditableLineup, validateRosterPlayers } from "../lib/lineup-validation";
 import {
   clearCurrentLineupConfirmation,
   ensureCurrentMatchday,
   getMarketStatus,
 } from "./market-service";
-
-const fantasyRoles = Object.keys(STARTER_LIMITS) as FantasyRole[];
 
 async function assertMarketOpen() {
   const status = await getMarketStatus();
@@ -23,30 +19,9 @@ async function assertMarketOpen() {
 function assertLineupShape(
   players: Array<{ role: string; status: string; isCaptain: boolean; playerId: string }>,
 ) {
-  const starters = players.filter((player) => player.status === "STARTER");
-  const bench = players.filter((player) => player.status === "BENCH");
-  if (starters.length !== 11 || bench.length !== 4) {
-    throw new AppError("BAD_REQUEST", "La rosa deve avere 11 titolari e 4 riserve.", 400);
-  }
-  for (const role of fantasyRoles) {
-    if (starters.filter((player) => player.role === role).length !== STARTER_LIMITS[role]) {
-      throw new AppError(
-        "BAD_REQUEST",
-        `I titolari richiedono ${STARTER_LIMITS[role]} ${role.toLowerCase()}.`,
-        400,
-      );
-    }
-    if (bench.filter((player) => player.role === role).length !== BENCH_LIMITS[role]) {
-      throw new AppError(
-        "BAD_REQUEST",
-        `Le riserve richiedono ${BENCH_LIMITS[role]} ${role.toLowerCase()}.`,
-        400,
-      );
-    }
-  }
-  const captains = starters.filter((player) => player.isCaptain);
-  if (captains.length !== 1) {
-    throw new AppError("BAD_REQUEST", "Deve esserci esattamente un capitano tra i titolari.", 400);
+  const validation = validateRosterPlayers(players, { requireCaptain: true });
+  if (!validation.valid) {
+    throw new AppError("BAD_REQUEST", validation.message ?? "Formazione non valida.", 400);
   }
 }
 
@@ -103,14 +78,14 @@ export async function swapStarterWithBench(
   });
 }
 
-/** Reorder the 4 bench players. Does not consume a market transfer. */
+/** Reorder the current bench. Does not consume a market transfer. */
 export async function reorderBench(userId: string, orderedBenchPlayerIds: string[]) {
   await assertMarketOpen();
   if (
-    orderedBenchPlayerIds.length !== BENCH_SIZE ||
-    new Set(orderedBenchPlayerIds).size !== BENCH_SIZE
+    orderedBenchPlayerIds.length < 1 ||
+    new Set(orderedBenchPlayerIds).size !== orderedBenchPlayerIds.length
   ) {
-    throw new AppError("BAD_REQUEST", "Specifica l'ordine completo delle 4 riserve.", 400);
+    throw new AppError("BAD_REQUEST", "Specifica l'ordine delle riserve attuali.", 400);
   }
 
   return prisma.$transaction(async (tx) => {
@@ -121,8 +96,8 @@ export async function reorderBench(userId: string, orderedBenchPlayerIds: string
     if (!team) throw new AppError("NOT_FOUND", "Squadra fantasy non trovata.", 404);
 
     const bench = team.players.filter((player) => player.status === "BENCH");
-    if (bench.length !== BENCH_SIZE) {
-      throw new AppError("BAD_REQUEST", "La panchina deve avere 4 riserve.", 400);
+    if (orderedBenchPlayerIds.length !== bench.length) {
+      throw new AppError("BAD_REQUEST", "L'ordine deve includere tutte le riserve attuali.", 400);
     }
     const benchIds = new Set(bench.map((player) => player.playerId));
     if (orderedBenchPlayerIds.some((id) => !benchIds.has(id))) {

@@ -1,0 +1,20 @@
+{
+  "api_url": "https://api.contextstream.io",
+  "associated_at": "2026-08-20T17:17:22.369780200+00:00",
+  "checkout_id": "checkout-v1:000fa5c1-0fbd-4d2e-8fcd-f359809e49ad",
+  "checkout_identity_kind": "git",
+  "checkout_root": "\\\\?\\C:\\Users\\mario\\WebstormProjects\\leonessa-app",
+  "configured_editors": [
+    "cursor"
+  ],
+  "context_pack": false,
+  "indexing_enabled": true,
+  "project_id": "9b6c8d10-c7a9-41ab-a422-05adaa449212",
+  "project_name": "leonessa-app",
+  "repository_fingerprint": "git-common-dir-v1:d3c5a900-6a3b-4fc9-87fe-8e6dd68fd8f2",
+  "repository_remote_identity": "git-remote-v1:github.com/m8lamario/leonessa-app",
+  "updated_at": "2026-08-20T17:00:56.425Z",
+  "version": "0.5.93",
+  "workspace_id": "eb18c5df-148c-46e6-a27a-d497ded1b066",
+  "workspace_name": "Mario's Workspace"
+}

@@ -7,9 +7,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import {
   BENCH_LIMITS,
-  BENCH_SIZE,
   CAPTAIN_MULTIPLIER,
   INITIAL_BUDGET,
+  MIN_BENCH_SIZE,
   STARTER_LIMITS,
   STARTER_SIZE,
   TEAM_SIZE,
@@ -149,13 +149,16 @@ export function TeamBuilder() {
       setError("Scegli un nome da 3 a 30 caratteri per la tua squadra.");
       return;
     }
-    if ((current.kind === "starter" || current.kind === "bench") && selectedForStep.length !== limit) {
-      setError(
-        current.kind === "bench"
-          ? `Seleziona 1 riserva ${roleLabels[activeRole!].toLowerCase()}.`
-          : `Completa i titolari: servono ${limit} ${roleLabels[activeRole!].toLowerCase()}.`,
-      );
+    if (current.kind === "starter" && selectedForStep.length !== limit) {
+      setError(`Completa i titolari: servono ${limit} ${roleLabels[activeRole!].toLowerCase()}.`);
       return;
+    }
+    if (current.kind === "bench") {
+      const isLastBenchStep = steps[step + 1]?.kind === "captain";
+      if (isLastBenchStep && bench.length < MIN_BENCH_SIZE) {
+        setError("Seleziona almeno 1 riserva (massimo 4).");
+        return;
+      }
     }
     if (current.kind === "captain" && !captainId) {
       setError("Scegli il capitano tra i titolari.");
@@ -284,7 +287,9 @@ export function TeamBuilder() {
             ? saving
               ? "La squadra entra in campo..."
               : "Conferma la squadra"
-            : "Continua"}
+            : current.kind === "bench" && selectedForStep.length === 0
+              ? "Salta"
+              : "Continua"}
         </button>
       </footer>
     </section>
@@ -352,6 +357,9 @@ function PlayerStep({
           ? `Riserva ${roleLabels[role].toLowerCase()}`
           : `Scegli ${limit === 1 ? "il tuo" : "i tuoi"} ${roleLabels[role].toLowerCase()}`}
       </h1>
+      {kind === "bench" && (
+        <p className={styles.sceneLead}>Facoltativa se hai già almeno una riserva (massimo 4).</p>
+      )}
       <div className={styles.roleCounter}>
         <span>
           {kind === "bench" ? "PANCHINA" : "TITOLARI"} · {roleLabels[role]}
@@ -459,11 +467,13 @@ function FinalStep({
       </div>
       <p className={styles.sceneEyebrow}>Passo 11 · Squadra completa</p>
       <h1 id="builder-title">{name}</h1>
-      <p className={styles.sceneLead}>11 titolari + 4 riserve, pronti per la Cup.</p>
+      <p className={styles.sceneLead}>
+        11 titolari e da 1 a 4 riserve, pronti per la Cup.
+      </p>
       <div className={styles.finalScore}>
         <span>
           <b>
-            {STARTER_SIZE}+{BENCH_SIZE}
+            {STARTER_SIZE}+{bench.length}
           </b>{" "}
           rosa
         </span>

@@ -3,6 +3,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { isSandboxMode } from "@/lib/sandbox";
 import { AppError } from "@/utils/errors";
+import { validateRosterPlayers } from "../lib/lineup-validation";
 import {
   SCORING_RULES,
   getPlayerMatchBreakdown,
@@ -371,30 +372,14 @@ export async function getAnomalies() {
   const anomalies: Array<{ area: string; message: string; recordId?: string }> = [];
   const teams = await prisma.fantasyTeam.findMany({ include: { players: true } });
   for (const team of teams) {
-    if (team.players.length !== 15)
+    const roster = validateRosterPlayers(team.players, { requireCaptain: true });
+    if (!roster.valid) {
       anomalies.push({
         area: "teams",
-        message: `${team.name}: ${team.players.length} giocatori`,
+        message: `${team.name}: ${roster.message ?? "rosa non valida"}`,
         recordId: team.id,
       });
-    if (team.players.filter((player) => player.status === "STARTER").length !== 11)
-      anomalies.push({
-        area: "teams",
-        message: `${team.name}: titolari != 11`,
-        recordId: team.id,
-      });
-    if (team.players.filter((player) => player.status === "BENCH").length !== 4)
-      anomalies.push({
-        area: "teams",
-        message: `${team.name}: riserve != 4`,
-        recordId: team.id,
-      });
-    if (team.players.filter((player) => player.isCaptain && player.status === "STARTER").length !== 1)
-      anomalies.push({
-        area: "teams",
-        message: `${team.name}: capitano non valido`,
-        recordId: team.id,
-      });
+    }
     if (team.budgetLp < 0)
       anomalies.push({ area: "teams", message: `${team.name}: LP negativi`, recordId: team.id });
   }
