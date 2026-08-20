@@ -87,8 +87,64 @@ export async function simulateMatchday() {
 }
 
 async function runScoringOnLatest() {
-  const { syncFantasyScoring } = await import("@/features/fanta/server");
-  await syncFantasyScoring();
+  const competition = await prisma.competition.findUnique({ where: { slug: LEONESSA_SLUG } });
+  if (!competition) return;
+  const matchday = await prisma.fantasyMatchday.upsert({
+    where: { round: Number(new Date().toISOString().slice(0, 10).replaceAll("-", "")) },
+    update: { completedAt: new Date() },
+    create: {
+      round: Number(new Date().toISOString().slice(0, 10).replaceAll("-", "")),
+      startedAt: new Date(),
+      completedAt: new Date(),
+    },
+  });
+  const teams = await prisma.fantasyTeam.findMany({ include: { players: true } });
+  for (const team of teams) {
+    let points = 0;
+    for (const selection of team.players) {
+      const stat = await prisma.fantasyPlayerStat.findUnique({
+        where: { playerId: selection.playerId },
+      });
+      const events = await prisma.matchEvent.count({
+        where: { playerId: selection.playerId, match: { competitionId: competition.id } },
+      });
+      const playerPoints = (stat?.totalPoints ?? 0) + events * 25;
+      points += selection.isCaptain ? Math.round(playerPoints * 1.5) : playerPoints;
+      await prisma.fantasyPlayerStat.upsert({
+        where: { playerId: selection.playerId },
+        update: { matches: { increment: 1 }, totalPoints: { increment: events * 25 } },
+        create: { playerId: selection.playerId, matches: 1, totalPoints: events * 25 },
+      });
+      const player = await prisma.teamMember.findUnique({
+        where: { id: selection.playerId },
+        select: { fantasyValue: true },
+      });
+      if (player) {
+        const delta = events >= 2 ? 5 : events === 1 ? 2 : 0;
+        const newValue = Math.max(5, Math.min(150, player.fantasyValue + delta));
+        if (newValue !== player.fantasyValue) {
+          await prisma.teamMember.update({
+            where: { id: selection.playerId },
+            data: { fantasyValue: newValue },
+          });
+          await prisma.fantasyPlayerValueHistory.create({
+            data: {
+              playerId: selection.playerId,
+              oldValue: player.fantasyValue,
+              newValue,
+              reason: "Prestazione Sandbox",
+            },
+          });
+        }
+      }
+    }
+    await prisma.fantasyScore.upsert({
+      where: { fantasyTeamId_matchdayId: { fantasyTeamId: team.id, matchdayId: matchday.id } },
+      update: { points },
+      create: { fantasyTeamId: team.id, matchdayId: matchday.id, points },
+    });
+    await prisma.fantasyTeam.update({ where: { id: team.id }, data: { totalPoints: points } });
+  }
 }
 
 export async function simulateMarket() {
@@ -215,31 +271,42 @@ export async function simulateEvent() {
 
 export async function resetSandbox() {
   const sandboxUsers = await prisma.user.findMany({
-    where: {
-      OR: [{ email: { startsWith: "sandbox-" } }, { email: { startsWith: "fanta-player-" } }],
-    },
+    where: { email: { startsWith: "sandbox-" } },
     select: { id: true },
   });
-  const ids = sandboxUsers.map((user) => user.id);
+  const userIds = sandboxUsers.map((user) => user.id);
+  const fantasyTeams = await prisma.fantasyTeam.findMany({
+    where: { userId: { in: userIds } },
+    select: { id: true },
+  });
+  const fantasyTeamIds = fantasyTeams.map((team) => team.id);
+  const players = await prisma.teamMember.findMany({
+    where: { team: { competition: { slug: LEONESSA_SLUG } } },
+    select: { id: true },
+  });
+  const playerIds = players.map((player) => player.id);
+  const matches = await prisma.match.findMany({
+    where: { competition: { slug: LEONESSA_SLUG } },
+    select: { id: true },
+  });
+  const matchIds = matches.map((match) => match.id);
 
-  await prisma.notification.deleteMany({ where: { userId: { in: ids } } });
-  await prisma.fantasyAchievement.deleteMany();
-  await prisma.fantasyActivity.deleteMany();
-  await prisma.fantasyScore.deleteMany();
-  await prisma.fantasyMatchday.deleteMany();
-  await prisma.fantasyProcessedMatch.deleteMany();
-  await prisma.fantasyTeamTransfer.deleteMany();
-  await prisma.fantasyTeamPlayer.deleteMany();
-  await prisma.fantasyTeam.deleteMany();
-  await prisma.fantasyPlayerValueHistory.deleteMany();
-  await prisma.fantasyPlayerStat.deleteMany();
-  await prisma.matchEvent.deleteMany();
-  await prisma.match.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
+  await prisma.notification.deleteMany({ where: { userId: { in: userIds } } });
+  await prisma.fantasyAchievement.deleteMany({ where: { userId: { in: userIds } } });
+  await prisma.fantasyScore.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
+  await prisma.fantasyTeamTransfer.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
+  await prisma.fantasyTeamPlayer.deleteMany({ where: { fantasyTeamId: { in: fantasyTeamIds } } });
+  await prisma.fantasyTeam.deleteMany({ where: { id: { in: fantasyTeamIds } } });
+  await prisma.fantasyPlayerValueHistory.deleteMany({ where: { playerId: { in: playerIds } } });
+  await prisma.fantasyPlayerStat.deleteMany({ where: { playerId: { in: playerIds } } });
+  await prisma.fantasyProcessedMatch.deleteMany({ where: { matchId: { in: matchIds } } });
+  await prisma.matchEvent.deleteMany({ where: { matchId: { in: matchIds } } });
+  await prisma.match.deleteMany({ where: { id: { in: matchIds } } });
+  await prisma.fantasyActivity.deleteMany({ where: { title: { contains: "Sandbox" } } });
   await prisma.newsArticle.deleteMany({ where: { slug: { startsWith: "sandbox-" } } });
   await prisma.event.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
-  await prisma.teamMember.deleteMany({ where: { team: { competition: { slug: LEONESSA_SLUG } } } });
-  await prisma.team.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
-  await prisma.user.deleteMany({ where: { id: { in: ids } } });
+  // Keep sandbox player records and teams: real users may reference them in test scenarios.
+  await prisma.user.deleteMany({ where: { id: { in: userIds } } });
 
   logger.info({}, "[SIMULATION] Sandbox reset");
   return { reset: true };

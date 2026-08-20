@@ -5,10 +5,19 @@ import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
+import { recordActivity } from "./social-service";
 import { FORMATION_LIMITS, MARKET } from "../constants/fanta";
 import type { FantasyRole } from "../types";
 
 const fantasyRoles = Object.keys(FORMATION_LIMITS) as FantasyRole[];
+
+async function recordMarketActivity(title: string) {
+  try {
+    await recordActivity({ type: "player_bought", title });
+  } catch {
+    // Social telemetry must not roll back a completed market transaction.
+  }
+}
 
 export type MarketStatusDto = {
   open: boolean;
@@ -80,9 +89,13 @@ function badgeOf(player: { fantasyValue: number; _marketChange?: number; _squadC
   return "deal";
 }
 
-export async function getMarketStatus(): Promise<MarketStatusDto> {
+export async function getMarketStatus(now = new Date()): Promise<MarketStatusDto> {
   const nextMatch = await prisma.match.findFirst({
-    where: { deletedAt: null, status: { in: ["SCHEDULED", "LIVE"] } },
+    where: {
+      deletedAt: null,
+      status: { in: ["SCHEDULED", "LIVE"] },
+      startAt: { gte: now },
+    },
     orderBy: { startAt: "asc" },
     select: { startAt: true },
   });
@@ -94,12 +107,16 @@ export async function getMarketStatus(): Promise<MarketStatusDto> {
   const closesAt = new Date(
     nextMatch.startAt.getTime() - MARKET.marketClosesBeforeKickoffMinutes * 60_000,
   );
-  return { open: new Date() < closesAt, closesAt, nextKickoff: nextMatch.startAt };
+  return { open: now < closesAt, closesAt, nextKickoff: nextMatch.startAt };
 }
 
 async function ensureCurrentMatchday(transaction: Prisma.TransactionClient, now = new Date()) {
   const match = await transaction.match.findFirst({
-    where: { deletedAt: null, status: { in: ["SCHEDULED", "LIVE"] } },
+    where: {
+      deletedAt: null,
+      status: { in: ["SCHEDULED", "LIVE"] },
+      startAt: { gte: now },
+    },
     orderBy: { startAt: "asc" },
     select: { startAt: true },
   });
@@ -158,7 +175,7 @@ function assertFormationValid(
   }
 }
 
-export async function buyPlayer(userId: string, playerId: string) {
+export async function buyPlayer(userId: string, playerId: string, replacementPlayerId: string) {
   await assertMarketOpen();
 
   try {
@@ -166,13 +183,22 @@ export async function buyPlayer(userId: string, playerId: string) {
       async (transaction) => {
         const team = await transaction.fantasyTeam.findUnique({
           where: { userId },
-          include: { players: true },
+          include: { players: { include: { player: { select: { fantasyValue: true } } } } },
         });
         if (!team) {
           throw new AppError("NOT_FOUND", "Squadra fantasy non trovata.", 404);
         }
-        if (team.players.some((selection) => selection.playerId === playerId)) {
-          throw new AppError("CONFLICT", "Giocatore già in rosa.", 409);
+        const replacement = team.players.find(
+          (selection) => selection.playerId === replacementPlayerId,
+        );
+        if (!replacement) {
+          throw new AppError("BAD_REQUEST", "Seleziona il giocatore da sostituire.", 400);
+        }
+        if (
+          playerId === replacementPlayerId ||
+          team.players.some((selection) => selection.playerId === playerId)
+        ) {
+          throw new AppError("CONFLICT", "Il giocatore è già in rosa.", 409);
         }
 
         const player = await transaction.teamMember.findFirst({
@@ -192,20 +218,27 @@ export async function buyPlayer(userId: string, playerId: string) {
         const transfers = await ensureTransfers(transaction, team.id, matchday.id);
         const transferCount = transfers.freeTransfers + transfers.paidTransfers;
         const isFree = transferCount < MARKET.freeTransfersPerMatchday;
-        const cost = player.fantasyValue + (isFree ? 0 : MARKET.paidTransferCostLp);
+        const transferFee = isFree ? 0 : MARKET.paidTransferCostLp;
+        const cost = player.fantasyValue + transferFee;
+        const saleCredit = replacement.player.fantasyValue;
+        const budgetDelta = cost - saleCredit;
 
-        if (team.budgetLp < cost) {
+        if (team.budgetLp < budgetDelta) {
           throw new AppError("BAD_REQUEST", "Budget LP insufficiente.", 400);
         }
 
-        assertFormationValid(team.players, { removedRole: null, addedRole: role });
+        if (replacement.role !== role) {
+          throw new AppError("BAD_REQUEST", "Il sostituto deve avere lo stesso ruolo.", 400);
+        }
+        assertFormationValid(team.players, { removedRole: replacement.role, addedRole: role });
 
+        await transaction.fantasyTeamPlayer.delete({ where: { id: replacement.id } });
         await transaction.fantasyTeamPlayer.create({
           data: { fantasyTeamId: team.id, playerId, role, purchaseCost: player.fantasyValue },
         });
         await transaction.fantasyTeam.update({
           where: { id: team.id },
-          data: { budgetLp: { decrement: cost } },
+          data: { budgetLp: { decrement: budgetDelta } },
         });
         await transaction.fantasyTeamTransfer.update({
           where: { id: transfers.id },
@@ -216,7 +249,8 @@ export async function buyPlayer(userId: string, playerId: string) {
         });
 
         logger.info({ userId, playerId, cost, free: isFree }, "Market buy completed");
-        return { budgetLp: team.budgetLp - cost, free: isFree };
+        await recordMarketActivity(`Ha sostituito un giocatore con ${playerId} sul mercato`);
+        return { budgetLp: team.budgetLp - budgetDelta, free: isFree, replacementPlayerId };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -226,7 +260,7 @@ export async function buyPlayer(userId: string, playerId: string) {
   }
 }
 
-export async function sellPlayer(userId: string, playerId: string) {
+export async function sellPlayer(userId: string, playerId: string, replacementPlayerId: string) {
   await assertMarketOpen();
 
   return prisma.$transaction(
@@ -243,6 +277,13 @@ export async function sellPlayer(userId: string, playerId: string) {
       if (!selection) {
         throw new AppError("NOT_FOUND", "Giocatore non in rosa.", 404);
       }
+      if (
+        !replacementPlayerId ||
+        replacementPlayerId === playerId ||
+        team.players.some((item) => item.playerId === replacementPlayerId)
+      ) {
+        throw new AppError("BAD_REQUEST", "Seleziona un nuovo giocatore disponibile.", 400);
+      }
 
       const player = await transaction.teamMember.findUnique({
         where: { id: playerId },
@@ -252,7 +293,20 @@ export async function sellPlayer(userId: string, playerId: string) {
         throw new AppError("NOT_FOUND", "Giocatore non trovato.", 404);
       }
 
-      assertFormationValid(team.players, { removedRole: selection.role, addedRole: null });
+      const replacement = await transaction.teamMember.findFirst({
+        where: { id: replacementPlayerId, role: "PLAYER", leftAt: null, user: { deletedAt: null } },
+        select: { id: true, fantasyRole: true, fantasyValue: true },
+      });
+      if (!replacement) {
+        throw new AppError("NOT_FOUND", "Nuovo giocatore non disponibile.", 404);
+      }
+      if (replacement.fantasyRole !== selection.role) {
+        throw new AppError("BAD_REQUEST", "Il sostituto deve avere lo stesso ruolo.", 400);
+      }
+      assertFormationValid(team.players, {
+        removedRole: selection.role,
+        addedRole: replacement.fantasyRole,
+      });
 
       const matchday = await ensureCurrentMatchday(transaction);
       const transfers = await ensureTransfers(transaction, team.id, matchday.id);
@@ -260,9 +314,19 @@ export async function sellPlayer(userId: string, playerId: string) {
       const isFree = transferCount < MARKET.freeTransfersPerMatchday;
 
       await transaction.fantasyTeamPlayer.delete({ where: { id: selection.id } });
+      await transaction.fantasyTeamPlayer.create({
+        data: {
+          fantasyTeamId: team.id,
+          playerId: replacement.id,
+          role: selection.role,
+          purchaseCost: replacement.fantasyValue,
+          isCaptain: selection.isCaptain,
+        },
+      });
+      const budgetDelta = player.fantasyValue - replacement.fantasyValue;
       await transaction.fantasyTeam.update({
         where: { id: team.id },
-        data: { budgetLp: { increment: player.fantasyValue } },
+        data: { budgetLp: { increment: budgetDelta } },
       });
       await transaction.fantasyTeamTransfer.update({
         where: { id: transfers.id },
@@ -272,11 +336,11 @@ export async function sellPlayer(userId: string, playerId: string) {
         },
       });
 
-      logger.info(
-        { userId, playerId, credits: player.fantasyValue, free: isFree },
-        "Market sell completed",
+      await recordMarketActivity(
+        `Ha sostituito un giocatore con ${replacementPlayerId} sul mercato`,
       );
-      return { budgetLp: team.budgetLp + player.fantasyValue, free: isFree };
+      logger.info({ userId, playerId, replacementPlayerId, free: isFree }, "Market sell completed");
+      return { budgetLp: team.budgetLp + budgetDelta, free: isFree, replacementPlayerId };
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
   );
@@ -306,6 +370,7 @@ export async function changeCaptain(userId: string, playerId: string) {
       data: { isCaptain: true },
     });
 
+    await recordMarketActivity("Ha cambiato capitano nella sua squadra fantasy 👑");
     logger.info({ userId, teamId: team.id, playerId }, "Market captain changed");
     return { captainId: playerId };
   });

@@ -75,6 +75,59 @@
   font-size: 0.8rem;
 }
 
+.replacementCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid rgb(247 201 72 / 42%);
+  border-radius: var(--radius-md);
+  background: rgb(247 201 72 / 10%);
+}
+.replacementCard h2 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--type-h3-size);
+  font-weight: 400;
+}
+.replacementCard p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+}
+.replacementOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.replacementOption {
+  display: flex;
+  min-height: 52px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 9px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 9px;
+  background: rgb(255 255 255 / 7%);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+.replacementOption small {
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+}
+.cancelReplacement {
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .notice {
   margin: 0 0 16px;
   padding: 12px 14px;

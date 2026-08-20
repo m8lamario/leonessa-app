@@ -5,7 +5,6 @@ import { Prisma } from "@prisma/client";
 import { syncLeonessaCup } from "@/features/cup/server";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { adjustmentFromPoints, applyMatchdayValueAdjustments } from "./value-engine";
 
 const SCORING = {
   goal: 100,
@@ -153,7 +152,6 @@ async function processMatch(transaction: Prisma.TransactionClient, match: Scorin
     pointsAssigned += points;
   }
 
-  const adjustments = [];
   for (const player of players) {
     const delta = getStatDelta(match.events, player.id);
     const points = getPlayerPoints(match, player);
@@ -174,17 +172,14 @@ async function processMatch(transaction: Prisma.TransactionClient, match: Scorin
         redCards: { increment: delta.redCards },
       },
     });
-    adjustments.push(adjustmentFromPoints(player.id, player.fantasyValue, points));
   }
 
-  await applyMatchdayValueAdjustments(
-    transaction,
-    adjustments,
-    matchday.id,
-    "Prestazione giornata",
-  );
-
-  return { matchId: claim.matchId, events: match.events.length, pointsAssigned };
+  return {
+    matchId: claim.matchId,
+    events: match.events.length,
+    pointsAssigned,
+    matchdayId: matchday.id,
+  };
 }
 
 export type FantasyScoringSyncResult = {

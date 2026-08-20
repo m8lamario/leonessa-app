@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     const user = await requireUser();
     const body = await request.json();
     const playerId = typeof body.playerId === "string" ? body.playerId : "";
-    return NextResponse.json({ result: await buyPlayer(user.id, playerId) });
+    const replacementPlayerId = typeof body.replacementPlayerId === "string" ? body.replacementPlayerId : "";
+    return NextResponse.json({ result: await buyPlayer(user.id, playerId, replacementPlayerId) });
   } catch (error) {
     if (error instanceof AppError) {
       return NextResponse.json(

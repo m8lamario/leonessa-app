@@ -6,7 +6,7 @@ import { MARKET, VALUE_DELTAS } from "../constants/fanta";
 const MIN_VALUE = MARKET.minValue;
 const MAX_VALUE = MARKET.maxValue;
 
-function valueDeltaFromPoints(points: number) {
+export function valueDeltaFromPoints(points: number) {
   if (points >= 100) return VALUE_DELTAS.excellent;
   if (points >= 30) return VALUE_DELTAS.good;
   if (points <= -40) return VALUE_DELTAS.veryNegative;

@@ -104,7 +104,7 @@ export function FantaDashboard({ dashboard }: FantaDashboardProps) {
             <p className={styles.kicker}>Ultima giornata</p>
             <h2 id="performance-title">Prestazioni</h2>
           </div>
-          <span>Mock</span>
+          <span>Dati reali</span>
         </div>
         <div className={styles.performanceList}>
           {dashboard.roster.slice(0, 5).map((player) => (

@@ -79,6 +79,12 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
   const [role, setRole] = useState<string>("ALL");
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [replacementRequest, setReplacementRequest] = useState<{
+    action: "buy" | "sell";
+    playerId: string;
+    role: string;
+    name: string;
+  } | null>(null);
 
   const isOpen = market.status.open;
 
@@ -93,7 +99,7 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
 
   if (!market.team) return null;
 
-  async function act(path: string, playerId: string) {
+  async function act(path: "buy" | "sell" | "captain", playerId: string, replacementPlayerId = "") {
     if (!isOpen) return;
     setBusy(true);
     setNotice(null);
@@ -101,14 +107,15 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
       const response = await fetch(`/api/fanta/market/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId }),
+        body: JSON.stringify({ playerId, replacementPlayerId }),
       });
       const body = await response.json();
       if (!response.ok) {
         setNotice(body.message ?? "Operazione non riuscita.");
         return;
       }
-      setNotice(path === "captain" ? "Capitano aggiornato." : "Operazione completata.");
+      setNotice(path === "captain" ? "Capitano aggiornato." : "Sostituzione completata.");
+      setReplacementRequest(null);
       window.location.reload();
     } catch {
       setNotice("Errore di rete. Riprova.");
@@ -136,6 +143,51 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
         <p className={styles.notice} role="status">
           {notice}
         </p>
+      )}
+
+      {replacementRequest && (
+        <section className={styles.replacementCard} aria-label="Scegli il giocatore da sostituire">
+          <div>
+            <p className={styles.kicker}>Sostituzione obbligatoria</p>
+            <h2>
+              {replacementRequest.action === "buy" ? "Chi vuoi sostituire?" : "Chi vuoi inserire?"}
+            </h2>
+            <p>Ruolo: {roleLabels[replacementRequest.role] ?? replacementRequest.role}</p>
+          </div>
+          <div className={styles.replacementOptions}>
+            {(replacementRequest.action === "buy"
+              ? market.team.squad.filter((player) => player.role === replacementRequest.role)
+              : market.pool.filter(
+                  (player) => player.role === replacementRequest.role && !player.owned,
+                )
+            ).map((player) => {
+              const id = "playerId" in player ? player.playerId : player.id;
+              return (
+                <button
+                  className={styles.replacementOption}
+                  disabled={busy}
+                  key={id}
+                  onClick={() =>
+                    void act(replacementRequest.action, replacementRequest.playerId, id)
+                  }
+                  type="button"
+                >
+                  <strong>{player.name}</strong>
+                  <small>
+                    {player.school} · {"value" in player ? player.value : player.fantasyValue} LP
+                  </small>
+                </button>
+              );
+            })}
+          </div>
+          <button
+            className={styles.cancelReplacement}
+            onClick={() => setReplacementRequest(null)}
+            type="button"
+          >
+            Annulla
+          </button>
+        </section>
       )}
 
       <section className={styles.walletCard} aria-label="Risorse disponibili">
@@ -180,7 +232,14 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
                   <button
                     className={styles.sellButton}
                     disabled={busy}
-                    onClick={() => act("sell", player.playerId)}
+                    onClick={() =>
+                      setReplacementRequest({
+                        action: "sell",
+                        playerId: player.playerId,
+                        role: player.role,
+                        name: player.name,
+                      })
+                    }
                     type="button"
                   >
                     Vendi
@@ -245,7 +304,14 @@ export function MarketDashboard({ market }: MarketDashboardProps) {
               player={player}
               isOpen={isOpen}
               busy={busy}
-              onBuy={() => act("buy", player.id)}
+              onBuy={() =>
+                setReplacementRequest({
+                  action: "buy",
+                  playerId: player.id,
+                  role: player.role,
+                  name: player.name,
+                })
+              }
             />
           ))}
           {pool.length === 0 && <p className={styles.emptyPool}>Nessun giocatore trovato.</p>}

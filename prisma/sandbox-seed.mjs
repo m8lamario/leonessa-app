@@ -155,7 +155,7 @@ async function upsertCompetition(schools) {
 
 async function generateUsers() {
   const users = [];
-  for (let index = 0; index < 12; index++) {
+  for (let index = 0; index < 20; index++) {
     const email = `sandbox-user-${index}@leonessacup.test`;
     const user = await prisma.user.upsert({
       where: { email },
@@ -201,7 +201,7 @@ async function generatePlayers(schools, teams, random) {
           leftAt: null,
           fantasyRole,
           fantasyValue: BASE_VALUES[fantasyRole] + Math.floor(random() * 20),
-          jerseyNumber: jersey,
+          jerseyNumber: null,
           schoolYear: `${1 + Math.floor(random() * 5)}`,
         },
         create: {
@@ -210,7 +210,7 @@ async function generatePlayers(schools, teams, random) {
           role: "PLAYER",
           fantasyRole,
           fantasyValue: BASE_VALUES[fantasyRole] + Math.floor(random() * 20),
-          jerseyNumber: jersey,
+          jerseyNumber: null,
           schoolYear: `${1 + Math.floor(random() * 5)}`,
         },
       });
@@ -229,13 +229,19 @@ async function generateFantasyTeams(users, players, random) {
     const mid = players.filter((p) => p.fantasyRole === "CENTROCAMPISTA");
     const att = players.filter((p) => p.fantasyRole === "ATTACCANTE");
 
-    const pick = (arr) => arr[Math.floor(random() * arr.length)];
-    const roster = [pick(gk)];
-    for (let i = 0; i < 4; i++) roster.push(pick(def));
-    for (let i = 0; i < 3; i++) roster.push(pick(mid));
-    for (let i = 0; i < 3; i++) roster.push(pick(att));
+    const pickUnique = (arr, used) => {
+      const available = arr.filter((player) => !used.has(player.id));
+      const player = available[Math.floor(random() * available.length)];
+      if (player) used.add(player.id);
+      return player;
+    };
+    const used = new Set();
+    const roster = [pickUnique(gk, used)];
+    for (let i = 0; i < 4; i++) roster.push(pickUnique(def, used));
+    for (let i = 0; i < 3; i++) roster.push(pickUnique(mid, used));
+    for (let i = 0; i < 3; i++) roster.push(pickUnique(att, used));
 
-    const uniqueRoster = [...new Map(roster.map((p) => [p.id, p])).values()];
+    const uniqueRoster = roster.filter(Boolean);
 
     const captain = uniqueRoster[Math.floor(random() * uniqueRoster.length)];
     const cost = uniqueRoster.reduce((sum, p) => sum + p.fantasyValue, 0);
@@ -267,6 +273,42 @@ async function generateFantasyTeams(users, players, random) {
   return teams;
 }
 
+async function generateFantasyStatsAndScores(fantasyTeams, players, random) {
+  for (const player of players) {
+    const goals = Math.floor(random() * 4);
+    const assists = Math.floor(random() * 3);
+    const matches = 1 + Math.floor(random() * 5);
+    const totalPoints = goals * 100 + assists * 50 + matches * 25;
+    await prisma.fantasyPlayerStat.upsert({
+      where: { playerId: player.id },
+      update: { goals, assists, matches, totalPoints },
+      create: { playerId: player.id, goals, assists, matches, totalPoints },
+    });
+  }
+
+  const matchday = await prisma.fantasyMatchday.upsert({
+    where: { round: 20260820 },
+    update: {
+      startedAt: new Date("2026-08-19T18:00:00.000Z"),
+      completedAt: new Date("2026-08-19T20:00:00.000Z"),
+    },
+    create: {
+      round: 20260820,
+      startedAt: new Date("2026-08-19T18:00:00.000Z"),
+      completedAt: new Date("2026-08-19T20:00:00.000Z"),
+    },
+  });
+  for (const team of fantasyTeams) {
+    const points = 100 + Math.floor(random() * 500);
+    await prisma.fantasyScore.upsert({
+      where: { fantasyTeamId_matchdayId: { fantasyTeamId: team.id, matchdayId: matchday.id } },
+      update: { points },
+      create: { fantasyTeamId: team.id, matchdayId: matchday.id, points },
+    });
+    await prisma.fantasyTeam.update({ where: { id: team.id }, data: { totalPoints: points } });
+  }
+}
+
 async function generateMatches(competition, teams, random) {
   // Create a round-robin ladder of completed matches across a few matchdays.
   const matches = [];
@@ -292,30 +334,56 @@ async function generateMatches(competition, teams, random) {
 }
 
 async function cleanupSandboxData() {
-  // Order matters to satisfy FK constraints (RESTRICT on TeamMember references).
-  await prisma.fantasyAchievement.deleteMany();
-  await prisma.fantasyActivity.deleteMany();
-  await prisma.fantasyScore.deleteMany();
-  await prisma.fantasyMatchday.deleteMany();
-  await prisma.fantasyProcessedMatch.deleteMany();
-  await prisma.fantasyTeamTransfer.deleteMany();
-  await prisma.fantasyTeamPlayer.deleteMany();
-  await prisma.fantasyTeam.deleteMany();
-  await prisma.fantasyPlayerValueHistory.deleteMany();
-  await prisma.fantasyPlayerStat.deleteMany();
-  await prisma.matchEvent.deleteMany();
-  await prisma.match.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
+  // Keep production fantasy data untouched; only remove rows owned by sandbox users/competition.
+  const sandboxUsers = await prisma.user.findMany({
+    where: { email: { startsWith: "sandbox-" } },
+    select: { id: true },
+  });
+  const sandboxUserIds = sandboxUsers.map((user) => user.id);
+  const sandboxTeams = await prisma.fantasyTeam.findMany({
+    where: { userId: { in: sandboxUserIds } },
+    select: { id: true },
+  });
+  const sandboxFantasyTeamIds = sandboxTeams.map((team) => team.id);
+  const sandboxPlayers = await prisma.teamMember.findMany({
+    where: { team: { competition: { slug: LEONESSA_SLUG } } },
+    select: { id: true },
+  });
+  const sandboxPlayerIds = sandboxPlayers.map((player) => player.id);
+  const sandboxMatches = await prisma.match.findMany({
+    where: { competition: { slug: LEONESSA_SLUG } },
+    select: { id: true },
+  });
+  const sandboxMatchIds = sandboxMatches.map((match) => match.id);
+
+  await prisma.fantasyAchievement.deleteMany({ where: { userId: { in: sandboxUserIds } } });
+  await prisma.fantasyScore.deleteMany({ where: { fantasyTeamId: { in: sandboxFantasyTeamIds } } });
+  await prisma.fantasyTeamTransfer.deleteMany({
+    where: { fantasyTeamId: { in: sandboxFantasyTeamIds } },
+  });
+  await prisma.fantasyTeamPlayer.deleteMany({
+    where: { fantasyTeamId: { in: sandboxFantasyTeamIds } },
+  });
+  await prisma.fantasyTeam.deleteMany({ where: { id: { in: sandboxFantasyTeamIds } } });
+  await prisma.fantasyPlayerValueHistory.deleteMany({
+    where: { playerId: { in: sandboxPlayerIds } },
+  });
+  await prisma.fantasyPlayerStat.deleteMany({ where: { playerId: { in: sandboxPlayerIds } } });
+  await prisma.fantasyProcessedMatch.deleteMany({ where: { matchId: { in: sandboxMatchIds } } });
+  await prisma.fantasyActivity.deleteMany({ where: { title: { contains: "Sandbox" } } });
+  await prisma.matchEvent.deleteMany({ where: { matchId: { in: sandboxMatchIds } } });
+  await prisma.match.deleteMany({ where: { id: { in: sandboxMatchIds } } });
   await prisma.event.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
   await prisma.newsArticle.deleteMany({ where: { slug: { startsWith: "sandbox-" } } });
-  await prisma.notification.deleteMany({
-    where: { user: { email: { startsWith: "sandbox-" } } },
-  });
-  await prisma.teamMember.deleteMany({ where: { team: { competition: { slug: LEONESSA_SLUG } } } });
-  await prisma.user.deleteMany({ where: { email: { startsWith: "sandbox-" } } });
-  await prisma.team.deleteMany({ where: { competition: { slug: LEONESSA_SLUG } } });
+  await prisma.notification.deleteMany({ where: { userId: { in: sandboxUserIds } } });
+  // Player users/team members may be referenced by non-sandbox fantasy teams; keep them for isolation.
+  await prisma.user.deleteMany({ where: { email: { startsWith: "sandbox-user-" } } });
 }
 
 async function main() {
+  if (process.env.APP_SANDBOX_MODE !== "true") {
+    throw new Error("Sandbox disabled. Set APP_SANDBOX_MODE=true before running sandbox:seed.");
+  }
   console.log("[SIMULATION] Sandbox seed started");
   const random = seededRandom(2026);
 
@@ -326,6 +394,7 @@ async function main() {
   const players = await generatePlayers(schools, teams, random);
   const fantasyTeams = await generateFantasyTeams(users, players, random);
   const matches = await generateMatches(competition, teams, random);
+  await generateFantasyStatsAndScores(fantasyTeams, players, random);
 
   // News + Events
   await prisma.newsArticle.create({

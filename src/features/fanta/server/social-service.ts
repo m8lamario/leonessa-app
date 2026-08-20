@@ -120,6 +120,12 @@ export async function getSocialDashboard(userId: string): Promise<SocialDashboar
     buildTopScorers(),
     buildBestBuyers(),
   ]);
+  if (mvp) await recordIfMissing("MATCHDAY_MVP", `MVP della giornata: ${mvp.name}`);
+  if (bestBuyers[0])
+    await recordIfMissing(
+      "PLAYER_MOST_SELECTED",
+      `Giocatore più acquistato: ${bestBuyers[0].name}`,
+    );
 
   return {
     activity: activityRows.map((row) => ({
@@ -242,6 +248,38 @@ async function findWeeklyDuel(myTeamId: string, rivalUserId: string): Promise<We
 }
 
 async function getAchievements(userId: string): Promise<AchievementDto[]> {
+  const team = await prisma.fantasyTeam.findUnique({
+    where: { userId },
+    select: { id: true, totalPoints: true },
+  });
+  const higherTeams = team
+    ? await prisma.fantasyTeam.count({ where: { totalPoints: { gt: team.totalPoints } } })
+    : 999;
+  if (team && higherTeams === 0) await grantAchievement(userId, "KING");
+  if (team && higherTeams < 3) await grantAchievement(userId, "COMPETITIVE");
+  if (team && higherTeams < 10) await grantAchievement(userId, "TOP10");
+
+  const ownedPlayers = team
+    ? await prisma.fantasyTeamPlayer.findMany({
+        where: { fantasyTeamId: team.id },
+        select: { playerId: true },
+      })
+    : [];
+  if (ownedPlayers.length > 0) {
+    const goals = await prisma.fantasyPlayerStat.count({
+      where: { playerId: { in: ownedPlayers.map((player) => player.playerId) }, goals: { gt: 0 } },
+    });
+    if (goals > 0) await grantAchievement(userId, "TALENT_SCOUT");
+    const growth = await prisma.fantasyPlayerValueHistory.findFirst({
+      where: {
+        playerId: { in: ownedPlayers.map((player) => player.playerId) },
+        newValue: { gt: 0 },
+      },
+      orderBy: { newValue: "desc" },
+    });
+    if (growth && growth.newValue - growth.oldValue >= 20) await grantAchievement(userId, "TRADER");
+  }
+
   const unlockedRows = await prisma.fantasyAchievement.findMany({
     where: { userId },
     select: { code: true, unlockedAt: true },
@@ -270,6 +308,15 @@ export async function recordActivity(input: { type: string; title: string; descr
   await prisma.fantasyActivity.create({
     data: { type: input.type, title: input.title, description: input.description },
   });
+}
+
+async function recordIfMissing(type: string, title: string) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const exists = await prisma.fantasyActivity.findFirst({
+    where: { type, title, createdAt: { gte: since } },
+    select: { id: true },
+  });
+  if (!exists) await recordActivity({ type, title });
 }
 
 async function buildHallOfFame(): Promise<HallOfFameDto> {
@@ -346,8 +393,6 @@ async function buildTopScorers() {
 async function buildBestBuyers() {
   const players = await prisma.teamMember.findMany({
     where: { role: "PLAYER", leftAt: null },
-    orderBy: { fantasyValue: "desc" },
-    take: 5,
     select: { id: true, user: { select: { name: true, surname: true } } },
   });
   const result = await Promise.all(

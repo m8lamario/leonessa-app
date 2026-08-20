@@ -34,6 +34,7 @@ export async function getFantasyDashboardData(userId: string) {
             select: {
               id: true,
               fantasyRole: true,
+              fantasyStat: { select: { totalPoints: true, goals: true, assists: true } },
               user: { select: { name: true, surname: true } },
               team: { select: { school: { select: { shortName: true, name: true } } } },
             },
@@ -62,6 +63,7 @@ export async function getFantasyDashboardData(userId: string) {
         deletedAt: null,
         status: { in: ["SCHEDULED", "LIVE"] },
         startAt: { gte: new Date() },
+        competition: { slug: "leonessa-cup" },
       },
       select: {
         id: true,
@@ -77,32 +79,73 @@ export async function getFantasyDashboardData(userId: string) {
       select: {
         id: true,
         fantasyValue: true,
+        fantasyStat: { select: { totalPoints: true } },
+        valueHistory: { orderBy: { createdAt: "desc" }, take: 1, select: { oldValue: true } },
+        _count: { select: { fantasySelections: true } },
         user: { select: { name: true, surname: true } },
         team: { select: { school: { select: { shortName: true } } } },
       },
       orderBy: { fantasyValue: "desc" },
-      take: 3,
+      take: 20,
     }),
   ]);
 
-  const position = rankingTeams.findIndex((item) => item.id === team.id) + 1;
-  const roster = team.players.map((entry, index) => ({
+  const position =
+    rankingTeams.findIndex((item) => item.id === team.id) >= 0
+      ? rankingTeams.findIndex((item) => item.id === team.id) + 1
+      : (await prisma.fantasyTeam.count({
+          where: {
+            OR: [
+              { totalPoints: { gt: team.totalPoints } },
+              { totalPoints: team.totalPoints, createdAt: { lt: team.createdAt } },
+            ],
+          },
+        })) + 1;
+  const latestScore = await prisma.fantasyScore.findFirst({
+    where: { fantasyTeamId: team.id },
+    orderBy: { createdAt: "desc" },
+    select: { points: true },
+  });
+  const roster = team.players.map((entry) => ({
     id: entry.id,
     name:
       [entry.player.user.name, entry.player.user.surname].filter(Boolean).join(" ") || "Giocatore",
     school: entry.player.team.school.shortName,
     role: entry.role,
     isCaptain: entry.isCaptain,
-    totalPoints: 90 + ((index * 37 + entry.purchaseCost) % 150),
-    matchPoints: 12 + ((index * 13 + entry.purchaseCost) % 48),
-    goals: index % 5 === 0 ? 1 : 0,
-    assists: index % 4 === 0 ? 1 : 0,
+    totalPoints: entry.player.fantasyStat?.totalPoints ?? 0,
+    matchPoints: entry.player.fantasyStat?.totalPoints ?? 0,
+    goals: entry.player.fantasyStat?.goals ?? 0,
+    assists: entry.player.fantasyStat?.assists ?? 0,
   }));
+
+  const mostSelected = [...featuredPlayers].sort(
+    (a, b) => b._count.fantasySelections - a._count.fantasySelections,
+  )[0];
+  const fastestRising = [...featuredPlayers].sort((a, b) => {
+    const aChange = a.valueHistory[0] ? a.fantasyValue - a.valueHistory[0].oldValue : 0;
+    const bChange = b.valueHistory[0] ? b.fantasyValue - b.valueHistory[0].oldValue : 0;
+    return bChange - aChange;
+  })[0];
+  const currentMvp = [...featuredPlayers].sort(
+    (a, b) => (b.fantasyStat?.totalPoints ?? 0) - (a.fantasyStat?.totalPoints ?? 0),
+  )[0];
+  const discoveryEntries = [
+    mostSelected ? { player: mostSelected, label: "🔥 Più scelto" } : null,
+    fastestRising ? { player: fastestRising, label: "📈 In crescita" } : null,
+    currentMvp ? { player: currentMvp, label: "⭐ MVP attuale" } : null,
+  ].filter((entry): entry is { player: (typeof featuredPlayers)[number]; label: string } =>
+    Boolean(entry),
+  );
+  const uniqueDiscoveries = discoveryEntries.filter(
+    (entry, index, items) =>
+      items.findIndex((item) => item.player.id === entry.player.id) === index,
+  );
 
   return {
     team: { id: team.id, name: team.name, budgetLp: team.budgetLp, totalPoints: team.totalPoints },
     position: position || rankingTeams.length + 1,
-    lastMatchPoints: roster.reduce((sum, player) => sum + player.matchPoints, 0),
+    lastMatchPoints: latestScore?.points ?? 0,
     roster,
     ranking: rankingTeams.map((item, index) => ({
       position: index + 1,
@@ -116,9 +159,9 @@ export async function getFantasyDashboardData(userId: string) {
       away: match.awayTeam.name,
       startAt: match.startAt.toISOString(),
     })),
-    discoveries: featuredPlayers.map((player, index) => ({
+    discoveries: uniqueDiscoveries.map(({ player, label }) => ({
       id: player.id,
-      label: ["🔥 Più scelto", "📈 In crescita", "⭐ MVP attuale"][index],
+      label,
       name: [player.user.name, player.user.surname].filter(Boolean).join(" ") || "Giocatore",
       school: player.team.school.shortName,
       value: player.fantasyValue,
