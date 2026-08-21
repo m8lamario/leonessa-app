@@ -11,7 +11,6 @@ import {
   Plus,
   RefreshCw,
   Shield,
-  ShoppingBag,
   UserRound,
   X,
 } from "lucide-react";
@@ -20,12 +19,7 @@ import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "r
 
 import * as haptics from "@/shared/lib/haptics/haptics";
 import { networkErrorMessage, readApiErrorMessage } from "../lib/market-feedback";
-import {
-  BUDGET_INSUFFICIENT_LABEL,
-  evaluateSellToVacancy,
-  getRealTransferCost,
-  getTransfersUsed,
-} from "../lib/transfer-cost";
+import { evaluateSellToVacancy, getTransfersUsed } from "../lib/transfer-cost";
 import { validateEditableLineup } from "../lib/lineup-validation";
 import type { FantasyRole } from "../types";
 import styles from "./lineup-experience.module.css";
@@ -105,7 +99,6 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
   const [noticeKind, setNoticeKind] = useState<"success" | "error">("success");
   const [selected, setSelected] = useState<SelectedPlayer | null>(null);
   const [swapStarter, setSwapStarter] = useState<LineupPlayer | null>(null);
-  const [activeVacancy, setActiveVacancy] = useState<LineupVacancy | null>(null);
   const [drag, setDrag] = useState<{
     benchPlayerId: string;
     role: string;
@@ -183,7 +176,6 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
 
       setSelected(null);
       setSwapStarter(null);
-      setActiveVacancy(null);
       setNoticeKind("success");
       setNotice(successMessage);
       void haptics.success();
@@ -213,6 +205,10 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
       { action: "reorder-bench", orderedBenchPlayerIds: ordered },
       "Ordine panchina aggiornato.",
     );
+  }
+
+  function goToMarketBuy(role: string) {
+    router.push(`/fanta/market?role=${encodeURIComponent(role)}#browse` as never);
   }
 
   function resolveDropTarget(clientX: number, clientY: number) {
@@ -427,7 +423,7 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                         dropId={vacancy.id}
                         dropKind="vacancy"
                         key={vacancy.id}
-                        onClick={() => setActiveVacancy(vacancy)}
+                        onClick={() => goToMarketBuy(vacancy.role)}
                         role={vacancy.role}
                       />
                     );
@@ -520,7 +516,7 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                   compact
                   disabled={!isOpen || busy}
                   key={vacancy.id}
-                  onClick={() => setActiveVacancy(vacancy)}
+                  onClick={() => goToMarketBuy(vacancy.role)}
                   role={vacancy.role}
                 />
               ))}
@@ -567,84 +563,6 @@ export function LineupExperience({ lineup }: { lineup: LineupExperienceData }) {
                   <strong>Entra</strong>
                 </button>
               ))}
-          </div>
-        </section>
-      )}
-
-      {activeVacancy && (
-        <section className={styles.selectionPanel} aria-label="Completa lo slot vuoto">
-          <div className={styles.panelHeading}>
-            <div>
-              <p className={styles.kicker}>Slot {roleLabels[activeVacancy.role]}</p>
-              <h3>Completa la formazione</h3>
-            </div>
-            <button onClick={() => setActiveVacancy(null)} type="button">
-              <X size={18} />
-            </button>
-          </div>
-          {activeVacancy.status === "STARTER" &&
-            bench
-              .filter((player) => player.role === activeVacancy.role)
-              .map((player) => (
-                <button
-                  className={styles.promoteReserve}
-                  disabled={busy || !isOpen}
-                  key={player.id}
-                  onClick={() =>
-                    void request(
-                      {
-                        action: "promote-bench",
-                        benchPlayerId: player.playerId,
-                        vacancyId: activeVacancy.id,
-                      },
-                      `${player.name} entra tra i titolari.`,
-                    )
-                  }
-                  type="button"
-                >
-                  <RefreshCw aria-hidden="true" size={16} />
-                  Usa la riserva {player.name}
-                </button>
-              ))}
-          <p className={styles.poolTitle}>
-            <ShoppingBag aria-hidden="true" size={15} /> Mercato · {team.budgetLp} LP disponibili
-          </p>
-          <div className={styles.choiceList}>
-            {lineup.pool
-              .filter((player) => player.role === activeVacancy.role && !player.owned)
-              .map((player) => {
-                const cost = getRealTransferCost(player.fantasyValue, transfersUsed);
-                const unaffordable = cost.total > team.budgetLp;
-                return (
-                  <button
-                    className={unaffordable ? styles.choiceUnaffordable : undefined}
-                    disabled={busy || !isOpen || unaffordable}
-                    key={player.id}
-                    onClick={() => {
-                      if (unaffordable) {
-                        setNoticeKind("error");
-                        setNotice(BUDGET_INSUFFICIENT_LABEL);
-                        return;
-                      }
-                      void request(
-                        { action: "buy-vacancy", playerId: player.id, vacancyId: activeVacancy.id },
-                        `${player.name} è entrato in rosa.`,
-                      );
-                    }}
-                    type="button"
-                  >
-                    <span>
-                      <b>{player.name}</b>
-                      <small>
-                        {player.school} · {roleLabels[player.role]}
-                        {cost.fee > 0 ? ` · +${cost.fee} comm.` : ""}
-                        {unaffordable ? ` · ${BUDGET_INSUFFICIENT_LABEL}` : ""}
-                      </small>
-                    </span>
-                    <strong>{unaffordable ? BUDGET_INSUFFICIENT_LABEL : `${cost.total} LP`}</strong>
-                  </button>
-                );
-              })}
           </div>
         </section>
       )}

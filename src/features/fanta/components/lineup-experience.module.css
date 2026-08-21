@@ -12,9 +12,16 @@
 .confirmation > div,
 .actionSheetHeader,
 .actionSheetHeader > div,
-.panelHeading,
-.poolTitle,
-.promoteReserve {
+.header,
+.budget,
+.statusOpen,
+.statusClosed,
+.benchHeading,
+.confirmation,
+.confirmation > div,
+.actionSheetHeader,
+.actionSheetHeader > div,
+.panelHeading {
   display: flex;
   align-items: center;
 }
@@ -629,10 +636,6 @@
   opacity: 0.48;
 }
 
-.choiceUnaffordable {
-  filter: grayscale(0.72) brightness(0.62);
-}
-
 .choiceList span {
   display: flex;
   min-width: 0;
@@ -658,28 +661,6 @@
   color: #bfcaff;
   font-size: 0.65rem;
   white-space: nowrap;
-}
-
-.promoteReserve {
-  justify-content: center;
-  gap: 7px;
-  min-height: 42px;
-  border: 1px solid rgb(34 197 94 / 42%);
-  border-radius: 10px;
-  background: rgb(34 197 94 / 13%);
-  color: #b7f1c8;
-  font-size: 0.76rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.poolTitle {
-  gap: 6px;
-  margin: 2px 0 -4px;
-  color: #bfcaff;
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
 }
 
 .confirmation {

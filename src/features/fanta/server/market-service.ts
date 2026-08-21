@@ -110,25 +110,37 @@ function badgeOf(player: { fantasyValue: number; _marketChange?: number; _squadC
   return "deal";
 }
 
-export async function getMarketStatus(now = new Date()): Promise<MarketStatusDto> {
-  const nextMatch = await prisma.match.findFirst({
+export async function getMarketStatus(
+  now = new Date(),
+): Promise<MarketStatusDto> {
+  const blockingMatch = await prisma.match.findFirst({
     where: {
       deletedAt: null,
-      status: { in: ["SCHEDULED", "LIVE"] },
-      startAt: { gte: now },
+      startAt: {
+        gte: new Date(now.getTime() - 60 * 60_000),
+        lte: new Date(now.getTime() + 30 * 60_000),
+      },
     },
     orderBy: { startAt: "asc" },
     select: { startAt: true },
   });
 
-  if (!nextMatch) {
-    return { open: true, closesAt: null, nextKickoff: null };
+  if (!blockingMatch) {
+    return {
+      open: true,
+      closesAt: null,
+      nextKickoff: null,
+    };
   }
 
-  const closesAt = new Date(
-    nextMatch.startAt.getTime() - MARKET.marketClosesBeforeKickoffMinutes * 60_000,
-  );
-  return { open: now < closesAt, closesAt, nextKickoff: nextMatch.startAt };
+  return {
+    open: false,
+    closesAt: new Date(
+      blockingMatch.startAt.getTime() -
+        MARKET.marketClosesBeforeKickoffMinutes * 60_000,
+    ),
+    nextKickoff: blockingMatch.startAt,
+  };
 }
 
 export async function ensureCurrentMatchday(
