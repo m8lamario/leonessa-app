@@ -28,6 +28,12 @@ const ACTIONS: Action[] = [
     endpoint: "/api/dev/simulate-notification",
   },
   {
+    key: "match-started",
+    label: "Simula Match Started",
+    emoji: "🔴",
+    endpoint: "/api/dev/simulate-match-started",
+  },
+  {
     key: "achievement",
     label: "Simula achievement",
     emoji: "🏅",
@@ -53,6 +59,23 @@ export function SandboxPanel() {
       }
     } catch {
       setLog((prev) => [`❌ ${action.label}: errore di rete`, ...prev].slice(0, 30));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function loadPushDebug() {
+    setBusy("push-debug");
+    try {
+      const response = await fetch("/api/dev/simulate-match-started", { method: "GET" });
+      const body = await response.json();
+      if (!response.ok) {
+        setLog((prev) => [`❌ Push debug: ${body.message ?? "errore"}`, ...prev].slice(0, 30));
+      } else {
+        setLog((prev) => [`✅ Push debug → ${JSON.stringify(body.result ?? {})}`, ...prev].slice(0, 30));
+      }
+    } catch {
+      setLog((prev) => [`❌ Push debug: errore di rete`, ...prev].slice(0, 30));
     } finally {
       setBusy(null);
     }
@@ -108,6 +131,16 @@ export function SandboxPanel() {
               )}
             </button>
           ))}
+          <button
+            className={styles.actionCard}
+            disabled={busy !== null}
+            onClick={() => void loadPushDebug()}
+            type="button"
+          >
+            <span className={styles.actionEmoji}>📱</span>
+            <strong>Debug push / follow</strong>
+            {busy === "push-debug" ? <em>Esecuzione…</em> : <RefreshCw aria-hidden="true" size={14} />}
+          </button>
         </div>
       </section>
 

@@ -38,7 +38,11 @@ export type DashboardFeaturedMatch = {
   awayTeam: string;
   schedule: string;
   venue: string;
+  /** Display label for the badge (e.g. LIVE / IN PROGRAMMA). */
   status: string;
+  matchStatus: "SCHEDULED" | "LIVE" | "FINISHED" | "CANCELLED";
+  startAt: string;
+  following: boolean;
 };
 
 export type DashboardData = {

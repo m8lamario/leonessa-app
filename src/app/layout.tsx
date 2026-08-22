@@ -5,6 +5,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { MotionProvider } from "@/providers/motion-provider";
 import { DeepLinkListener } from "@/features/auth/components/deep-link-listener";
+import { PushRuntime } from "@/features/notifications/components/push-runtime";
 
 import "./globals.css";
 
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </svg>
         <AuthProvider>
           <DeepLinkListener />
+          <PushRuntime />
           <QueryProvider>
             <MotionProvider>{children}</MotionProvider>
           </QueryProvider>

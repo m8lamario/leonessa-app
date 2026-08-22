@@ -10,6 +10,7 @@ import {
   EmailVerificationBanner,
   type EmailVerificationBannerStatus,
 } from "@/features/auth/components/email-verification-banner";
+import { MatchFollowButton } from "@/features/notifications/components/match-follow-button";
 import { Logo, PageContainer } from "@/shared/components";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import type { DashboardData } from "../types";
@@ -108,9 +109,17 @@ export function UserDashboard({
           )}
         </div>
         <div className={styles.heroActions}>
-          <a className={styles.primaryAction} href="#featured-match">
-            Segui partita
-          </a>
+          {featuredMatch ? (
+            <MatchFollowButton
+              className={styles.primaryAction}
+              initialFollowing={featuredMatch.following}
+              matchId={featuredMatch.id}
+              startAt={featuredMatch.startAt}
+              status={featuredMatch.matchStatus}
+            />
+          ) : (
+            <span className={styles.primaryAction}>Nessuna partita</span>
+          )}
           {school.teamId ? (
             <Link className={styles.secondaryAction} href={`/team/${school.teamId}`}>
               Vedi squadra
@@ -156,9 +165,13 @@ export function UserDashboard({
                   <dd>{featuredMatch.venue}</dd>
                 </div>
               </dl>
-              <a className={styles.fullAction} href="#missions">
-                Segui partita
-              </a>
+              <MatchFollowButton
+                className={styles.fullAction}
+                initialFollowing={featuredMatch.following}
+                matchId={featuredMatch.id}
+                startAt={featuredMatch.startAt}
+                status={featuredMatch.matchStatus}
+              />
             </article>
           ) : (
             <article className={styles.matchCard}>

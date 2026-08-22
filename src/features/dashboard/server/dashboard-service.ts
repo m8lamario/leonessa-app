@@ -104,10 +104,16 @@ function getNewsVisual(type: "ARTICLE" | "ANNOUNCEMENT" | "MATCH_REPORT") {
 
 function mapFeaturedMatch(
   match: DashboardFeaturedMatchRow | null,
+  following: boolean,
+  now = new Date(),
 ): DashboardData["featuredMatch"] {
   if (!match) {
     return null;
   }
+
+  const kickoffPassed = match.startAt.getTime() <= now.getTime();
+  const matchStatus =
+    match.status === "SCHEDULED" && kickoffPassed ? "LIVE" : match.status;
 
   return {
     id: match.id,
@@ -115,7 +121,15 @@ function mapFeaturedMatch(
     awayTeam: match.awayTeam.name,
     schedule: formatDateTime(match.startAt),
     venue: match.venue ?? "Sede da comunicare",
-    status: match.status === "LIVE" ? "LIVE" : "IN PROGRAMMA",
+    status:
+      matchStatus === "LIVE"
+        ? "LIVE"
+        : matchStatus === "FINISHED"
+          ? "FINITA"
+          : "IN PROGRAMMA",
+    matchStatus,
+    startAt: match.startAt.toISOString(),
+    following,
   };
 }
 
@@ -283,13 +297,24 @@ export async function getDashboardData(
     : null;
   const totalLp = balance?.balance ?? 0;
 
+  const following = featuredMatch
+    ? Boolean(
+        await prisma.followedMatch.findUnique({
+          where: {
+            userId_matchId: { userId, matchId: featuredMatch.id },
+          },
+          select: { id: true },
+        }),
+      )
+    : false;
+
   return {
     school: {
       position: currentSchoolPosition,
       points: currentSchoolRanking?.totalPoints ?? 0,
       teamId: currentTeam?.id ?? null,
     },
-    featuredMatch: mapFeaturedMatch(featuredMatch),
+    featuredMatch: mapFeaturedMatch(featuredMatch, following),
     missions: userMissions.map(mapMission),
     schoolRanking: ranking.map<DashboardRankingEntry>((entry) => ({
       id: entry.schoolId,

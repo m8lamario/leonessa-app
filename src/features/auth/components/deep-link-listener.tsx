@@ -5,6 +5,8 @@ import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { resolveAppPathFromDeepLink } from "@/features/notifications";
+
 function getVerificationDestination(url: string) {
   const parsed = new URL(url);
   const path =
@@ -24,6 +26,10 @@ function getVerificationDestination(url: string) {
   return `${path}?token=${encodeURIComponent(token)}`;
 }
 
+function getDeepLinkDestination(url: string) {
+  return getVerificationDestination(url) ?? resolveAppPathFromDeepLink(url);
+}
+
 export function DeepLinkListener() {
   const router = useRouter();
 
@@ -33,7 +39,7 @@ export function DeepLinkListener() {
     }
 
     const navigate = (url: string) => {
-      const destination = getVerificationDestination(url);
+      const destination = getDeepLinkDestination(url);
 
       if (destination) {
         router.replace(destination as never);

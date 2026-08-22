@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   typedRoutes: true,
   allowedDevOrigins: ["192.168.1.75"],
+  // Prevent Turbopack from bundling multiple @opentelemetry/api copies (Sentry OTel
+  // instrumentation otherwise stacks close listeners on ServerResponse).
+  serverExternalPackages: ["@opentelemetry/api"],
 };
 
 export default withSentryConfig(nextConfig, {

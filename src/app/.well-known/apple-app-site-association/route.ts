@@ -17,7 +17,7 @@ export function GET() {
         details: [
           {
             appID: `${env.APPLE_TEAM_ID}.it.leonessa.platform`,
-            paths: ["/verify-email*", "/reset-password*"],
+            paths: ["/verify-email*", "/reset-password*", "/live*"],
           },
         ],
       },

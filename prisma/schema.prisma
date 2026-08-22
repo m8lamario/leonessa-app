@@ -28,10 +28,12 @@ model User {
   createdCompetitions Competition[]               @relation("CompetitionCreator")
   eventAttendances    EventAttendance[]
   authoredNews        NewsArticle[]
-  notifications       Notification[]
-  pointTransactions   PointTransaction[]
-  pushDevices         PushDevice[]
-  sessions            Session[]
+  notifications           Notification[]
+  notificationDeliveries  NotificationDelivery[]
+  followedMatches         FollowedMatch[]
+  pointTransactions       PointTransaction[]
+  pushDevices             PushDevice[]
+  sessions                Session[]
   createdShifts       Shift[]                     @relation("ShiftCreator")
   shiftAssignments    ShiftAssignment[]
   teamApplications    TeamApplication[]
@@ -458,9 +460,11 @@ model Match {
   awayTeam              Team                   @relation("AwayTeam", fields: [awayTeamId], references: [id])
   competition           Competition            @relation(fields: [competitionId], references: [id])
   homeTeam              Team                   @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  events                MatchEvent[]
-  fantasyProcessedMatch FantasyProcessedMatch?
-  fantasySubstitutions  FantasySubstitution[]
+  events                   MatchEvent[]
+  fantasyProcessedMatch    FantasyProcessedMatch?
+  fantasySubstitutions     FantasySubstitution[]
+  followedBy               FollowedMatch[]
+  notificationDeliveries   NotificationDelivery[]
 
   @@index([competitionId, startAt])
   @@index([homeTeamId])
@@ -706,16 +710,56 @@ model Notification {
 }
 
 model PushDevice {
-  id         String    @id @default(uuid())
-  userId     String
-  token      String    @unique
-  platform   String
-  lastSeenAt DateTime  @default(now())
-  createdAt  DateTime  @default(now())
-  revokedAt  DateTime?
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                     String                  @id @default(uuid())
+  userId                 String
+  token                  String                  @unique
+  platform               String
+  enabled                Boolean                 @default(true)
+  lastSeenAt             DateTime                @default(now())
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  revokedAt              DateTime?
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationDeliveries NotificationDelivery[]
 
+  @@index([userId, enabled])
   @@index([userId, revokedAt])
+}
+
+model FollowedMatch {
+  id        String   @id @default(uuid())
+  userId    String
+  matchId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+  @@index([matchId])
+  @@index([userId, createdAt])
+}
+
+model NotificationDelivery {
+  id               String      @id @default(uuid())
+  idempotencyKey   String      @unique
+  userId           String
+  deviceId         String?
+  matchId          String?
+  notificationType String
+  status           String
+  title            String?
+  body             String?
+  linkUrl          String?
+  error            String?
+  createdAt        DateTime    @default(now())
+  sentAt           DateTime?
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device           PushDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  match            Match?      @relation(fields: [matchId], references: [id], onDelete: SetNull)
+
+  @@index([matchId, notificationType])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }
 
 model NewsArticle {
