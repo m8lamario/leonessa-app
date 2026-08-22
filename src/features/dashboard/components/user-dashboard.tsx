@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
-import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -11,8 +10,7 @@ import {
   type EmailVerificationBannerStatus,
 } from "@/features/auth/components/email-verification-banner";
 import { MatchFollowButton } from "@/features/notifications/components/match-follow-button";
-import { Logo, PageContainer } from "@/shared/components";
-import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
+import { PageContainer } from "@/shared/components";import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
 import type { DashboardData } from "../types";
 import styles from "../dashboard.module.css";
 
@@ -51,29 +49,8 @@ export function UserDashboard({
 
   return (
     <PageContainer className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
-      <m.header
-        className={styles.brandHeader}
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={revealTransition}
-      >
-        <Logo />
-        <div className={styles.brandActions}>
-          <a
-            aria-label="Visualizza aggiornamenti"
-            className={styles.notificationLink}
-            href="#news-title"
-          >
-            <Bell aria-hidden="true" size={21} strokeWidth={2} />
-          </a>
-          <Link className={styles.avatar} href="/profile" aria-label="Apri il tuo profilo">
-            {userInitials}
-          </Link>
-        </div>
-      </m.header>
       {verificationStatus && <EmailVerificationBanner initialStatus={verificationStatus} />}
-      <m.header
-        className={styles.hero}
+      <m.header        className={styles.hero}
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={revealTransition}

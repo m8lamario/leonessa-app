@@ -87,7 +87,7 @@ const ROLES = [
   "ATTACCANTE",
   "ATTACCANTE",
 ];
-const BASE_VALUES = { PORTIERE: 20, DIFENSORE: 25, CENTROCAMPISTA: 30, ATTACCANTE: 35 };
+const BASE_VALUES = { PORTIERE: 5, DIFENSORE: 5, CENTROCAMPISTA: 5, ATTACCANTE: 5 };
 
 const LEONESSA_SLUG = "leonessa-cup-sandbox";
 
@@ -200,7 +200,7 @@ async function generatePlayers(schools, teams, random) {
           role: "PLAYER",
           leftAt: null,
           fantasyRole,
-          fantasyValue: BASE_VALUES[fantasyRole] + Math.floor(random() * 20),
+          fantasyValue: 5,
           jerseyNumber: null,
           schoolYear: `${1 + Math.floor(random() * 5)}`,
         },
@@ -209,7 +209,7 @@ async function generatePlayers(schools, teams, random) {
           userId: user.id,
           role: "PLAYER",
           fantasyRole,
-          fantasyValue: BASE_VALUES[fantasyRole] + Math.floor(random() * 20),
+          fantasyValue: 5,
           jerseyNumber: null,
           schoolYear: `${1 + Math.floor(random() * 5)}`,
         },

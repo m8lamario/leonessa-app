@@ -1,0 +1,4 @@
+.content {
+  --page-top-spacing: var(--space-md);
+  padding-top: var(--app-top-nav-height);
+}

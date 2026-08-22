@@ -1,0 +1,79 @@
+.overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding:
+    max(var(--space-xl), var(--safe-area-top))
+    max(var(--space-xl), env(safe-area-inset-right, 0px))
+    max(var(--space-xl), var(--safe-area-bottom))
+    max(var(--space-xl), env(safe-area-inset-left, 0px));
+  background:
+    radial-gradient(ellipse at 50% 42%, rgb(48 92 255 / 16%), transparent 54%),
+    linear-gradient(165deg, rgb(13 27 96 / 45%), transparent 58%),
+    var(--color-background-deep);
+  pointer-events: auto;
+  touch-action: none;
+  will-change: opacity, transform;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  width: min(72vw, 220px);
+  place-items: center;
+  gap: var(--space-lg);
+}
+
+.markWrap {
+  position: relative;
+  display: grid;
+  width: clamp(88px, 28vw, 132px);
+  aspect-ratio: 1986 / 2744;
+  place-items: center;
+}
+
+.ring {
+  position: absolute;
+  inset: -22%;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 28px rgb(48 92 255 / 22%),
+    inset 0 0 16px rgb(48 92 255 / 10%);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.mark {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 28px rgb(0 0 0 / 35%));
+  will-change: opacity, transform;
+}
+
+.wordmark {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-family-display);
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .ring,
+  .mark,
+  .wordmark {
+    will-change: auto;
+  }
+}

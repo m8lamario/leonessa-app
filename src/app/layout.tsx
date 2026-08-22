@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 
 import { AuthProvider } from "@/providers/auth-provider";
@@ -6,6 +6,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { MotionProvider } from "@/providers/motion-provider";
 import { DeepLinkListener } from "@/features/auth/components/deep-link-listener";
 import { PushRuntime } from "@/features/notifications/components/push-runtime";
+import { LeonessaPulseGate } from "@/shared/components";
 
 import "./globals.css";
 
@@ -25,6 +26,12 @@ const bebasNeue = Bebas_Neue({
 export const metadata: Metadata = {
   title: "Leonessa",
   description: "La piattaforma ufficiale della Leonessa Cup.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -61,7 +68,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <DeepLinkListener />
           <PushRuntime />
           <QueryProvider>
-            <MotionProvider>{children}</MotionProvider>
+            <MotionProvider>
+              <LeonessaPulseGate>{children}</LeonessaPulseGate>
+            </MotionProvider>
           </QueryProvider>
         </AuthProvider>
       </body>

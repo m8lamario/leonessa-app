@@ -384,7 +384,7 @@ function TeamContent({
           viewer={team.viewer}
         />
 
-        <section aria-label="Approfondimenti sul sito ufficiale" className={styles.officialLinks}>
+        <section aria-label="Approfondimenti sul sito ufficiale" className={styles.ialLinks}>
           <a href="https://estudentsleague.com/" rel="noreferrer" target="_blank">
             Visualizza classifica completa
             <ExternalLink aria-hidden="true" size={16} />

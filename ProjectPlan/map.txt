@@ -8,3 +8,5 @@ Dashboard Utente
 
 GENERALI:
 - Notifiche push
+- pre loading grafico
+- controllare lighthouse per tutte le pagine

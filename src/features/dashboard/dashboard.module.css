@@ -2,40 +2,6 @@
   min-width: 0;
 }
 
-.brandHeader,
-.brandActions {
-  display: flex;
-  align-items: center;
-}
-
-.brandHeader {
-  justify-content: space-between;
-  gap: var(--space-md);
-  min-height: 44px;
-}
-
-.brandActions {
-  gap: 10px;
-}
-
-.notificationLink,
-.avatar {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid rgb(198 204 218 / 20%);
-  border-radius: 50%;
-  background: rgb(19 30 82 / 72%);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.notificationLink {
-  color: var(--color-text-secondary);
-}
-
 .hero {
   margin-top: var(--space-md);
   position: relative;

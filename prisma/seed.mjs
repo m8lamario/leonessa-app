@@ -111,7 +111,7 @@ async function main() {
     "Galli",
     "Conti",
   ];
-  const baseValues = { PORTIERE: 20, DIFENSORE: 25, CENTROCAMPISTA: 35, ATTACCANTE: 45 };
+  const baseValues = { PORTIERE: 5, DIFENSORE: 5, CENTROCAMPISTA: 5, ATTACCANTE: 5 };
 
   await Promise.all(
     roles.map(async (fantasyRole, index) => {
@@ -139,14 +139,14 @@ async function main() {
           role: "PLAYER",
           leftAt: null,
           fantasyRole,
-          fantasyValue: baseValues[fantasyRole] + (index % 5) * 5,
+          fantasyValue: 5,
         },
         create: {
           teamId: team.id,
           userId: user.id,
           role: "PLAYER",
           fantasyRole,
-          fantasyValue: baseValues[fantasyRole] + (index % 5) * 5,
+          fantasyValue: 5,
         },
       });
     }),

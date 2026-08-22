@@ -1,0 +1,54 @@
+.nav {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  right: max(0px, calc((100vw - 720px) / 2));
+  left: max(0px, calc((100vw - 720px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: var(--app-top-nav-bar-height);
+  padding:
+    max(var(--space-sm), var(--safe-area-top))
+    max(var(--space-md), env(safe-area-inset-right, 0px))
+    var(--space-sm)
+    max(var(--space-md), env(safe-area-inset-left, 0px));
+  backdrop-filter: blur(3px);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav {
+    background: rgb(6 15 51 / 94%);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notificationLink,
+.avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(198 204 218 / 20%);
+  border-radius: 50%;
+  background: rgb(19 30 82 / 72%);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.notificationLink {
+  color: var(--color-text-secondary);
+}
+
+.avatar {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
