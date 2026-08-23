@@ -1,8 +1,17 @@
 "use client";
 
-import { Award, Flame, Medal, Swords, Target, TrendingUp, Trophy } from "lucide-react";
+import {
+  Award,
+  Flame,
+  Medal,
+  Swords,
+  Target,
+  TrendingUp,
+  Trophy,
+} from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
+import { FantaIcon } from "./fanta-icons";
 import styles from "./social-dashboard.module.css";
 
 type ActivityDto = {
@@ -11,12 +20,12 @@ type ActivityDto = {
   title: string;
   description: string | null;
   createdAt: string;
-  emoji: string;
+  icon: string;
 };
 
 type AchievementDto = {
   code: string;
-  emoji: string;
+  icon: string;
   title: string;
   description: string;
   unlocked: boolean;
@@ -50,7 +59,7 @@ type SocialData = {
 
 type SocialDashboardProps = { social: SocialData };
 
-const podium = ["🥇", "🥈", "🥉"];
+const podiumIcons = ["medal", "medal", "medal"] as const;
 
 export function SocialDashboard({ social }: SocialDashboardProps) {
   const unlockedCount = social.achievements.filter((a) => a.unlocked).length;
@@ -81,12 +90,15 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
         <div className={styles.activityList}>
           {social.activity.length === 0 && (
             <p className={styles.emptyState}>
-              Nessuna attività recente. La community sta per scaldarsi 🔥
+              Nessuna attività recente. La community sta per scaldarsi{" "}
+              <FantaIcon className={styles.inlineIcon} name="flame" size={14} />
             </p>
           )}
           {social.activity.map((activity) => (
             <article className={styles.activityCard} key={activity.id}>
-              <span className={styles.activityEmoji}>{activity.emoji}</span>
+              <span className={styles.activityEmoji}>
+                <FantaIcon name={activity.icon} size={18} />
+              </span>
               <div>
                 <p>{activity.title}</p>
                 {activity.description && <small>{activity.description}</small>}
@@ -108,7 +120,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
         <div className={styles.podiumList}>
           {social.topPerformers.map((team, index) => (
             <article className={styles.podiumRow} key={team.name}>
-              <span className={styles.podiumMedal}>{podium[index] ?? "🎖️"}</span>
+              <span className={styles.podiumMedal}>
+                <FantaIcon name={podiumIcons[index] ?? "award"} size={18} />
+              </span>
               <span className={styles.podiumName}>{team.name}</span>
               <b>+{team.points}</b>
             </article>
@@ -129,7 +143,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
             <Medal aria-hidden="true" size={20} />
           </div>
           <article className={styles.mvpCard}>
-            <span className={styles.mvpIcon}>⭐</span>
+            <span className={styles.mvpIcon}>
+              <FantaIcon name="star" size={18} />
+            </span>
             <div>
               <strong>{social.mvp.name}</strong>
               <small>{social.mvp.school}</small>
@@ -178,7 +194,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
               }
               key={achievement.code}
             >
-              <span>{achievement.emoji}</span>
+              <span>
+                <FantaIcon name={achievement.icon} size={20} />
+              </span>
               <strong>{achievement.title}</strong>
               <small>{achievement.description}</small>
               {!achievement.unlocked && <em>Bloccato</em>}
@@ -220,7 +238,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
         <div className={styles.hofList}>
           {social.hallOfFame.bestMatchday && (
             <div className={styles.hofRow}>
-              <span>🏆 Miglior punteggio giornata</span>
+              <span className={styles.hofLabel}>
+                <FantaIcon name="trophy" size={14} /> Miglior punteggio giornata
+              </span>
               <b>
                 {social.hallOfFame.bestMatchday.teamName} · {social.hallOfFame.bestMatchday.points}
               </b>
@@ -228,7 +248,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
           )}
           {social.hallOfFame.topGoals && (
             <div className={styles.hofRow}>
-              <span>⚽ Maggior numero di gol</span>
+              <span className={styles.hofLabel}>
+                <FantaIcon name="goal" size={14} /> Maggior numero di gol
+              </span>
               <b>
                 {social.hallOfFame.topGoals.playerName} · {social.hallOfFame.topGoals.goals}
               </b>
@@ -236,7 +258,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
           )}
           {social.hallOfFame.biggestGrowth && (
             <div className={styles.hofRow}>
-              <span>📈 Maggior crescita valore</span>
+              <span className={styles.hofLabel}>
+                <FantaIcon name="trending-up" size={14} /> Maggior crescita valore
+              </span>
               <b>
                 {social.hallOfFame.biggestGrowth.playerName} · +
                 {social.hallOfFame.biggestGrowth.growth} LP
@@ -245,7 +269,9 @@ export function SocialDashboard({ social }: SocialDashboardProps) {
           )}
           {social.hallOfFame.topWins && (
             <div className={styles.hofRow}>
-              <span>👑 Utente più vincente</span>
+              <span className={styles.hofLabel}>
+                <FantaIcon name="crown" size={14} /> Utente più vincente
+              </span>
               <b>
                 {social.hallOfFame.topWins.userName} · {social.hallOfFame.topWins.points}
               </b>

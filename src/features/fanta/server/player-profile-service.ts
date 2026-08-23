@@ -28,7 +28,7 @@ export type PlayerProfileDto = {
     redCards: number;
     cleanSheets: number;
   };
-  badges: Array<{ key: string; label: string; emoji: string }>;
+  badges: Array<{ key: string; label: string; icon: string }>;
   market: {
     ownedCount: number;
     ownedPercentage: number;
@@ -141,24 +141,24 @@ function buildBadges(input: {
   const badges: PlayerProfileDto["badges"] = [];
 
   if (input.isVerifiedPlayer) {
-    badges.push({ key: "verified", label: "Giocatore Verificato", emoji: "✅" });
+    badges.push({ key: "verified", label: "Giocatore Verificato", icon: "badge-check" });
   }
   if (input.matches === 0) {
-    badges.push({ key: "rookie", label: "Rookie", emoji: "🆕" });
+    badges.push({ key: "rookie", label: "Rookie", icon: "sparkles" });
   }
   if (input.goals > 0) {
-    badges.push({ key: "bomber", label: "Bomber", emoji: "⚽" });
+    badges.push({ key: "bomber", label: "Bomber", icon: "goal" });
   }
   if (input.assists > 0) {
-    badges.push({ key: "assistman", label: "Assist Man", emoji: "🎯" });
+    badges.push({ key: "assistman", label: "Assist Man", icon: "target" });
   }
   if (input.cleanSheets > 0) {
-    badges.push({ key: "wall", label: "Muro", emoji: "🧱" });
+    badges.push({ key: "wall", label: "Muro", icon: "brick-wall" });
   }
   if (input.ownedPercentage >= 25) {
-    badges.push({ key: "hot", label: "Molto Scelto", emoji: "🔥" });
+    badges.push({ key: "hot", label: "Molto Scelto", icon: "flame" });
   } else if (input.ownedPercentage >= 10) {
-    badges.push({ key: "popular", label: "Popolare", emoji: "⭐" });
+    badges.push({ key: "popular", label: "Popolare", icon: "star" });
   }
 
   return badges;

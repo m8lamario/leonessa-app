@@ -140,11 +140,19 @@ export async function getFantasyDashboardData(userId: string) {
     (a, b) => (b.fantasyStat?.totalPoints ?? 0) - (a.fantasyStat?.totalPoints ?? 0),
   )[0];
   const discoveryEntries = [
-    mostSelected ? { player: mostSelected, label: "🔥 Più scelto" } : null,
-    fastestRising ? { player: fastestRising, label: "📈 In crescita" } : null,
-    currentMvp ? { player: currentMvp, label: "⭐ MVP attuale" } : null,
-  ].filter((entry): entry is { player: (typeof featuredPlayers)[number]; label: string } =>
-    Boolean(entry),
+    mostSelected ? { player: mostSelected, icon: "flame" as const, label: "Più scelto" } : null,
+    fastestRising
+      ? { player: fastestRising, icon: "trending-up" as const, label: "In crescita" }
+      : null,
+    currentMvp ? { player: currentMvp, icon: "star" as const, label: "MVP attuale" } : null,
+  ].filter(
+    (
+      entry,
+    ): entry is {
+      player: (typeof featuredPlayers)[number];
+      icon: "flame" | "trending-up" | "star";
+      label: string;
+    } => Boolean(entry),
   );
   const uniqueDiscoveries = discoveryEntries.filter(
     (entry, index, items) =>
@@ -170,8 +178,9 @@ export async function getFantasyDashboardData(userId: string) {
       away: match.awayTeam.name,
       startAt: match.startAt.toISOString(),
     })),
-    discoveries: uniqueDiscoveries.map(({ player, label }) => ({
+    discoveries: uniqueDiscoveries.map(({ player, icon, label }) => ({
       id: player.id,
+      icon,
       label,
       name: [player.user.name, player.user.surname].filter(Boolean).join(" ") || "Giocatore",
       school: player.team.school.shortName,
@@ -192,8 +201,13 @@ export async function getAvailableFantasyPlayers() {
       id: true,
       fantasyRole: true,
       fantasyValue: true,
+      jerseyNumber: true,
+      avatarUrl: true,
       user: { select: { name: true, surname: true } },
       team: { select: { school: { select: { shortName: true } } } },
+      fantasyStat: {
+        select: { totalPoints: true, matches: true, goals: true, assists: true },
+      },
     },
     orderBy: [{ fantasyRole: "asc" }, { fantasyValue: "asc" }],
   });
@@ -206,7 +220,13 @@ export async function getAvailableFantasyPlayers() {
       ? player.fantasyRole
       : "CENTROCAMPISTA") as FantasyRole,
     fantasyValue: player.fantasyValue,
-    badges: [],
+    badges: [] as string[],
+    jerseyNumber: player.jerseyNumber,
+    photoUrl: player.avatarUrl,
+    totalPoints: player.fantasyStat?.totalPoints,
+    matches: player.fantasyStat?.matches,
+    goals: player.fantasyStat?.goals,
+    assists: player.fantasyStat?.assists,
   }));
 }
 
@@ -336,7 +356,7 @@ export async function createFantasyTeam(userId: string, input: CreateFantasyTeam
       await grantAchievement(userId, "FOUNDER");
       await recordActivity({
         type: "achievement",
-        title: `${team.name} ha creato la sua squadra fantasy 🏁`,
+        title: `${team.name} ha creato la sua squadra fantasy`,
       });
       return team;
     })

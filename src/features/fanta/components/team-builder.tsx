@@ -1,7 +1,8 @@
 "use client";
 
-import { AnimatePresence, m } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { Check, ChevronLeft, Crown, Search, Shield, Sparkles, Users } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -14,14 +15,28 @@ import {
   STARTER_SIZE,
   TEAM_SIZE,
 } from "../constants/fanta";
+import {
+  filterBuilderPlayers,
+  PRICE_FILTERS,
+  SORT_OPTIONS,
+  type PriceFilterId,
+  type SortId,
+} from "../lib/builder-player-filters";
 import type { FantasyPlayer, FantasyRole } from "../types";
-import styles from "./fanta-dashboard.module.css";
+import styles from "./team-builder.module.css";
 
 const roleLabels: Record<FantasyRole, string> = {
   PORTIERE: "Portiere",
   DIFENSORE: "Difensori",
   CENTROCAMPISTA: "Centrocampisti",
   ATTACCANTE: "Attaccanti",
+};
+
+const roleShort: Record<FantasyRole, string> = {
+  PORTIERE: "POR",
+  DIFENSORE: "DIF",
+  CENTROCAMPISTA: "CEN",
+  ATTACCANTE: "ATT",
 };
 
 type StepKind = "name" | "starter" | "bench" | "captain" | "ready";
@@ -40,6 +55,18 @@ const steps: Array<{ label: string; kind: StepKind; role?: FantasyRole }> = [
   { label: "OK", kind: "ready" },
 ];
 
+function initialsOf(name: string) {
+  return (
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "LC"
+  );
+}
+
 export function TeamBuilder() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -48,7 +75,6 @@ export function TeamBuilder() {
   const [starters, setStarters] = useState<string[]>([]);
   const [bench, setBench] = useState<string[]>([]);
   const [captainId, setCaptainId] = useState("");
-  const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -110,8 +136,9 @@ export function TeamBuilder() {
     if (player.role !== activeRole) return false;
     if (current.kind === "starter" && bench.includes(player.id)) return false;
     if (current.kind === "bench" && starters.includes(player.id)) return false;
-    return `${player.name} ${player.school}`.toLowerCase().includes(search.toLowerCase());
+    return true;
   });
+  const isPlayerStep = current.kind === "starter" || current.kind === "bench";
 
   function togglePlayer(player: FantasyPlayer) {
     setError("");
@@ -164,7 +191,6 @@ export function TeamBuilder() {
       setError("Scegli il capitano tra i titolari.");
       return;
     }
-    setSearch("");
     setStep((currentStep) => Math.min(steps.length - 1, currentStep + 1));
   }
 
@@ -191,7 +217,7 @@ export function TeamBuilder() {
     <section className={styles.builderExperience} aria-labelledby="builder-title">
       <header className={styles.builderHeader}>
         <div className={styles.builderBrand}>
-          <Shield aria-hidden="true" size={20} />
+          <Shield aria-hidden="true" size={18} />
           <span>Fanta Leonessa</span>
         </div>
         <div className={styles.builderMetrics}>
@@ -199,27 +225,48 @@ export function TeamBuilder() {
             <b>{remaining}</b> LP
           </span>
           <span>
-            <b>{starters.length + bench.length}</b>/{TEAM_SIZE} <Users aria-hidden="true" size={14} />
+            <b>{starters.length + bench.length}</b>/{TEAM_SIZE}{" "}
+            <Users aria-hidden="true" size={14} />
           </span>
         </div>
       </header>
 
-      <nav className={`${styles.stepper} ${styles.stepperCompact}`} aria-label="Progresso creazione squadra">
-        {steps.map((item, index) => (
-          <div className={index <= step ? styles.stepActive : styles.step} key={item.label}>
-            <i>{index < step ? <Check aria-hidden="true" size={12} /> : index + 1}</i>
-            <span>{item.label}</span>
-          </div>
-        ))}
+      <nav className={styles.timeline} aria-label="Progresso creazione squadra">
+        <ol className={styles.timelineDots}>
+          {steps.map((item, index) => {
+            const state = index < step ? "done" : index === step ? "current" : "todo";
+            return (
+              <li key={item.label}>
+                <span
+                  aria-current={index === step ? "step" : undefined}
+                  className={
+                    state === "done"
+                      ? styles.dotDone
+                      : state === "current"
+                        ? styles.dotCurrent
+                        : styles.dot
+                  }
+                  title={item.label}
+                >
+                  <span className={styles.visuallyHidden}>
+                    {item.label}
+                    {index < step ? ", completato" : index === step ? ", attuale" : ""}
+                  </span>
+                  {index < step ? <Check aria-hidden="true" size={8} /> : null}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <div className={styles.timelineBar}>
+          <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+        </div>
       </nav>
-      <div className={styles.stepProgress}>
-        <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
-      </div>
 
       <AnimatePresence mode="wait">
         <m.div
           animate={{ opacity: 1, x: 0 }}
-          className={styles.stepScene}
+          className={`${styles.stepScene} ${isPlayerStep ? styles.stepScenePlayers : styles.stepSceneStatic}`}
           exit={{ opacity: 0, x: -18 }}
           initial={{ opacity: 0, x: 18 }}
           key={step}
@@ -230,13 +277,12 @@ export function TeamBuilder() {
             <PlayerStep
               kind={current.kind}
               limit={limit}
-              onSearch={setSearch}
               onToggle={togglePlayer}
               players={rolePlayers}
+              remaining={remaining}
               role={activeRole}
-              search={search}
-              selectedIds={allSelected}
               selectedCount={selectedForStep.length}
+              selectedIds={allSelected}
               stepNumber={step + 1}
             />
           )}
@@ -328,84 +374,254 @@ function PlayerStep({
   kind,
   limit,
   players,
+  remaining,
   role,
-  search,
   selectedIds,
   selectedCount,
   stepNumber,
-  onSearch,
   onToggle,
 }: {
   kind: "starter" | "bench";
   limit: number;
   players: FantasyPlayer[];
+  remaining: number;
   role: FantasyRole;
-  search: string;
   selectedIds: Set<string>;
   selectedCount: number;
   stepNumber: number;
-  onSearch: (search: string) => void;
   onToggle: (player: FantasyPlayer) => void;
 }) {
+  const reduceMotion = useReducedMotion();
+  const [search, setSearch] = useState("");
+  const [priceFilter, setPriceFilter] = useState<PriceFilterId>("all");
+  const [schoolFilter, setSchoolFilter] = useState("all");
+  const [sort, setSort] = useState<SortId>("price-asc");
+
+  const schools = useMemo(
+    () => [...new Set(players.map((player) => player.school))].sort((a, b) => a.localeCompare(b, "it")),
+    [players],
+  );
+
+  const visiblePlayers = useMemo(
+    () => filterBuilderPlayers(players, { search, priceFilter, schoolFilter, sort }),
+    [players, priceFilter, schoolFilter, search, sort],
+  );
+
+  const roleFull = selectedCount >= limit;
+
   return (
-    <>
-      <p className={styles.sceneEyebrow}>
-        Passo {stepNumber} · {kind === "bench" ? "Panchina" : "Titolari"}
-      </p>
-      <h1 id="builder-title">
-        {kind === "bench"
-          ? `Riserva ${roleLabels[role].toLowerCase()}`
-          : `Scegli ${limit === 1 ? "il tuo" : "i tuoi"} ${roleLabels[role].toLowerCase()}`}
-      </h1>
-      {kind === "bench" && (
-        <p className={styles.sceneLead}>Facoltativa se hai già almeno una riserva (massimo 4).</p>
-      )}
-      <div className={styles.roleCounter}>
-        <span>
-          {kind === "bench" ? "PANCHINA" : "TITOLARI"} · {roleLabels[role]}
-        </span>
-        <b>
-          {selectedCount}/{limit}
-        </b>
-      </div>
-      <label className={styles.searchField}>
-        <Search aria-hidden="true" size={18} />
-        <input
-          aria-label="Cerca giocatore o scuola"
-          onChange={(event) => onSearch(event.target.value)}
-          placeholder="Cerca giocatore o scuola"
-          value={search}
-        />
-      </label>
-      <div className={styles.playerDeck}>
-        {players.map((player) => {
-          const chosen = selectedIds.has(player.id);
-          return (
-            <m.button
-              animate={chosen ? { scale: [1, 1.025, 1] } : { scale: 1 }}
-              className={chosen ? styles.premiumPlayerSelected : styles.premiumPlayer}
-              key={player.id}
-              onClick={() => onToggle(player)}
-              type="button"
+    <div className={styles.playerPhase}>
+      <header className={styles.phaseHeader}>
+        <p className={styles.sceneEyebrow}>
+          Passo {stepNumber} · {kind === "bench" ? "Panchina" : "Titolari"}
+        </p>
+        <div className={styles.phaseTitleRow}>
+          <h1 id="builder-title">
+            {kind === "bench"
+              ? `Riserva ${roleLabels[role].toLowerCase()}`
+              : roleLabels[role]}
+          </h1>
+          <m.b
+            animate={{ scale: 1 }}
+            aria-live="polite"
+            className={styles.roleCount}
+            initial={reduceMotion ? false : { scale: 1.12 }}
+            key={selectedCount}
+            transition={{ duration: 0.18 }}
+          >
+            {selectedCount}/{limit}
+          </m.b>
+        </div>
+        {kind === "bench" && (
+          <p className={styles.sceneLead}>Facoltativa se hai già almeno una riserva (massimo 4).</p>
+        )}
+      </header>
+
+      <div className={styles.playerToolbar}>
+        <label className={styles.searchField}>
+          <Search aria-hidden="true" size={18} />
+          <input
+            aria-label="Cerca giocatore o scuola"
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Cerca giocatore o scuola"
+            value={search}
+          />
+        </label>
+        <div className={styles.filterRow}>
+          <label className={styles.filterField}>
+            <span className={styles.visuallyHidden}>Filtro prezzo</span>
+            <select
+              aria-label="Filtro prezzo"
+              onChange={(event) => setPriceFilter(event.target.value as PriceFilterId)}
+              value={priceFilter}
             >
-              <span className={styles.playerDetails}>
-                <b>{player.name}</b>
-                <small>{player.school}</small>
-                <em>
-                  {role.slice(0, 3)} · {player.fantasyValue} LP
-                </em>
-              </span>
-              <span className={styles.selectMark}>
-                {chosen ? <Check aria-hidden="true" size={17} /> : "+"}
-              </span>
-            </m.button>
+              {PRICE_FILTERS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterField}>
+            <span className={styles.visuallyHidden}>Filtro scuola</span>
+            <select
+              aria-label="Filtro scuola"
+              onChange={(event) => setSchoolFilter(event.target.value)}
+              value={schoolFilter}
+            >
+              <option value="all">Tutte le scuole</option>
+              {schools.map((school) => (
+                <option key={school} value={school}>
+                  {school}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.filterField}>
+            <span className={styles.visuallyHidden}>Ordinamento</span>
+            <select
+              aria-label="Ordinamento"
+              onChange={(event) => setSort(event.target.value as SortId)}
+              value={sort}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div className={styles.playerDeck}>
+        {visiblePlayers.length === 0 && (
+          <p className={styles.helper}>Nessun giocatore corrisponde a ricerca e filtri.</p>
+        )}
+        {visiblePlayers.map((player) => {
+          const chosen = selectedIds.has(player.id);
+          const unaffordable = !chosen && remaining < player.fantasyValue;
+          const roleLocked = !chosen && roleFull;
+          const blocked = unaffordable || roleLocked;
+          const reason = unaffordable
+            ? "Non hai abbastanza LP"
+            : roleLocked
+              ? "Ruolo completo"
+              : null;
+
+          return (
+            <PlayerCard
+              blocked={blocked}
+              chosen={chosen}
+              key={player.id}
+              onToggle={onToggle}
+              player={player}
+              reason={reason}
+              reduceMotion={Boolean(reduceMotion)}
+            />
           );
         })}
       </div>
-      {players.length === 0 && (
-        <p className={styles.helper}>Nessun giocatore corrisponde alla ricerca.</p>
-      )}
-    </>
+    </div>
+  );
+}
+
+function PlayerCard({
+  blocked,
+  chosen,
+  onToggle,
+  player,
+  reason,
+  reduceMotion,
+}: {
+  blocked: boolean;
+  chosen: boolean;
+  onToggle: (player: FantasyPlayer) => void;
+  player: FantasyPlayer;
+  reason: string | null;
+  reduceMotion: boolean;
+}) {
+  const stats = [
+    player.totalPoints != null ? { label: "PT", value: player.totalPoints } : null,
+    player.matches != null ? { label: "PRE", value: player.matches } : null,
+    player.goals != null ? { label: "GOL", value: player.goals } : null,
+    player.assists != null ? { label: "AST", value: player.assists } : null,
+  ].filter((item): item is { label: string; value: number } => Boolean(item));
+
+  const extras = [
+    player.preferredFoot ? `Piede ${player.preferredFoot}` : null,
+    player.secondaryRole ? player.secondaryRole : null,
+  ].filter(Boolean);
+
+  return (
+    <m.button
+      aria-pressed={chosen}
+      className={[
+        styles.playerCard,
+        chosen ? styles.playerCardSelected : "",
+        blocked ? styles.playerCardDisabled : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      disabled={blocked}
+      onClick={() => onToggle(player)}
+      type="button"
+      whileTap={reduceMotion || blocked ? undefined : { scale: 0.97 }}
+    >
+      <span className={styles.portrait}>
+        {player.photoUrl ? (
+          <Image
+            alt=""
+            className={styles.portraitImage}
+            fill
+            sizes="40vw"
+            src={player.photoUrl}
+            unoptimized
+          />
+        ) : (
+          <span className={styles.portraitFallback}>{initialsOf(player.name)}</span>
+        )}
+        {player.jerseyNumber != null && (
+          <span className={styles.jersey}>N°{player.jerseyNumber}</span>
+        )}
+      </span>
+
+      <span className={styles.playerBody}>
+        <span className={styles.playerTop}>
+          <b className={styles.playerName}>{player.name}</b>
+          <strong className={styles.playerPrice}>{player.fantasyValue} LP</strong>
+        </span>
+        <small className={styles.playerMeta}>
+          {player.school}
+          <span aria-hidden="true"> · </span>
+          {roleShort[player.role]}
+        </small>
+        {extras.length > 0 && <small className={styles.playerExtras}>{extras.join(" · ")}</small>}
+        {stats.length > 0 && (
+          <span className={styles.playerStats}>
+            {stats.map((stat) => (
+              <span key={stat.label}>
+                <em>{stat.label}</em>
+                <b>{stat.value}</b>
+              </span>
+            ))}
+          </span>
+        )}
+        {player.badges.length > 0 && (
+          <span className={styles.playerBadges}>
+            {player.badges.map((badge) => (
+              <span key={badge}>{badge}</span>
+            ))}
+          </span>
+        )}
+        {chosen && (
+          <span className={styles.playerStatus}>
+            <Check aria-hidden="true" size={14} /> Selezionato
+          </span>
+        )}
+        {reason && <span className={styles.playerStatusMuted}>{reason}</span>}
+      </span>
+    </m.button>
   );
 }
 
@@ -434,7 +650,9 @@ function CaptainStep({
             onClick={() => onSelect(player.id)}
             type="button"
           >
-            <span>{captainId === player.id ? "👑" : "C"}</span>
+            <span>
+              {captainId === player.id ? <Crown aria-hidden="true" size={14} /> : "C"}
+            </span>
             <b>{player.name}</b>
             <small>
               {player.school} · {player.role.slice(0, 3)}
@@ -467,9 +685,7 @@ function FinalStep({
       </div>
       <p className={styles.sceneEyebrow}>Passo 11 · Squadra completa</p>
       <h1 id="builder-title">{name}</h1>
-      <p className={styles.sceneLead}>
-        11 titolari e da 1 a 4 riserve, pronti per la Cup.
-      </p>
+      <p className={styles.sceneLead}>11 titolari e da 1 a 4 riserve, pronti per la Cup.</p>
       <div className={styles.finalScore}>
         <span>
           <b>
@@ -481,14 +697,21 @@ function FinalStep({
           <b>{remaining}</b> LP rimasti
         </span>
         <span>
-          <b>👑</b> {captain?.name ?? "Capitano"}
+          <b>
+            <Crown aria-hidden="true" size={18} />
+          </b>{" "}
+          {captain?.name ?? "Capitano"}
         </span>
       </div>
       <div className={styles.finalRoster}>
         <strong>Titolari</strong>
         {starters.map((player) => (
           <span key={player.id}>
-            {player.id === captainId ? "👑 " : ""}
+            {player.id === captainId ? (
+              <>
+                <Crown aria-hidden="true" size={12} />{" "}
+              </>
+            ) : null}
             {player.name}
           </span>
         ))}

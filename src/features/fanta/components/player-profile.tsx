@@ -7,6 +7,7 @@ import { useMemo } from "react";
 
 import { PageContainer } from "@/shared/components";
 import type { PlayerProfileDto } from "../server/player-profile-service";
+import { FantaIcon } from "./fanta-icons";
 import styles from "./player-profile.module.css";
 
 type PlayerProfileProps = {
@@ -94,20 +95,24 @@ export function PlayerProfileView({ profile, myProfile }: PlayerProfileProps) {
       <section className={styles.badgeRow} aria-label="Badge">
         {profile.badges.map((badge) => (
           <span className={styles.badge} key={badge.key}>
-            {badge.emoji} {badge.label}
+            <FantaIcon name={badge.icon} size={14} /> {badge.label}
           </span>
         ))}
-        {profile.isRookie && <span className={styles.badge}>🆕 Rookie</span>}
+        {profile.isRookie && (
+          <span className={styles.badge}>
+            <FantaIcon name="sparkles" size={14} /> Rookie
+          </span>
+        )}
       </section>
 
       <section className={styles.statsCard} aria-label="Statistiche principali">
-        <Stat label="Gol" value={profile.stats.goals} emoji="⚽" />
-        <Stat label="Assist" value={profile.stats.assists} emoji="🎯" />
-        <Stat label="Presenze" value={profile.stats.matches} emoji="🏃" />
+        <Stat label="Gol" value={profile.stats.goals} icon="goal" />
+        <Stat label="Assist" value={profile.stats.assists} icon="target" />
+        <Stat label="Presenze" value={profile.stats.matches} icon="footprints" />
         <Stat
           label="Punti Fantasy"
           value={profile.stats.totalPoints.toLocaleString("it-IT")}
-          emoji="⭐"
+          icon="star"
         />
       </section>
 
@@ -249,10 +254,20 @@ export function PlayerProfileView({ profile, myProfile }: PlayerProfileProps) {
   );
 }
 
-function Stat({ label, value, emoji }: { label: string; value: number | string; emoji: string }) {
+function Stat({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: number | string;
+  icon: string;
+}) {
   return (
     <div className={styles.stat}>
-      <span className={styles.statIcon}>{emoji}</span>
+      <span className={styles.statIcon}>
+        <FantaIcon name={icon} size={16} />
+      </span>
       <strong>{value}</strong>
       <small>{label}</small>
     </div>

@@ -618,7 +618,7 @@ export async function changeCaptain(userId: string, playerId: string) {
       data: { isCaptain: true },
     });
 
-    await recordMarketActivity("Ha cambiato capitano nella sua squadra fantasy 👑");
+    await recordMarketActivity("Ha cambiato capitano nella sua squadra fantasy");
     logger.info({ userId, teamId: team.id, playerId }, "Market captain changed");
     return { captainId: playerId };
   });

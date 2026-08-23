@@ -251,10 +251,10 @@ export function FantaControlCenter({ initialData }: { initialData: Data }) {
                 value={eventType}
                 onChange={(event) => setEventType(event.target.value)}
               >
-                <option value="GOAL">⚽ Gol</option>
-                <option value="ASSIST">🎯 Assist</option>
-                <option value="YELLOW_CARD">🟨 Ammonizione</option>
-                <option value="RED_CARD">🟥 Espulsione</option>
+                <option value="GOAL">Gol</option>
+                <option value="ASSIST">Assist</option>
+                <option value="YELLOW_CARD">Ammonizione</option>
+                <option value="RED_CARD">Espulsione</option>
                 <option value="OWN_GOAL">↩ Autogol</option>
               </select>
               <select

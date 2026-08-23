@@ -58,7 +58,9 @@
   background: rgb(255 255 255 / 5%);
 }
 .statusLight {
-  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  color: #22c55e;
 }
 .statusOpen div,
 .statusClosed div {
@@ -435,8 +437,17 @@
 }
 
 .playerMain small {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
   color: var(--color-text-secondary);
   font-size: 0.66rem;
+}
+
+.badgeIcon {
+  flex: 0 0 auto;
+  color: #f7c948;
 }
 
 .playerChange {

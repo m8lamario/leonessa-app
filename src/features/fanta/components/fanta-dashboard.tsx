@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowUpRight, Store, Trophy } from "lucide-react";
+import { ArrowUpRight, Goal, Store, Target, Trophy } from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
+import { FantaIcon } from "./fanta-icons";
 import styles from "./fanta-dashboard.module.css";
 import { LineupExperience, type LineupExperienceData } from "./lineup-experience";
 
@@ -28,7 +29,14 @@ type DashboardData = {
   bench: RosterPlayer[];
   ranking: Array<{ position: number; name: string; points: number; isCurrent: boolean }>;
   upcomingMatches: Array<{ id: string; home: string; away: string; startAt: string }>;
-  discoveries: Array<{ id: string; label: string; name: string; school: string; value: number }>;
+  discoveries: Array<{
+    id: string;
+    icon: string;
+    label: string;
+    name: string;
+    school: string;
+    value: number;
+  }>;
 };
 
 type FantaDashboardProps = { dashboard: DashboardData | null; lineup: LineupExperienceData | null };
@@ -91,10 +99,20 @@ export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
             <article className={styles.performanceCard} key={player.id}>
               <div>
                 <strong>{player.name}</strong>
-                <small>
+                <small className={styles.performanceMeta}>
                   {player.school}
-                  {player.goals ? ` · ⚽ ${player.goals} gol` : ""}
-                  {player.assists ? ` · 🎯 ${player.assists} assist` : ""}
+                  {player.goals ? (
+                    <>
+                      {" · "}
+                      <Goal aria-hidden="true" size={12} /> {player.goals} gol
+                    </>
+                  ) : null}
+                  {player.assists ? (
+                    <>
+                      {" · "}
+                      <Target aria-hidden="true" size={12} /> {player.assists} assist
+                    </>
+                  ) : null}
                 </small>
               </div>
               <b>+{player.matchPoints}</b>
@@ -170,7 +188,9 @@ export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
           </div>
         </div>
         <Link className={styles.socialLink} href={"/fanta/social" as never}>
-          <span className={styles.socialEmoji}>🏅</span>
+          <span className={styles.socialEmoji}>
+            <FantaIcon name="award" size={18} />
+          </span>
           <div>
             <strong>Feed & rivalità</strong>
             <small>Attività, podio, achievement e Hall of Fame</small>
@@ -189,7 +209,9 @@ export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
         <div className={styles.discoveryGrid}>
           {dashboard.discoveries.map((player) => (
             <article className={styles.discoveryCard} key={player.id}>
-              <span>{player.label}</span>
+              <span className={styles.discoveryLabel}>
+                <FantaIcon name={player.icon} size={14} /> {player.label}
+              </span>
               <strong>{player.name}</strong>
               <small>
                 {player.school} · {player.value} LP
@@ -206,7 +228,9 @@ function EmptyDashboard() {
   return (
     <PageContainer className={styles.page}>
       <section className={styles.emptyHero} aria-labelledby="fanta-empty-title">
-        <p className={styles.kicker}>⚽ Fanta Leonessa</p>
+        <p className={styles.kicker}>
+          <Goal aria-hidden="true" size={14} /> Fanta Leonessa
+        </p>
         <h1 id="fanta-empty-title">La tua squadra. La tua Cup.</h1>
         <p>Entra in campo, scegli la tua formazione e sfida gli studenti di Brescia.</p>
         <Link className={styles.primaryAction} href={"/fanta/team" as never}>

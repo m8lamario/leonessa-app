@@ -7,6 +7,9 @@
 }
 
 .kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 0 0 8px;
   color: var(--color-accent, #8ea9ff);
   font-size: 0.72rem;
@@ -494,7 +497,12 @@
   flex-direction: column;
   gap: 3px;
 }
-.performanceCard small {
+.performanceCard small,
+.performanceMeta {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
   overflow: hidden;
   font-size: 0.76rem;
   text-overflow: ellipsis;
@@ -571,7 +579,7 @@
   place-items: center;
   border-radius: 12px;
   background: linear-gradient(145deg, #6482ff, #2847bd);
-  font-size: 1.2rem;
+  color: #fff;
 }
 .socialLink > div {
   display: flex;
@@ -607,8 +615,12 @@
   border-radius: var(--radius-sm);
   background: rgb(255 255 255 / 5%);
 }
-.discoveryCard span {
+.discoveryCard span,
+.discoveryLabel {
+  display: inline-flex;
   min-height: 30px;
+  align-items: center;
+  gap: 6px;
   color: #f7c948;
   font-size: 0.68rem;
   font-weight: 800;

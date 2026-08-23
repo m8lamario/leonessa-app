@@ -21,6 +21,14 @@ export type FantasyPlayer = {
   role: FantasyRole;
   fantasyValue: number;
   badges: string[];
+  jerseyNumber?: number | null;
+  photoUrl?: string | null;
+  totalPoints?: number | null;
+  matches?: number | null;
+  goals?: number | null;
+  assists?: number | null;
+  preferredFoot?: string | null;
+  secondaryRole?: string | null;
 };
 
 export type FantasyTeam = {

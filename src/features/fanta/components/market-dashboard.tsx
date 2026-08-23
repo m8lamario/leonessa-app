@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowDownRight,
   ArrowUpRight,
+  Circle,
   Crown,
   LockKeyhole,
   Plus,
@@ -26,6 +27,7 @@ import {
   getTransferFee,
   getTransfersUsed,
 } from "../lib/transfer-cost";
+import { FantaIcon } from "./fanta-icons";
 import styles from "./market-dashboard.module.css";
 
 type MarketWindow = {
@@ -743,7 +745,9 @@ function MarketStatusCard({ status }: { status: MarketWindow }) {
   return (
     <section className={open ? styles.statusOpen : styles.statusClosed} aria-label="Stato mercato">
       {open ? (
-        <span className={styles.statusLight}>🟢</span>
+        <span className={styles.statusLight}>
+          <Circle aria-hidden="true" fill="currentColor" size={10} />
+        </span>
       ) : (
         <LockKeyhole aria-hidden="true" size={16} />
       )}
@@ -778,11 +782,11 @@ function PlayerCard({
   unaffordable: boolean;
   onBuy: () => void;
 }) {
-  const badgeLabel: Record<string, string> = {
-    trending: "📈",
-    falling: "📉",
-    deal: "💎",
-    top: "🔥",
+  const badgeIcons: Record<string, string> = {
+    trending: "trending-up",
+    falling: "trending-down",
+    deal: "gem",
+    top: "flame",
   };
   return (
     <article
@@ -809,7 +813,16 @@ function PlayerCard({
               {player.change}
             </span>
           )}
-          {player.badge && ` · ${badgeLabel[player.badge]}`}
+          {player.badge && (
+            <>
+              {" · "}
+              <FantaIcon
+                className={styles.badgeIcon}
+                name={badgeIcons[player.badge] ?? "star"}
+                size={12}
+              />
+            </>
+          )}
         </small>
         {unaffordable && <small className={styles.unaffordableReason}>{BUDGET_INSUFFICIENT_LABEL}</small>}
       </div>

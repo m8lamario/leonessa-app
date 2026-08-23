@@ -18,12 +18,12 @@ export type ActivityDto = {
   title: string;
   description: string | null;
   createdAt: string;
-  emoji: string;
+  icon: string;
 };
 
 export type AchievementDto = {
   code: string;
-  emoji: string;
+  icon: string;
   title: string;
   description: string;
   unlocked: boolean;
@@ -74,17 +74,17 @@ export type SocialDashboardDto = {
   bestBuyers: Array<{ name: string; value: number }>;
 };
 
-const ACTIVITY_EMOJI: Record<string, string> = {
-  ranking_up: "🔥",
-  player_bought: "📈",
-  big_points: "⚽",
-  captain_change: "👑",
-  best_buy: "💎",
-  achievement: "🏅",
+const ACTIVITY_ICONS: Record<string, string> = {
+  ranking_up: "flame",
+  player_bought: "trending-up",
+  big_points: "goal",
+  captain_change: "crown",
+  best_buy: "gem",
+  achievement: "award",
 };
 
-function emojiFor(type: string) {
-  return ACTIVITY_EMOJI[type] ?? "📣";
+function iconFor(type: string) {
+  return ACTIVITY_ICONS[type] ?? "megaphone";
 }
 
 function fullName(name: string | null, surname: string | null) {
@@ -134,7 +134,7 @@ export async function getSocialDashboard(userId: string): Promise<SocialDashboar
       title: row.title,
       description: row.description,
       createdAt: row.createdAt.toISOString(),
-      emoji: emojiFor(row.type),
+      icon: iconFor(row.type),
     })),
     topPerformers: topScores.map((row) => ({
       name: row.fantasyTeam.name,
@@ -288,7 +288,7 @@ async function getAchievements(userId: string): Promise<AchievementDto[]> {
 
   return Object.values(ACHIEVEMENTS).map((achievement) => ({
     code: achievement.code,
-    emoji: achievement.emoji,
+    icon: achievement.icon,
     title: achievement.title,
     description: achievement.description,
     unlocked: unlocked.has(achievement.code),
