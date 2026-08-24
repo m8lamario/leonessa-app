@@ -1,2 +1,8 @@
 export { ProfileDashboard } from "./components/profile-dashboard";
-export type { ApplicationKind, ApplicationStatus, ProfileApplication, ProfileMock } from "./types";
+export type {
+  ApplicationKind,
+  ApplicationStatus,
+  ProfileApplication,
+  ProfileIdentity,
+  ProfileMock,
+} from "./types";

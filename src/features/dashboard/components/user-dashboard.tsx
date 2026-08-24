@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -42,6 +43,7 @@ export function UserDashboard({
   useEffect(() => {
     router.prefetch("/ranking");
     router.prefetch("/profile");
+    router.prefetch("/altro" as Route);
     if (school.teamId) {
       router.prefetch(`/team/${school.teamId}`);
     }
@@ -170,7 +172,9 @@ export function UserDashboard({
               <p className={styles.kicker}>Guadagna LP</p>
               <h2 id="missions-title">Missioni</h2>
             </div>
-            <span className={styles.sectionCount}>{missions.length}</span>
+            <Link className={styles.textAction} href={"/altro/missioni" as Route}>
+              Vedi tutte
+            </Link>
           </div>
           <div className={styles.missionList}>
             {missions.length === 0 ? (

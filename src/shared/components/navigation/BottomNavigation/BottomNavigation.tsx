@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { BottomNavigationItem } from "./BottomNavigationItem";
-import { bottomNavigationItems } from "./navigation.config";
+import { bottomNavigationItems, isBottomNavItemActive } from "./navigation.config";
 import styles from "./BottomNavigation.module.css";
 
 export function BottomNavigation() {
@@ -16,7 +16,11 @@ export function BottomNavigation() {
   return (
     <nav className={styles.navigation} aria-label="Navigazione principale">
       {bottomNavigationItems.map((item) => (
-        <BottomNavigationItem isActive={item.activePath === pathname} item={item} key={item.id} />
+        <BottomNavigationItem
+          isActive={isBottomNavItemActive(pathname, item)}
+          item={item}
+          key={item.id}
+        />
       ))}
     </nav>
   );

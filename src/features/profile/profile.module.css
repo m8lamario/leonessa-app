@@ -134,6 +134,10 @@
   color: #ffd989;
 }
 
+.topline .featuredBadge {
+  margin-top: 0;
+}
+
 .levelGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -223,6 +227,61 @@
   font-weight: 700;
 }
 
+.infoCard {
+  display: grid;
+  padding: 6px 18px;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+}
+
+.infoRow + .infoRow {
+  border-top: 1px solid rgb(198 204 218 / 10%);
+}
+
+.infoRow span {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.infoRow strong {
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+.badgeList {
+  display: grid;
+  gap: 10px;
+}
+
+.badgeItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.badgeItem p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.emptyState {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
 .opportunities {
   display: grid;
   gap: 12px;
@@ -256,6 +315,7 @@
 .actionButton,
 .submitButton,
 .textButton,
+.textLink,
 .logoutButton {
   min-height: 44px;
   border-radius: var(--radius-sm);
@@ -409,11 +469,13 @@
 .settingRow span {
   font-size: 0.88rem;
 }
-.textButton {
+.textButton,
+.textLink {
   border: 0;
   background: transparent;
   color: #b9c8ff;
   text-align: left;
+  text-decoration: none;
 }
 .logoutButton {
   width: 100%;

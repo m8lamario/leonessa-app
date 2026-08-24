@@ -3,6 +3,8 @@
 import { signOut } from "next-auth/react";
 import { m } from "framer-motion";
 import { Award, ClipboardList, Medal, Rocket, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import type { Route } from "next";
 import { type FormEvent, useState } from "react";
 
 import { PageContainer } from "@/shared/components";
@@ -10,12 +12,13 @@ import { error as hapticError, success as hapticSuccess } from "@/shared/lib/hap
 
 import { profileMock } from "../mock/profile.mock";
 import styles from "../profile.module.css";
-import type { ApplicationKind, ApplicationStatus, ProfileApplication } from "../types/profile";
+import type { ApplicationKind, ApplicationStatus, ProfileApplication, ProfileIdentity } from "../types/profile";
 
 type ProfileDashboardProps = {
   email: string;
   name: string;
   role: string;
+  identity: ProfileIdentity;
 };
 
 const reveal = { duration: 0.24, ease: "easeOut" as const };
@@ -77,7 +80,7 @@ function statusClass(status: ApplicationStatus) {
   return styles.review;
 }
 
-export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
+export function ProfileDashboard({ email, name, role, identity }: ProfileDashboardProps) {
   const [openForm, setOpenForm] = useState<ApplicationKind | null>(null);
   const [applications, setApplications] = useState<ProfileApplication[]>(profileMock.applications);
   const [notifications, setNotifications] = useState({
@@ -160,10 +163,12 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
       >
         <div className={styles.topline}>
           <p className={styles.kicker}>La tua identità Leonessa</p>
-          <span aria-label="Badge in evidenza" className={styles.featuredBadge}>
-            <Medal aria-hidden="true" size={15} strokeWidth={2.2} />
-            {profileMock.featuredBadge}
-          </span>
+          {identity.featuredBadge ? (
+            <span aria-label="Badge in evidenza" className={styles.featuredBadge}>
+              <Medal aria-hidden="true" size={15} strokeWidth={2.2} />
+              {identity.featuredBadge}
+            </span>
+          ) : null}
         </div>
         <div className={styles.identity}>
           <div className={styles.avatar} aria-hidden="true">
@@ -171,7 +176,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
           </div>
           <div className={styles.identityCopy}>
             <h1>{name}</h1>
-            <p className={styles.meta}>{profileMock.schoolName}</p>
+            <p className={styles.meta}>{identity.schoolName ?? "Scuola non assegnata"}</p>
             <span className={styles.roleBadge}>
               <Award aria-hidden="true" size={15} strokeWidth={2.2} />
               {roleLabel}
@@ -181,12 +186,12 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
         <div className={styles.levelGrid}>
           <div>
             <span className={styles.statLabel}>Livello</span>
-            <strong className={styles.statValue}>{profileMock.level}</strong>
+            <strong className={styles.statValue}>{identity.level}</strong>
           </div>
           <div>
-            <span className={styles.statLabel}>LP totali</span>
+            <span className={styles.statLabel}>LP</span>
             <strong className={styles.statValue}>
-              {profileMock.totalLp.toLocaleString("it-IT")}
+              {identity.totalLp.toLocaleString("it-IT")}
             </strong>
           </div>
         </div>
@@ -197,17 +202,83 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
           className={styles.section}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...reveal, delay: 0.06 }}
+          transition={{ ...reveal, delay: 0.04 }}
+          aria-labelledby="info-title"
+        >
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className={styles.kicker}>Account</p>
+              <h2 id="info-title">Informazioni personali</h2>
+            </div>
+          </div>
+          <article className={`${styles.card} ${styles.infoCard}`}>
+            <div className={styles.infoRow}>
+              <span>Nome</span>
+              <strong>{name}</strong>
+            </div>
+            <div className={styles.infoRow}>
+              <span>Email</span>
+              <strong>{email}</strong>
+            </div>
+            <div className={styles.infoRow}>
+              <span>Scuola</span>
+              <strong>{identity.schoolName ?? "Non assegnata"}</strong>
+            </div>
+            <div className={styles.infoRow}>
+              <span>Ruolo</span>
+              <strong>{roleLabel}</strong>
+            </div>
+          </article>
+        </m.section>
+
+        <m.section
+          className={styles.section}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...reveal, delay: 0.08 }}
+          aria-labelledby="badges-title"
+        >
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className={styles.kicker}>Collezione</p>
+              <h2 id="badges-title">I miei badge</h2>
+            </div>
+            <Link className={styles.textLink} href={"/altro/badge" as Route}>
+              Vedi tutti
+            </Link>
+          </div>
+          {identity.badges.length === 0 ? (
+            <p className={styles.emptyState}>Non hai ancora ottenuto badge.</p>
+          ) : (
+            <div className={styles.badgeList}>
+              {identity.badges.map((badge) => (
+                <article className={`${styles.card} ${styles.badgeItem}`} key={badge.id}>
+                  <Medal aria-hidden="true" size={18} />
+                  <div>
+                    <strong>{badge.name}</strong>
+                    <p>{badge.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </m.section>
+
+        <m.section
+          className={styles.section}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...reveal, delay: 0.12 }}
           aria-labelledby="showcase-title"
         >
           <div className={styles.sectionHeading}>
             <div>
               <p className={styles.kicker}>Il tuo percorso</p>
-              <h2 id="showcase-title">Personal Showcase</h2>
+              <h2 id="showcase-title">Le mie statistiche</h2>
             </div>
           </div>
           <div className={styles.statsGrid}>
-            {profileMock.stats.map((stat) => (
+            {identity.stats.map((stat) => (
               <article className={`${styles.card} ${styles.statCard}`} key={stat.label}>
                 <span className={styles.statLabel}>{stat.label}</span>
                 <strong>{stat.value}</strong>
@@ -215,11 +286,17 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
               </article>
             ))}
           </div>
-          <article className={`${styles.card} ${styles.schoolCard}`}>
-            <span className={styles.kicker}>La tua scuola</span>
-            <strong>{profileMock.schoolName}</strong>
-            <span>#{profileMock.schoolRank} nel Ranking Scuole</span>
-          </article>
+          {identity.schoolName ? (
+            <article className={`${styles.card} ${styles.schoolCard}`}>
+              <span className={styles.kicker}>La tua scuola</span>
+              <strong>{identity.schoolName}</strong>
+              <span>
+                {identity.schoolRank
+                  ? `#${identity.schoolRank} nel Ranking Scuole`
+                  : "Posizione non disponibile"}
+              </span>
+            </article>
+          ) : null}
         </m.section>
 
         <m.section
@@ -439,7 +516,7 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
             ))}
           </div>
           <div className={styles.settingGroup}>
-            <h3>Privacy e supporto</h3>
+            <h3>Privacy / account</h3>
             <div className={styles.settingRow}>
               <button className={styles.textButton} type="button">
                 Privacy Policy
@@ -451,9 +528,9 @@ export function ProfileDashboard({ email, name, role }: ProfileDashboardProps) {
               </button>
             </div>
             <div className={styles.settingRow}>
-              <button className={styles.textButton} type="button">
-                Contatti e segnala un problema
-              </button>
+              <Link className={styles.textButton} href={"/altro/assistenza" as Route}>
+                Assistenza
+              </Link>
             </div>
           </div>
           <button

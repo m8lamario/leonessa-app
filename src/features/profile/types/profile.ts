@@ -18,3 +18,20 @@ export type ProfileMock = {
   stats: Array<{ label: string; value: string; detail?: string }>;
   applications: ProfileApplication[];
 };
+
+export type ProfileBadge = {
+  id: string;
+  name: string;
+  description: string;
+  earnedAt: string | null;
+};
+
+export type ProfileIdentity = {
+  schoolName: string | null;
+  schoolRank: number | null;
+  level: number;
+  totalLp: number;
+  featuredBadge: string | null;
+  badges: ProfileBadge[];
+  stats: Array<{ label: string; value: string; detail?: string }>;
+};

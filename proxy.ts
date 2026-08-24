@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/", "/dashboard", "/onboarding", "/profile", "/fanta"];
+const protectedRoutes = ["/", "/dashboard", "/onboarding", "/profile", "/fanta", "/altro"];
 
 export async function proxy(request: NextRequest) {
   const token = await getToken({
@@ -24,5 +24,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/onboarding/:path*", "/profile/:path*", "/fanta/:path*"],
+  matcher: [
+    "/",
+    "/dashboard/:path*",
+    "/onboarding/:path*",
+    "/profile/:path*",
+    "/fanta/:path*",
+    "/altro/:path*",
+  ],
 };
