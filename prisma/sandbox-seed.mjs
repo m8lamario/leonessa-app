@@ -378,7 +378,23 @@ async function cleanupSandboxData() {
     select: { id: true },
   });
   const sandboxMatchIds = sandboxMatches.map((match) => match.id);
+  const sandboxReferrals = await prisma.referral.findMany({
+    where: {
+      OR: [{ referrerId: { in: sandboxUserIds } }, { referredUserId: { in: sandboxUserIds } }],
+    },
+    select: { id: true },
+  });
+  const sandboxReferralIds = sandboxReferrals.map((referral) => referral.id);
 
+  await prisma.pointTransaction.deleteMany({
+    where: {
+      OR: [
+        { userId: { in: sandboxUserIds } },
+        { sourceType: "REFERRAL", sourceId: { in: sandboxReferralIds } },
+      ],
+    },
+  });
+  await prisma.referral.deleteMany({ where: { id: { in: sandboxReferralIds } } });
   await prisma.fantasyAchievement.deleteMany({ where: { userId: { in: sandboxUserIds } } });
   await prisma.fantasyScore.deleteMany({ where: { fantasyTeamId: { in: sandboxFantasyTeamIds } } });
   await prisma.fantasySubstitution.deleteMany({

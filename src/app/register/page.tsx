@@ -10,7 +10,13 @@ export const metadata: Metadata = {
   title: "Registrati | Leonessa",
 };
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  const referralCode = typeof query.ref === "string" ? query.ref : "";
   const schools = await prisma.school.findMany({
     where: { deletedAt: null },
     orderBy: { name: "asc" },
@@ -19,7 +25,7 @@ export default async function RegisterPage() {
 
   return (
     <AuthCard title="Registrati">
-      <RegisterForm schools={schools} />
+      <RegisterForm initialReferralCode={referralCode} schools={schools} />
     </AuthCard>
   );
 }

@@ -224,12 +224,6 @@ export function RankingDashboard({
 
   return (
     <PageContainer className={`${styles.ranking} ${skeletonStyles.fadeIn}`}>
-      <header className={styles.hero}>
-        <p className={styles.kicker}>Leonessa Cup</p>
-        <h1>Ranking</h1>
-        <p>Segui la tua crescita, sostieni {schoolShortName} e scopri il tuo prossimo traguardo.</p>
-      </header>
-
       <nav className={styles.tabs} aria-label="Sezioni ranking" role="tablist">
         {rankingTabs.map((tab) => (
           <button

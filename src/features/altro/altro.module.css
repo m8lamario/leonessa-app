@@ -19,7 +19,6 @@
 .hero,
 .pass {
   position: relative;
-  margin-top: var(--space-md);
   isolation: isolate;
   overflow: hidden;
   padding: 24px;
@@ -104,7 +103,6 @@
 .content {
   display: grid;
   gap: 28px;
-  margin-top: 24px;
 }
 
 .sectionHeading {
@@ -258,6 +256,19 @@
   color: var(--color-text-secondary);
   font-size: 0.78rem;
   line-height: 1.4;
+}
+
+.destinationStatus {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgb(48 92 255 / 17%);
+  color: #b9c8ff;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .supportList {

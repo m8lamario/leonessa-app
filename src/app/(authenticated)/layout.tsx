@@ -1,4 +1,5 @@
 import { requireUser } from "@/features/auth/server/guards";
+import { ReferralDeviceBootstrap } from "@/features/referral/components/referral-device-bootstrap";
 import { AppTopNav, BottomNavigation, ScreenLayout } from "@/shared/components";
 
 import styles from "./authenticated-layout.module.css";
@@ -19,6 +20,7 @@ export default async function AuthenticatedLayout({
 
   return (
     <ScreenLayout>
+      <ReferralDeviceBootstrap />
       <AppTopNav userInitials={buildUserInitials(user.name, user.surname)} />
       <div className={styles.content}>{children}</div>
       <BottomNavigation />

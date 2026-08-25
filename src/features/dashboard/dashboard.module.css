@@ -3,7 +3,6 @@
 }
 
 .hero {
-  margin-top: var(--space-md);
   position: relative;
   isolation: isolate;
   overflow: hidden;

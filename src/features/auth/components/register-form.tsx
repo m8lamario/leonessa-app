@@ -24,9 +24,16 @@ type RegistrationValues = {
   email: string;
   password: string;
   passwordConfirmation: string;
+  referralCode: string;
 };
 
-export function RegisterForm({ schools }: { schools: School[] }) {
+export function RegisterForm({
+  schools,
+  initialReferralCode = "",
+}: {
+  schools: School[];
+  initialReferralCode?: string;
+}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +45,7 @@ export function RegisterForm({ schools }: { schools: School[] }) {
     email: "",
     password: "",
     passwordConfirmation: "",
+    referralCode: initialReferralCode.trim().toUpperCase(),
   });
 
   const selectedSchool = schools.find((school) => school.id === values.schoolId);
@@ -127,6 +135,13 @@ export function RegisterForm({ schools }: { schools: School[] }) {
     let response: Response;
 
     try {
+      if (values.referralCode.trim()) {
+        const deviceResponse = await fetch("/api/referral/device", { method: "POST" });
+        if (!deviceResponse.ok) {
+          throw new Error("Referral device unavailable");
+        }
+      }
+
       response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -136,6 +151,7 @@ export function RegisterForm({ schools }: { schools: School[] }) {
           email: values.email,
           password: values.password,
           schoolId: values.schoolId,
+          referralCode: values.referralCode.trim() || undefined,
         }),
       });
     } catch {
@@ -348,6 +364,22 @@ export function RegisterForm({ schools }: { schools: School[] }) {
                     <dd>{values.email}</dd>
                   </div>
                 </dl>
+                <label>
+                  Codice invito (opzionale)
+                  <input
+                    autoComplete="off"
+                    maxLength={32}
+                    name="referralCode"
+                    placeholder="Inserisci il codice"
+                    value={values.referralCode}
+                    onChange={(event) =>
+                      updateValue("referralCode", event.target.value.toUpperCase())
+                    }
+                  />
+                </label>
+                {values.referralCode && (
+                  <p>Il codice sarà verificato quando crei l&apos;account.</p>
+                )}
               </>
             )}
           </m.div>

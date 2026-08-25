@@ -37,7 +37,7 @@ export async function getHubData(userId: string, schoolId: string | null): Promi
     : { competitionId: null };
   const badgeCompetitionFilter = missionCompetitionFilter;
 
-  const [userMissions, catalogBadges, userBadges, currentTeam] = await Promise.all([
+  const [userMissions, catalogBadges, userBadges, currentTeam, referrals] = await Promise.all([
     prisma.userMission.findMany({
       where: {
         userId,
@@ -75,6 +75,10 @@ export async function getHubData(userId: string, schoolId: string | null): Promi
           orderBy: { createdAt: "asc" },
         })
       : null,
+    prisma.referral.findMany({
+      where: { referrerId: userId },
+      select: { status: true },
+    }),
   ]);
 
   const earnedAtByBadgeId = new Map(userBadges.map((entry) => [entry.badgeId, entry.earnedAt]));
@@ -119,5 +123,10 @@ export async function getHubData(userId: string, schoolId: string | null): Promi
     missions: { active, completed },
     badges: { earned, locked },
     explore: { teamId: currentTeam?.id ?? null },
+    referral: {
+      total: referrals.length,
+      pending: referrals.filter(({ status }) => status === "PENDING").length,
+      completed: referrals.filter(({ status }) => status === "COMPLETED").length,
+    },
   };
 }

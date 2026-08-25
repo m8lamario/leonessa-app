@@ -16,6 +16,7 @@ import {
   QrCode,
   Sparkles,
   Target,
+  UserPlus,
 } from "lucide-react";
 import type { Route } from "next";
 
@@ -80,6 +81,13 @@ const destinations: Array<{
     description: "Scuole, squadre e partite.",
     icon: Compass,
   },
+  {
+    id: "referral",
+    href: "/altro/referral" as Route,
+    title: "Porta un amico",
+    description: "Invita amici e segui i tuoi inviti.",
+    icon: UserPlus,
+  },
 ];
 
 const supportLinks = [
@@ -121,24 +129,10 @@ function formatLp(value: number) {
 
 export function AltroHub({ data }: AltroHubProps) {
   const { pass } = data;
-  const remainingLp =
-    pass.nextLevelLP === null ? null : Math.max(0, pass.nextLevelLP - pass.lp);
+  const remainingLp = pass.nextLevelLP === null ? null : Math.max(0, pass.nextLevelLP - pass.lp);
 
   return (
     <PageContainer className={styles.page}>
-      <m.header
-        className={styles.hero}
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={reveal}
-      >
-        <p className={styles.kicker}>Leonessa</p>
-        <h1>Altro</h1>
-        <p className={styles.heroLead}>
-          Pass, accrediti, premi e tutto ciò che ruota intorno alla tua esperienza Leonessa.
-        </p>
-      </m.header>
-
       <div className={styles.content}>
         <m.section
           aria-labelledby="pass-title"
@@ -212,6 +206,13 @@ export function AltroHub({ data }: AltroHubProps) {
                   </span>
                   <h3>{destination.title}</h3>
                   <p>{destination.description}</p>
+                  {destination.id === "referral" && data.referral.total > 0 && (
+                    <span className={styles.destinationStatus}>
+                      {data.referral.completed > 0
+                        ? `${data.referral.completed} completati`
+                        : `${data.referral.pending} in attesa`}
+                    </span>
+                  )}
                 </Link>
               );
             })}

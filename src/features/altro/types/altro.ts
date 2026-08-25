@@ -42,6 +42,12 @@ export type HubExplore = {
   teamId: string | null;
 };
 
+export type HubReferral = {
+  total: number;
+  pending: number;
+  completed: number;
+};
+
 export type HubData = {
   pass: HubPass;
   missions: {
@@ -53,12 +59,8 @@ export type HubData = {
     locked: HubBadge[];
   };
   explore: HubExplore;
+  referral: HubReferral;
 };
 
 export type HubDestinationId =
-  | "accrediti"
-  | "premi"
-  | "partner"
-  | "missioni"
-  | "badge"
-  | "esplora";
+  "accrediti" | "premi" | "partner" | "missioni" | "badge" | "esplora" | "referral";

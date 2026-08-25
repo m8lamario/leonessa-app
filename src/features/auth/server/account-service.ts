@@ -4,6 +4,7 @@ import { EmailVerificationDeliveryKind, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { awardLPInTransaction } from "@/features/rewards/server";
+import { completeReferralForEvent } from "@/features/referral/server/referral-service";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/utils/errors";
 
@@ -238,7 +239,7 @@ export async function verifyEmail(token: string) {
 
   const email = verificationToken.identifier.slice(EMAIL_VERIFICATION_PREFIX.length);
 
-  return prisma.$transaction(async (transaction) => {
+  const result = await prisma.$transaction(async (transaction) => {
     await transaction.verificationToken.delete({ where: { token: tokenHash } });
 
     const user = await transaction.user.findUnique({
@@ -318,6 +319,18 @@ export async function verifyEmail(token: string) {
 
     return "verified" as const;
   });
+
+  if (result === "verified") {
+    const verifiedUser = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (verifiedUser) {
+      await completeReferralForEvent(verifiedUser.id, "EMAIL_VERIFIED");
+    }
+  }
+
+  return result;
 }
 
 export async function requestPasswordReset(email: string) {

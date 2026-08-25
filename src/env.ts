@@ -19,6 +19,9 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().email().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
+  REFERRAL_COMPLETION_EVENT: z.string().trim().min(1).optional(),
+  REFERRAL_REFERRER_REWARD_LP: z.coerce.number().int().positive().optional(),
+  REFERRAL_INVITEE_REWARD_LP: z.coerce.number().int().positive().optional(),
 });
 
 export const env = envSchema.parse({
@@ -40,4 +43,7 @@ export const env = envSchema.parse({
   FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
   FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,
   FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
+  REFERRAL_COMPLETION_EVENT: process.env.REFERRAL_COMPLETION_EVENT,
+  REFERRAL_REFERRER_REWARD_LP: process.env.REFERRAL_REFERRER_REWARD_LP,
+  REFERRAL_INVITEE_REWARD_LP: process.env.REFERRAL_INVITEE_REWARD_LP,
 });

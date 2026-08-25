@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 
+import { ensureReferralCode } from "@/features/referral/server/referral-service";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -64,13 +65,16 @@ export const authOptions: NextAuthOptions = {
   ],
   events: {
     async createUser({ user }) {
-      await prisma.userRole.create({
-        data: {
-          userId: user.id,
-          role: "USER",
-          isPrimary: true,
-        },
-      });
+      await Promise.all([
+        prisma.userRole.create({
+          data: {
+            userId: user.id,
+            role: "USER",
+            isPrimary: true,
+          },
+        }),
+        ensureReferralCode(user.id),
+      ]);
     },
   },
   callbacks: {

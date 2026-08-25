@@ -13,6 +13,14 @@ export const registrationSchema = z.object({
   password: passwordSchema,
   schoolId: z.string().uuid("Seleziona una scuola valida."),
   instagram: z.string().trim().max(30, "Username Instagram non valido.").optional(),
+  referralCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .min(6, "Codice referral non valido.")
+    .max(32, "Codice referral non valido.")
+    .regex(/^[A-Z0-9]+$/, "Codice referral non valido.")
+    .optional(),
 });
 
 export const passwordResetSchema = z

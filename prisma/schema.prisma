@@ -8,49 +8,96 @@ datasource db {
 }
 
 model User {
-  id                  String                      @id @default(uuid())
-  email               String                      @unique
-  emailVerified       DateTime?
-  name                String?
-  surname             String?
-  image               String?
-  passwordHash        String?
-  bio                 String?
-  instagram           String?
-  className           String?
-  schoolId            String?
-  createdAt           DateTime                    @default(now())
-  updatedAt           DateTime                    @updatedAt
-  deletedAt           DateTime?
-  accounts            Account[]
-  auditLogs           AuditLog[]                  @relation("AuditActor")
-  recordedCheckIns    CheckIn[]                   @relation("CheckInRecorder")
-  createdCompetitions Competition[]               @relation("CompetitionCreator")
-  eventAttendances    EventAttendance[]
-  authoredNews        NewsArticle[]
-  notifications           Notification[]
-  notificationDeliveries  NotificationDelivery[]
-  followedMatches         FollowedMatch[]
-  pointTransactions       PointTransaction[]
-  pushDevices             PushDevice[]
-  sessions                Session[]
-  createdShifts       Shift[]                     @relation("ShiftCreator")
-  shiftAssignments    ShiftAssignment[]
-  teamApplications    TeamApplication[]
-  teamMemberships     TeamMember[]
-  school              School?                     @relation(fields: [schoolId], references: [id])
-  badges              UserBadge[]
-  lpBalance           UserLPBalance?
-  missions            UserMission[]
-  assignedRoles       UserRole[]                  @relation("UserRoleAssigner")
-  roles               UserRole[]
-  emailVerifications  EmailVerificationDelivery[]
-  fantasyTeam         FantasyTeam?
-  fantasyAchievements FantasyAchievement[]
-  sandboxAuditLogs    SandboxAuditLog[]
+  id                     String                      @id @default(uuid())
+  email                  String                      @unique
+  emailVerified          DateTime?
+  name                   String?
+  surname                String?
+  image                  String?
+  passwordHash           String?
+  bio                    String?
+  instagram              String?
+  className              String?
+  schoolId               String?
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  deletedAt              DateTime?
+  accounts               Account[]
+  auditLogs              AuditLog[]                  @relation("AuditActor")
+  recordedCheckIns       CheckIn[]                   @relation("CheckInRecorder")
+  createdCompetitions    Competition[]               @relation("CompetitionCreator")
+  eventAttendances       EventAttendance[]
+  authoredNews           NewsArticle[]
+  notifications          Notification[]
+  notificationDeliveries NotificationDelivery[]
+  followedMatches        FollowedMatch[]
+  pointTransactions      PointTransaction[]
+  pushDevices            PushDevice[]
+  sessions               Session[]
+  createdShifts          Shift[]                     @relation("ShiftCreator")
+  shiftAssignments       ShiftAssignment[]
+  teamApplications       TeamApplication[]
+  teamMemberships        TeamMember[]
+  school                 School?                     @relation(fields: [schoolId], references: [id])
+  badges                 UserBadge[]
+  lpBalance              UserLPBalance?
+  missions               UserMission[]
+  assignedRoles          UserRole[]                  @relation("UserRoleAssigner")
+  roles                  UserRole[]
+  emailVerifications     EmailVerificationDelivery[]
+  fantasyTeam            FantasyTeam?
+  fantasyAchievements    FantasyAchievement[]
+  sandboxAuditLogs       SandboxAuditLog[]
+  referralCode           ReferralCode?
+  referralsSent          Referral[]                  @relation("ReferralReferrer")
+  referralReceived       Referral?                   @relation("ReferralInvitee")
+  referralDevices        ReferralDevice[]
 
   @@index([schoolId])
   @@index([deletedAt])
+}
+
+model ReferralCode {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  code      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals Referral[]
+}
+
+model Referral {
+  id                 String               @id @default(cuid())
+  referralCodeId     String
+  referrerId         String
+  referredUserId     String               @unique
+  status             ReferralStatus       @default(PENDING)
+  blockReason        ReferralBlockReason?
+  referrerDeviceHash String?
+  referredDeviceHash String?
+  completedAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  referralCode       ReferralCode         @relation(fields: [referralCodeId], references: [id], onDelete: Restrict)
+  referrer           User                 @relation("ReferralReferrer", fields: [referrerId], references: [id], onDelete: Restrict)
+  referredUser       User                 @relation("ReferralInvitee", fields: [referredUserId], references: [id], onDelete: Restrict)
+
+  @@unique([referrerId, referredUserId])
+  @@index([referrerId, status, createdAt])
+  @@index([referralCodeId])
+}
+
+model ReferralDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  deviceHash  String
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceHash])
+  @@index([deviceHash])
 }
 
 model FantasyTeam {
@@ -443,28 +490,28 @@ model TeamApplication {
 }
 
 model Match {
-  id                    String                 @id @default(uuid())
-  competitionId         String
-  homeTeamId            String
-  awayTeamId            String
-  venue                 String?
-  startAt               DateTime
-  status                MatchStatus            @default(SCHEDULED)
-  homeScore             Int                    @default(0)
-  awayScore             Int                    @default(0)
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  deletedAt             DateTime?
-  eslId                 String?                @unique
-  rankingProcessed      Boolean                @default(false)
-  awayTeam              Team                   @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  competition           Competition            @relation(fields: [competitionId], references: [id])
-  homeTeam              Team                   @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  events                   MatchEvent[]
-  fantasyProcessedMatch    FantasyProcessedMatch?
-  fantasySubstitutions     FantasySubstitution[]
-  followedBy               FollowedMatch[]
-  notificationDeliveries   NotificationDelivery[]
+  id                     String                 @id @default(uuid())
+  competitionId          String
+  homeTeamId             String
+  awayTeamId             String
+  venue                  String?
+  startAt                DateTime
+  status                 MatchStatus            @default(SCHEDULED)
+  homeScore              Int                    @default(0)
+  awayScore              Int                    @default(0)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  deletedAt              DateTime?
+  eslId                  String?                @unique
+  rankingProcessed       Boolean                @default(false)
+  awayTeam               Team                   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  competition            Competition            @relation(fields: [competitionId], references: [id])
+  homeTeam               Team                   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  events                 MatchEvent[]
+  fantasyProcessedMatch  FantasyProcessedMatch?
+  fantasySubstitutions   FantasySubstitution[]
+  followedBy             FollowedMatch[]
+  notificationDeliveries NotificationDelivery[]
 
   @@index([competitionId, startAt])
   @@index([homeTeamId])
@@ -710,16 +757,16 @@ model Notification {
 }
 
 model PushDevice {
-  id                     String                  @id @default(uuid())
+  id                     String                 @id @default(uuid())
   userId                 String
-  token                  String                  @unique
+  token                  String                 @unique
   platform               String
-  enabled                Boolean                 @default(true)
-  lastSeenAt             DateTime                @default(now())
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
+  enabled                Boolean                @default(true)
+  lastSeenAt             DateTime               @default(now())
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
   revokedAt              DateTime?
-  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   notificationDeliveries NotificationDelivery[]
 
   @@index([userId, enabled])
@@ -810,6 +857,16 @@ enum UserRoleType {
 enum FantasyLineupStatus {
   STARTER
   BENCH
+}
+
+enum ReferralStatus {
+  PENDING
+  COMPLETED
+  BLOCKED
+}
+
+enum ReferralBlockReason {
+  SAME_DEVICE
 }
 
 enum EmailVerificationDeliveryKind {
