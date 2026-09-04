@@ -6,10 +6,11 @@ import { useState } from "react";
 import { PageContainer } from "@/shared/components";
 import { selection as hapticSelection } from "@/shared/lib/haptics";
 import skeletonStyles from "@/shared/components/skeleton/Skeleton.module.css";
-import { createRankingMock } from "../mock/ranking.mock";
+import { getLevelProgress } from "@/features/rewards/levels";
 import type {
   RankingBadge,
   RankingMission,
+  RankingMock,
   SchoolRankingEntry,
   UserRankingEntry,
 } from "../types/ranking";
@@ -19,10 +20,7 @@ type RankingTab = "leaderboards" | "missions" | "badges" | "progression";
 type LeaderboardTab = "users" | "schools";
 
 type RankingDashboardProps = {
-  userName: string;
-  userInitials: string;
-  schoolName: string;
-  schoolShortName: string;
+  initialData: RankingMock;
 };
 
 const rankingTabs: Array<{ id: RankingTab; label: string }> = [
@@ -210,17 +208,13 @@ function BadgeCard({ badge, earned = false }: { badge: RankingBadge; earned?: bo
   );
 }
 
-export function RankingDashboard({
-  userName,
-  userInitials,
-  schoolName,
-  schoolShortName,
-}: RankingDashboardProps) {
+export function RankingDashboard({ initialData }: RankingDashboardProps) {
   const [activeTab, setActiveTab] = useState<RankingTab>("leaderboards");
   const [activeLeaderboard, setActiveLeaderboard] = useState<LeaderboardTab>("users");
-  const ranking = createRankingMock({ userName, userInitials, schoolName, schoolShortName });
-  const nextLevelLP = 1750;
-  const lpToNextLevel = nextLevelLP - ranking.currentUser.lp;
+  const ranking = initialData;
+  const progress = getLevelProgress(ranking.currentUser.lp);
+  const nextLevelThreshold = progress.nextLevelLP;
+  const lpToNextLevel = nextLevelThreshold ? nextLevelThreshold - ranking.currentUser.lp : 0;
 
   return (
     <PageContainer className={`${styles.ranking} ${skeletonStyles.fadeIn}`}>
@@ -372,15 +366,23 @@ export function RankingDashboard({
                     <strong>Livello {ranking.currentUser.level}</strong>
                     <span>{formatPoints(ranking.currentUser.lp)} LP</span>
                   </div>
-                  <ProgressBar
-                    label="Progresso verso il prossimo livello"
-                    progress={ranking.currentUser.lp - 1000}
-                    target={nextLevelLP - 1000}
-                  />
-                  <p>
-                    Ancora {formatPoints(lpToNextLevel)} LP per raggiungere il livello{" "}
-                    {ranking.currentUser.level + 1}.
-                  </p>
+                  {progress.isMaxLevel ? (
+                    <p style={{ marginTop: "14px", fontWeight: 700, color: "var(--color-primary-light)" }}>
+                      Livello massimo raggiunto!
+                    </p>
+                  ) : (
+                    <>
+                      <ProgressBar
+                        label="Progresso verso il prossimo livello"
+                        progress={progress.progressLP}
+                        target={nextLevelThreshold ? nextLevelThreshold - progress.currentLevelLP : 1}
+                      />
+                      <p>
+                        Ancora {formatPoints(lpToNextLevel)} LP per raggiungere il livello{" "}
+                        {ranking.currentUser.level + 1}.
+                      </p>
+                    </>
+                  )}
                 </article>
 
                 <div className={styles.sectionHeading}>
@@ -390,13 +392,21 @@ export function RankingDashboard({
                   </div>
                 </div>
                 <ol className={styles.historyList}>
-                  {ranking.history.map((entry) => (
-                    <li key={entry.id}>
-                      <strong>+{entry.amount} LP</strong>
-                      <span>{entry.reason}</span>
-                      <time>{entry.date}</time>
+                  {ranking.history.length === 0 ? (
+                    <li style={{ color: "var(--color-text-muted)", fontSize: "0.85rem", padding: "16px 0" }}>
+                      Nessun movimento recente registrato.
                     </li>
-                  ))}
+                  ) : (
+                    ranking.history.map((entry) => (
+                      <li key={entry.id}>
+                        <strong style={{ color: entry.amount >= 0 ? "#80a1ff" : "#ffd166" }}>
+                          {entry.amount >= 0 ? `+${entry.amount}` : entry.amount} LP
+                        </strong>
+                        <span>{entry.reason}</span>
+                        <time>{entry.date}</time>
+                      </li>
+                    ))
+                  )}
                 </ol>
 
                 <div className={styles.sectionHeading}>

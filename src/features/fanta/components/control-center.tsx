@@ -1,8 +1,10 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps, react/no-unescaped-entities */
 
+import Link from "next/link";
+import type { Route } from "next";
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle2, FlaskConical, RefreshCw, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Coins, FlaskConical, RefreshCw, ShieldAlert } from "lucide-react";
 import { PageContainer } from "@/shared/components";
 import styles from "./control-center.module.css";
 
@@ -148,9 +150,29 @@ export function FantaControlCenter({ initialData }: { initialData: Data }) {
             Strumento tecnico per verificare il flusso Scoring → Team → Market.
           </p>
         </div>
-        <span className={styles.sandbox}>
-          <FlaskConical size={15} /> SANDBOX MODE
-        </span>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <Link
+            href={"/admin/economy" as Route}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "8px 12px",
+              borderRadius: "8px",
+              background: "#305cff22",
+              border: "1px solid #305cff66",
+              color: "#c5d2ff",
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              textDecoration: "none",
+            }}
+          >
+            <Coins size={15} /> LP Economy
+          </Link>
+          <span className={styles.sandbox}>
+            <FlaskConical size={15} /> SANDBOX MODE
+          </span>
+        </div>
       </header>
       {message && <p className={styles.error}>{message}</p>}
       <section className={styles.health}>

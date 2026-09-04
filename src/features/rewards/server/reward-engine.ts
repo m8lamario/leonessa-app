@@ -346,6 +346,189 @@ export function awardSSP(
   return awardPoints({ ...input, type: "SSP" });
 }
 
+export type SpendLPInput = {
+  userId: string;
+  amount: number;
+  sourceType: PointSourceType;
+  sourceId?: string;
+  reason: string;
+  idempotencyKey: string;
+};
+
+export type SpendLPResult = {
+  applied: boolean;
+  transaction: {
+    id: string;
+    amount: number;
+    type: PointType;
+    sourceType: PointSourceType;
+    sourceId: string | null;
+    idempotencyKey: string | null;
+    createdAt: Date;
+  };
+  lpBalance: number;
+  level: LevelProgress;
+};
+
+function validateSpendInput(input: SpendLPInput) {
+  if (!input.userId.trim()) {
+    throw new TypeError("È necessario specificare un utente.");
+  }
+
+  if (!Number.isInteger(input.amount) || input.amount <= 0) {
+    throw new RangeError("La quantità di punti da spendere deve essere un intero maggiore di zero.");
+  }
+
+  if (!input.reason.trim()) {
+    throw new TypeError("È necessario specificare il motivo della spesa.");
+  }
+
+  if (!input.idempotencyKey.trim()) {
+    throw new TypeError("È necessaria una chiave di idempotenza.");
+  }
+}
+
+export async function spendLPInTransaction(
+  transaction: TransactionClient,
+  input: SpendLPInput,
+): Promise<{
+  applied: boolean;
+  pointTransaction: {
+    id: string;
+    amount: number;
+    type: PointType;
+    sourceType: PointSourceType;
+    sourceId: string | null;
+    idempotencyKey: string | null;
+    createdAt: Date;
+  };
+  lpBalance: number;
+}> {
+  validateSpendInput(input);
+
+  const existing = await transaction.pointTransaction.findUnique({
+    where: { idempotencyKey: input.idempotencyKey },
+    select: {
+      id: true,
+      userId: true,
+      schoolId: true,
+      amount: true,
+      type: true,
+      sourceType: true,
+      sourceId: true,
+      competitionId: true,
+      reason: true,
+      idempotencyKey: true,
+      createdAt: true,
+    },
+  });
+
+  if (existing) {
+    if (
+      existing.userId !== input.userId ||
+      existing.amount !== -input.amount ||
+      existing.type !== "LP" ||
+      existing.sourceType !== input.sourceType ||
+      existing.sourceId !== (input.sourceId ?? null) ||
+      existing.reason !== input.reason
+    ) {
+      throw new AppError(
+        "CONFLICT",
+        "La chiave di idempotenza è già associata a una spesa diversa.",
+        409,
+      );
+    }
+
+    const currentBalanceRecord = await transaction.userLPBalance.findUnique({
+      where: { userId: input.userId },
+      select: { balance: true },
+    });
+
+    return {
+      applied: false,
+      pointTransaction: existing,
+      lpBalance: currentBalanceRecord?.balance ?? 0,
+    };
+  }
+
+  const currentBalance = await transaction.userLPBalance.upsert({
+    where: { userId: input.userId },
+    create: { userId: input.userId, balance: 0, lifetimeEarned: 0 },
+    update: {},
+  });
+
+  if (currentBalance.balance < input.amount) {
+    throw new AppError("BAD_REQUEST", "Saldo LP insufficiente.", 400);
+  }
+
+  const pointTransaction = await transaction.pointTransaction.create({
+    data: {
+      userId: input.userId,
+      amount: -input.amount,
+      type: "LP",
+      sourceType: input.sourceType,
+      sourceId: input.sourceId,
+      reason: input.reason,
+      idempotencyKey: input.idempotencyKey,
+    },
+    select: {
+      id: true,
+      userId: true,
+      schoolId: true,
+      amount: true,
+      type: true,
+      sourceType: true,
+      sourceId: true,
+      idempotencyKey: true,
+      createdAt: true,
+    },
+  });
+
+  const updatedBalance = await transaction.userLPBalance.update({
+    where: { id: currentBalance.id },
+    data: {
+      balance: { decrement: input.amount },
+    },
+    select: { balance: true },
+  });
+
+  return {
+    applied: true,
+    pointTransaction,
+    lpBalance: updatedBalance.balance,
+  };
+}
+
+export async function spendLP(input: SpendLPInput): Promise<SpendLPResult> {
+  validateSpendInput(input);
+
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const spent = await spendLPInTransaction(tx, input);
+      return {
+        applied: spent.applied,
+        transaction: spent.pointTransaction,
+        lpBalance: spent.lpBalance,
+        level: getLevelProgress(spent.lpBalance),
+      };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  );
+
+  return result;
+}
+
+export async function getLPBalance(userId: string): Promise<number> {
+  if (!userId.trim()) {
+    throw new TypeError("È necessario specificare un utente.");
+  }
+  const balance = await prisma.userLPBalance.findUnique({
+    where: { userId },
+    select: { balance: true },
+  });
+  return balance?.balance ?? 0;
+}
+
 export async function getUserLPProfile(userId: string): Promise<UserLPProfile> {
   if (!userId.trim()) {
     throw new TypeError("È necessario specificare un utente.");

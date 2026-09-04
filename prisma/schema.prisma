@@ -52,6 +52,8 @@ model User {
   referralsSent          Referral[]                  @relation("ReferralReferrer")
   referralReceived       Referral?                   @relation("ReferralInvitee")
   referralDevices        ReferralDevice[]
+  rewardRedemptions      RewardRedemption[]
+  economyConfigChanges   EconomyConfigHistory[]      @relation("EconomyConfigModifier")
 
   @@index([schoolId])
   @@index([deletedAt])
@@ -845,6 +847,86 @@ model AuditLog {
   @@index([actorId, createdAt])
 }
 
+model Reward {
+  id              String             @id @default(uuid())
+  name            String
+  description     String
+  category        String             @default("merchandise")
+  costLp          Int
+  imageUrl        String?
+  stock           Int?
+  active          Boolean            @default(true)
+  conditions      String?
+  maxPerUser      Int?
+  displayOrder    Int                @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  deletedAt       DateTime?
+  redemptions     RewardRedemption[]
+
+  @@index([active, displayOrder])
+  @@index([category, active])
+  @@index([deletedAt])
+}
+
+model RewardRedemption {
+  id             String                 @id @default(uuid())
+  userId         String
+  rewardId       String
+  costLp         Int
+  status         RewardRedemptionStatus @default(COMPLETED)
+  code           String?                @unique
+  idempotencyKey String?                @unique
+  metadata       Json?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  reward         Reward                 @relation(fields: [rewardId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+  @@index([rewardId, status])
+  @@index([status, createdAt])
+}
+
+model EconomyRewardConfig {
+  id              String                 @id @default(uuid())
+  key             String                 @unique
+  title           String
+  description     String?
+  category        String                 @default("general")
+  rewardLp        Int
+  enabled         Boolean                @default(true)
+  conditions      Json?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  history         EconomyConfigHistory[]
+
+  @@index([enabled])
+}
+
+model EconomyConfigHistory {
+  id         String               @id @default(uuid())
+  configId   String
+  actorId    String?
+  oldValue   Int
+  newValue   Int
+  oldEnabled Boolean
+  newEnabled Boolean
+  reason     String?
+  createdAt  DateTime             @default(now())
+  config     EconomyRewardConfig  @relation(fields: [configId], references: [id], onDelete: Cascade)
+  actor      User?                @relation("EconomyConfigModifier", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([configId, createdAt])
+  @@index([actorId, createdAt])
+}
+
+enum RewardRedemptionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
 enum UserRoleType {
   USER
   PLAYER
@@ -965,6 +1047,7 @@ enum PointSourceType {
   STREAK
   SCHOOL_RESULT
   REFERRAL
+  REWARD_REDEMPTION
 }
 
 enum NotificationType {
@@ -997,4 +1080,6 @@ enum AuditAction {
   CHECK_IN
   PUBLISH
   AWARD_POINTS
+  REWARD_REDEMPTION
+  ECONOMY_CONFIG_UPDATE
 }

@@ -465,3 +465,124 @@
     grid-template-columns: 1fr;
   }
 }
+
+.rewardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .rewardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.rewardCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgb(19 30 82 / 88%), rgb(7 16 52 / 92%));
+  gap: 14px;
+}
+
+.rewardCardDisabled {
+  opacity: 0.7;
+}
+
+.rewardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.rewardCostBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgb(247 201 72 / 16%);
+  border: 1px solid rgb(247 201 72 / 44%);
+  color: #ffd166;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.rewardTitle {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+.rewardCategory {
+  color: #9cb2ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.rewardDescription {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.rewardConditions {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 4%);
+  color: #d1d5db;
+  font-size: 0.74rem;
+}
+
+.rewardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.rewardMetaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.rewardButton {
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  background: var(--color-primary-light);
+  color: white;
+  transition: opacity 0.15s ease;
+}
+
+.rewardButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.rewardButton:disabled {
+  background: rgb(255 255 255 / 10%);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}

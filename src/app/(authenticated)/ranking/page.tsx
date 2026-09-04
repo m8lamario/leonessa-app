@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
-import { RankingDashboard } from "@/features/ranking";
+import { getRankingData, RankingDashboard } from "@/features/ranking";
 
 export const dynamic = "force-dynamic";
 
@@ -17,19 +17,8 @@ export default async function RankingPage() {
     redirect("/onboarding");
   }
 
-  const userName = [user.name, user.surname].filter(Boolean).join(" ") || "Tifoso";
-  const userInitials =
-    [user.name, user.surname]
-      .filter(Boolean)
-      .map((value) => value?.slice(0, 1).toUpperCase())
-      .join("") || "LC";
+  const initialData = await getRankingData(user.id);
 
-  return (
-    <RankingDashboard
-      schoolName={user.school?.name ?? "La tua scuola"}
-      schoolShortName={user.school?.shortName ?? "LC"}
-      userInitials={userInitials}
-      userName={userName}
-    />
-  );
+  return <RankingDashboard initialData={initialData} />;
 }
+

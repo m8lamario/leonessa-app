@@ -1,0 +1,270 @@
+.page {
+  min-width: 0;
+  color: #eef2ff;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0 28px;
+}
+
+.header h1 {
+  margin: 0;
+  font: 400 clamp(2rem, 7vw, 3.4rem)/0.95 var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #9cb2ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sub {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: #b8c0d5;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid #305cff66;
+  border-radius: 8px;
+  background: #305cff22;
+  color: #b9c8ff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #c6ccda26;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #9cb2ff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabBtn:hover {
+  background: #ffffff0a;
+  color: #fff;
+}
+
+.activeTab {
+  border-color: #305cff88;
+  background: #305cff2a;
+  color: #fff;
+}
+
+.section {
+  padding: 20px;
+  border: 1px solid #c6ccda26;
+  border-radius: 12px;
+  background: #0d1b6033;
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font: 400 1.5rem var(--font-family-display);
+  text-transform: uppercase;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid #c6ccda33;
+  color: #9cb2ff;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #ffffff0d;
+}
+
+.table tr:hover td {
+  background: #ffffff05;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #c6ccda33;
+  border-radius: 8px;
+  background: #071034;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup label {
+  color: #aeb7cc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+  transition: opacity 0.15s ease;
+}
+
+.btnPrimary {
+  background: var(--color-primary-light, #486fff);
+  color: #fff;
+}
+
+.btnSecondary {
+  border: 1px solid #c6ccda33;
+  background: #ffffff0d;
+  color: #eef2ff;
+}
+
+.btnDanger {
+  border: 1px solid #dc262666;
+  background: #dc262622;
+  color: #ffb3b3;
+}
+
+.btnPrimary:hover,
+.btnSecondary:hover,
+.btnDanger:hover {
+  opacity: 0.9;
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled,
+.btnDanger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionBtn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.statusActive {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #10b98122;
+  border: 1px solid #10b98166;
+  color: #34d399;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.statusInactive {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #6b728022;
+  border: 1px solid #6b728066;
+  color: #9ca3af;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+
+.messageSuccess {
+  background: #10b98118;
+  border: 1px solid #10b98144;
+  color: #6ee7b7;
+}
+
+.messageError {
+  background: #dc262618;
+  border: 1px solid #dc262644;
+  color: #fca5a5;
+}

@@ -14,6 +14,7 @@
     "prisma:generate": "prisma generate",
     "prisma:seed": "prisma db seed",
     "prisma:validate": "prisma validate",
+    "economy:seed": "node prisma/demo-economy-seed.mjs",
     "sandbox:seed": "node prisma/sandbox-seed.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
