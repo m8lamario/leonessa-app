@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
+import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 import { ProfileDashboard } from "@/features/profile";
 import { getProfileIdentity } from "@/features/profile/server";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-  const user = await requireUser();
+  const user = await requireUserForPage();
 
   if (!isOnboardingComplete(user)) {
     redirect("/onboarding");

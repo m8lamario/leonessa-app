@@ -4,7 +4,7 @@ import { AnimatePresence, m } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/shared/components/ui";
 
@@ -47,6 +47,19 @@ export function RegisterForm({
     passwordConfirmation: "",
     referralCode: initialReferralCode.trim().toUpperCase(),
   });
+
+  useEffect(() => {
+    if (!values.referralCode.trim()) return;
+
+    const controller = new AbortController();
+    void fetch("/api/referral/device", {
+      method: "POST",
+      credentials: "same-origin",
+      signal: controller.signal,
+    }).catch(() => undefined);
+
+    return () => controller.abort();
+  }, [values.referralCode]);
 
   const selectedSchool = schools.find((school) => school.id === values.schoolId);
   const matchingSchools = useMemo(() => {
@@ -136,7 +149,10 @@ export function RegisterForm({
 
     try {
       if (values.referralCode.trim()) {
-        const deviceResponse = await fetch("/api/referral/device", { method: "POST" });
+        const deviceResponse = await fetch("/api/referral/device", {
+          method: "POST",
+          credentials: "same-origin",
+        });
         if (!deviceResponse.ok) {
           throw new Error("Referral device unavailable");
         }
@@ -144,6 +160,7 @@ export function RegisterForm({
 
       response = await fetch("/api/auth/register", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,

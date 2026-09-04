@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 
 import { getEmailVerificationStatus } from "@/features/auth/server/account-service";
-import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
+import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 import { UserDashboard } from "@/features/dashboard";
 import { getDashboardData } from "@/features/dashboard/server/dashboard-service";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const user = await requireUser();
+  const user = await requireUserForPage();
 
   if (!isOnboardingComplete(user)) {
     redirect("/onboarding");

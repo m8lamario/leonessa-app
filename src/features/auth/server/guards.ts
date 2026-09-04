@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -49,6 +50,19 @@ export async function requireUser() {
   return user;
 }
 
+/** Same as requireUser, but sends unauthenticated visitors to login instead of throwing. */
+export async function requireUserForPage() {
+  try {
+    return await requireUser();
+  } catch (error) {
+    if (error instanceof AppError && error.code === "UNAUTHORIZED") {
+      redirect("/login");
+    }
+
+    throw error;
+  }
+}
+
 export async function requireRole(role: ApplicationRole) {
   const user = await requireUser();
   const hasRole = user.roles.some((userRole) => userRole.role === role);
@@ -69,6 +83,30 @@ export async function requireAnyRole(roles: ApplicationRole[]) {
   }
 
   return user;
+}
+
+export async function requireRoleForPage(role: ApplicationRole) {
+  try {
+    return await requireRole(role);
+  } catch (error) {
+    if (error instanceof AppError && error.code === "UNAUTHORIZED") {
+      redirect("/login");
+    }
+
+    throw error;
+  }
+}
+
+export async function requireAnyRoleForPage(roles: ApplicationRole[]) {
+  try {
+    return await requireAnyRole(roles);
+  } catch (error) {
+    if (error instanceof AppError && error.code === "UNAUTHORIZED") {
+      redirect("/login");
+    }
+
+    throw error;
+  }
 }
 
 export function isOnboardingComplete(user: {

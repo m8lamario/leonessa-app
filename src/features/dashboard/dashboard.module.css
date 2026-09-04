@@ -123,7 +123,6 @@
 
 .heroStats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
 }
@@ -132,11 +131,6 @@
   display: grid;
   gap: 2px;
   padding: 14px 0;
-}
-
-.heroStats > div + div {
-  padding-left: 16px;
-  border-left: 1px solid var(--color-line);
 }
 
 .heroStats span,
@@ -156,18 +150,6 @@
   letter-spacing: 0.03em;
 }
 
-.heroStats .accountPoints {
-  gap: 3px;
-  padding: 18px 0;
-}
-
-.accountPoints strong {
-  color: var(--color-primary-light);
-  font-size: 3rem;
-  line-height: 0.95;
-}
-
-.accountPoints small,
 .schoolPoints small {
   color: var(--color-text-muted);
   font-size: 0.7rem;
@@ -175,7 +157,7 @@
 
 .heroStats .schoolPoints {
   gap: 3px;
-  padding: 18px 0 18px 16px;
+  padding: 18px 0;
 }
 
 .schoolPoints strong {

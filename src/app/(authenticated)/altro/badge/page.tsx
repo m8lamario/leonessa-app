@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { BadgePage } from "@/features/altro";
 import { getHubData } from "@/features/altro/server";
-import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
+import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AltroBadgePage() {
-  const user = await requireUser();
+  const user = await requireUserForPage();
   if (!isOnboardingComplete(user)) redirect("/onboarding");
 
   const data = await getHubData(user.id, user.schoolId);

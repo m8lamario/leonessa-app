@@ -61,11 +61,6 @@ export function UserDashboard({
         <h1>{schoolName}</h1>
         <p className={styles.schoolName}>La tua scuola</p>
         <div className={styles.heroStats}>
-          <div className={styles.accountPoints}>
-            <span>I tuoi LP</span>
-            <strong>{profile.totalLp.toLocaleString("it-IT")}</strong>
-            <small>Livello {profile.level}</small>
-          </div>
           <div className={styles.schoolPoints}>
             <span>Punti scuola</span>
             <strong>{school.points.toLocaleString("it-IT")}</strong>
@@ -356,10 +351,6 @@ export function UserDashboard({
             <div>
               <span>Livello</span>
               <strong>{profile.level}</strong>
-            </div>
-            <div>
-              <span>LP totali</span>
-              <strong>{profile.totalLp.toLocaleString("it-IT")}</strong>
             </div>
           </div>
         </section>

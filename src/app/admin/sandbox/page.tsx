@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
-import { isOnboardingComplete, requireAnyRole } from "@/features/auth/server/guards";
+import { isOnboardingComplete, requireAnyRoleForPage } from "@/features/auth/server/guards";
 import { isSandboxMode } from "@/lib/sandbox";
 import { SandboxPanel } from "@/features/sandbox";
 
@@ -11,7 +11,7 @@ export default async function AdminSandboxPage() {
     notFound();
   }
 
-  const user = await requireAnyRole(["ADMIN", "ORGANIZER"]);
+  const user = await requireAnyRoleForPage(["ADMIN", "ORGANIZER"]);
   if (!isOnboardingComplete(user)) {
     redirect("/onboarding");
   }

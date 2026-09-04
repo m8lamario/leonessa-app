@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 16px;
+  margin: 16px 0 16px 0;
   padding: 14px 16px;
   border: 1px solid rgb(48 92 255 / 50%);
   border-radius: var(--radius-md);

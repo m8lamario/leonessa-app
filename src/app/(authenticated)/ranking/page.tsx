@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { isOnboardingComplete, requireUser } from "@/features/auth/server/guards";
+import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 import { RankingDashboard } from "@/features/ranking";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RankingPage() {
-  const user = await requireUser();
+  const user = await requireUserForPage();
 
   if (!isOnboardingComplete(user)) {
     redirect("/onboarding");

@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Coins } from "lucide-react";
+import type { Route } from "next";
 
 import { Logo } from "@/shared/components/common/Logo/Logo";
 
@@ -10,22 +8,28 @@ import styles from "./AppTopNav.module.css";
 
 export type AppTopNavProps = {
   userInitials: string;
+  lpBalance: number;
 };
 
-export function AppTopNav({ userInitials }: AppTopNavProps) {
-  const pathname = usePathname();
-  const notificationsHref = pathname === "/dashboard" ? "#news-title" : "/dashboard#news-title";
+function formatLp(value: number) {
+  return value.toLocaleString("it-IT");
+}
+
+export function AppTopNav({ userInitials, lpBalance }: AppTopNavProps) {
+  const formattedLp = formatLp(lpBalance);
 
   return (
     <header className={styles.nav}>
       <Logo />
       <div className={styles.actions}>
         <Link
-          aria-label="Visualizza aggiornamenti"
-          className={styles.notificationLink}
-          href={notificationsHref}
+          aria-label={`Saldo ${formattedLp} LP`}
+          className={styles.lpBalance}
+          href={"/altro" as Route}
         >
-          <Bell aria-hidden="true" size={21} strokeWidth={2} />
+          <Coins aria-hidden="true" size={16} strokeWidth={2} />
+          <span className={styles.lpAmount}>{formattedLp}</span>
+          <span className={styles.lpUnit}>LP</span>
         </Link>
         <Link className={styles.avatar} href="/profile" aria-label="Apri il tuo profilo">
           {userInitials}

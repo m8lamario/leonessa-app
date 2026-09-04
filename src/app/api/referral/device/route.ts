@@ -37,12 +37,15 @@ export async function POST(request: NextRequest) {
 
   const response = NextResponse.json({ deviceReady: true, referralStatus });
   if (!existingToken) {
+    // Secure only on HTTPS. Production builds on http://localhost would otherwise
+    // get a cookie the browser refuses to store, breaking referral attribution.
+    const secure = request.nextUrl.protocol === "https:";
     response.cookies.set({
       name: REFERRAL_DEVICE_COOKIE,
       value: token,
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure,
       path: "/",
       maxAge: REFERRAL_DEVICE_MAX_AGE_SECONDS,
     });
