@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { EsploraPage } from "@/features/altro";
-import { getHubData } from "@/features/altro/server";
+import { getExploreData } from "@/features/altro/server";
 import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export default async function AltroEsploraPage() {
   const user = await requireUserForPage();
   if (!isOnboardingComplete(user)) redirect("/onboarding");
 
-  const data = await getHubData(user.id, user.schoolId);
+  const data = await getExploreData(user.id, user.schoolId);
 
-  return <EsploraPage explore={data.explore} />;
+  return <EsploraPage data={data} />;
 }

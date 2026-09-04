@@ -1,4 +1,8 @@
 export type {
+  ExploreCategory,
+  ExploreData,
+} from "./explore";
+export type {
   HubBadge,
   HubData,
   HubDestinationId,

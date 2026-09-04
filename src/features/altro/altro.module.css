@@ -1,4 +1,6 @@
 .page {
+  display: grid;
+  gap: 28px;
   min-width: 0;
 }
 

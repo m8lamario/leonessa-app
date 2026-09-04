@@ -49,12 +49,20 @@ body {
   min-height: 100dvh;
   margin: 0;
   overflow-x: hidden;
-  background:
-    radial-gradient(ellipse at 50% -20%, #305cff33, transparent 48%), var(--color-background);
+  background: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-family-body);
   font-size: var(--type-body-size);
   text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% -20%, #305cff33, transparent 48%);
 }
 
 h1,
@@ -95,7 +103,7 @@ h3 {
 }
 
 .pattern {
-  position: absolute;
+  position: fixed;
   z-index: 0;
   inset: 0;
   width: 100%;

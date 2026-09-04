@@ -6,4 +6,4 @@ export { MissioniPage } from "./components/missioni-page";
 export { PartnerPage } from "./components/partner-page";
 export { PremiPage } from "./components/premi-page";
 export { SupportPage } from "./components/support-page";
-export type { HubData } from "./types";
+export type { ExploreData, HubData } from "./types";
