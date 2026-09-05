@@ -78,7 +78,7 @@ export function MatchPredictionCard({ prediction }: MatchPredictionCardProps) {
         <div className={styles.predictionActions}>
           <button
             className={choice === "HOME" ? styles.predictionChoiceActive : styles.predictionChoice}
-            disabled={pending}
+            disabled={pending || !prediction.editable}
             onClick={() => void submit("HOME")}
             type="button"
           >
@@ -86,7 +86,7 @@ export function MatchPredictionCard({ prediction }: MatchPredictionCardProps) {
           </button>
           <button
             className={choice === "AWAY" ? styles.predictionChoiceActive : styles.predictionChoice}
-            disabled={pending}
+            disabled={pending || !prediction.editable}
             onClick={() => void submit("AWAY")}
             type="button"
           >

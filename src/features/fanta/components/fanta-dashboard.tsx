@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Goal, Store, Target, Trophy } from "lucide-react";
+import { ArrowUpRight, Goal, Store } from "lucide-react";
 
 import { PageContainer } from "@/shared/components";
 import { FantaIcon } from "./fanta-icons";
@@ -46,21 +46,12 @@ export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
     return <EmptyDashboard />;
   }
 
-  const starters =
-    dashboard.starters ?? dashboard.roster.filter((player) => player.status === "STARTER");
-  const bench = dashboard.bench ?? dashboard.roster.filter((player) => player.status === "BENCH");
-  const involvedPlayers = starters.length + bench.length;
-
   return (
     <PageContainer className={styles.page}>
       <header className={styles.dashboardHeader}>
         <div>
           <p className={styles.kicker}>Fanta Leonessa · Stagione 2026</p>
           <h1>{dashboard.team.name}</h1>
-        </div>
-        <div className={styles.headerStat}>
-          <span>Budget</span>
-          <strong>{dashboard.team.budgetLp} LP</strong>
         </div>
       </header>
 
@@ -86,139 +77,42 @@ export function FantaDashboard({ dashboard, lineup }: FantaDashboardProps) {
 
       {lineup && <LineupExperience lineup={lineup} />}
 
-      <section className={styles.section} aria-labelledby="performance-title">
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.kicker}>Ultima giornata</p>
-            <h2 id="performance-title">Prestazioni</h2>
+      {dashboard.upcomingMatches.length ? (
+        <section className={styles.nextMatch} aria-labelledby="next-match-title">
+          <p className={styles.kicker}>Prossima giornata</p>
+          <h2 id="next-match-title">Calendario</h2>
+          <div className={styles.matchChips}>
+            {dashboard.upcomingMatches.slice(0, 3).map((match) => (
+              <span key={match.id}>
+                {match.home} <b>vs</b> {match.away}
+              </span>
+            ))}
           </div>
-          <span>Dati reali</span>
-        </div>
-        <div className={styles.performanceList}>
-          {starters.slice(0, 5).map((player) => (
-            <article className={styles.performanceCard} key={player.id}>
-              <div>
-                <strong>{player.name}</strong>
-                <small className={styles.performanceMeta}>
-                  {player.school}
-                  {player.goals ? (
-                    <>
-                      {" · "}
-                      <Goal aria-hidden="true" size={12} /> {player.goals} gol
-                    </>
-                  ) : null}
-                  {player.assists ? (
-                    <>
-                      {" · "}
-                      <Target aria-hidden="true" size={12} /> {player.assists} assist
-                    </>
-                  ) : null}
-                </small>
-              </div>
-              <b>+{player.matchPoints}</b>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.nextMatch} aria-labelledby="next-match-title">
-        <p className={styles.kicker}>Prossima giornata Leonessa Cup</p>
-        <h2 id="next-match-title">{involvedPlayers} giocatori in rosa</h2>
-        {dashboard.upcomingMatches.length ? (
-          <>
-            <p>Inizio al prossimo fischio d&apos;inizio.</p>
-            <div className={styles.matchChips}>
-              {dashboard.upcomingMatches.map((match) => (
-                <span key={match.id}>
-                  {match.home} <b>vs</b> {match.away}
-                </span>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p>Il calendario della prossima giornata sarà disponibile a breve.</p>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       <section className={styles.marketCard} id="market" aria-labelledby="market-title">
         <div>
           <p className={styles.kicker}>Mercato</p>
-          <h2 id="market-title">{dashboard.team.budgetLp} LP disponibili</h2>
-          <p>Gestisci rosa e formazione nel mercato.</p>
+          <h2 id="market-title">Gestisci la rosa</h2>
+          <p>Compra, vendi e conferma la formazione.</p>
         </div>
         <Link className={styles.marketButton} href="/fanta/market">
           <Store aria-hidden="true" size={18} /> Vai al mercato
         </Link>
       </section>
 
-      <section className={styles.section} id="ranking" aria-labelledby="ranking-title">
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.kicker}>Competizione</p>
-            <h2 id="ranking-title">Classifica rapida</h2>
-          </div>
-          <Trophy aria-hidden="true" size={22} />
-        </div>
-        <ol className={styles.rankingList}>
-          {dashboard.ranking.map((item) => (
-            <li
-              className={item.isCurrent ? styles.currentRank : undefined}
-              key={`${item.position}-${item.name}`}
-            >
-              <span>#{item.position}</span>
-              <strong>{item.name}</strong>
-              <b>{item.points.toLocaleString("it-IT")}</b>
-            </li>
-          ))}
-          {!dashboard.ranking.some((item) => item.isCurrent) && (
-            <li className={styles.currentRank}>
-              <span>#{dashboard.position}</span>
-              <strong>Tu</strong>
-              <b>{dashboard.team.totalPoints.toLocaleString("it-IT")}</b>
-            </li>
-          )}
-        </ol>
-      </section>
-
       <section className={styles.section} aria-labelledby="social-title">
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.kicker}>Community</p>
-            <h2 id="social-title">Cosa succede intorno a te</h2>
-          </div>
-        </div>
         <Link className={styles.socialLink} href={"/fanta/social" as never}>
           <span className={styles.socialEmoji}>
             <FantaIcon name="award" size={18} />
           </span>
           <div>
-            <strong>Feed & rivalità</strong>
-            <small>Attività, podio, achievement e Hall of Fame</small>
+            <strong id="social-title">Rivalità Fanta</strong>
+            <small>Podio, achievement e Hall of Fame</small>
           </div>
           <ArrowUpRight aria-hidden="true" size={18} />
         </Link>
-      </section>
-
-      <section className={styles.section} aria-labelledby="discover-title">
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.kicker}>Scopri</p>
-            <h2 id="discover-title">Giocatori da seguire</h2>
-          </div>
-        </div>
-        <div className={styles.discoveryGrid}>
-          {dashboard.discoveries.map((player) => (
-            <article className={styles.discoveryCard} key={player.id}>
-              <span className={styles.discoveryLabel}>
-                <FantaIcon name={player.icon} size={14} /> {player.label}
-              </span>
-              <strong>{player.name}</strong>
-              <small>
-                {player.school} · {player.value} LP
-              </small>
-            </article>
-          ))}
-        </div>
       </section>
     </PageContainer>
   );

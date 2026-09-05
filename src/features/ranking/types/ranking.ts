@@ -18,48 +18,9 @@ export type SchoolRankingEntry = {
   isCurrentSchool?: boolean;
 };
 
-export type RankingMission = {
-  id: string;
-  title: string;
-  description: string;
-  rewardLP: number;
-  progress: number;
-  target: number | null;
-  status: "AVAILABLE" | "IN_PROGRESS" | "COMPLETED" | "CLAIMED";
-  completedAt?: string;
-};
-
-export type RankingBadge = {
-  id: string;
-  name: string;
-  description: string;
-  earnedAt?: string;
-  progress?: number;
-  target?: number;
-};
-
-export type RankingHistoryEntry = {
-  id: string;
-  amount: number;
-  reason: string;
-  date: string;
-};
-
-export type RankingMock = {
+export type RankingData = {
   userRanking: UserRankingEntry[];
   currentUser: UserRankingEntry;
   schoolRanking: SchoolRankingEntry[];
   currentSchool: SchoolRankingEntry;
-  activeMissions: RankingMission[];
-  completedMissions: RankingMission[];
-  earnedBadges: RankingBadge[];
-  lockedBadges: RankingBadge[];
-  history: RankingHistoryEntry[];
-  stats: {
-    lpEarned: number;
-    missionsCompleted: number;
-    badgesEarned: number;
-    eventsAttended: number;
-    referralsCompleted: number;
-  };
 };

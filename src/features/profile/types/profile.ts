@@ -45,6 +45,27 @@ export type ProfileIdentity = {
   bio: string | null;
 };
 
+export type LpMovement = {
+  id: string;
+  amount: number;
+  reason: string;
+  date: string;
+};
+
+export type AccountPageData = {
+  userId: string;
+  email: string;
+  name: string;
+  role: string;
+  schoolName: string | null;
+  history: LpMovement[];
+};
+
+export type CandidaturePageData = {
+  schoolTeamId: string | null;
+  applications: ProfileApplication[];
+};
+
 export type ProfileHighlight = {
   id: string;
   title: string;

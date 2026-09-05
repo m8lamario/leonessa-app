@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { Route } from "next";
 import { useState } from "react";
 import { Award, ChartNoAxesColumn, Medal, Swords, Trophy } from "lucide-react";
 
@@ -93,9 +94,14 @@ export function PublicProfileView({
           </div>
         </div>
         {isOwnProfile ? (
-          <Link className={styles.profileAccountLink} href="/profile">
-            Gestisci account
-          </Link>
+          <div className={styles.showcaseActions}>
+            <Link className={styles.profileAccountLink} href="/profile">
+              Gestisci account
+            </Link>
+            <Link className={styles.textButton} href={"/altro/badge" as Route}>
+              Collezione badge
+            </Link>
+          </div>
         ) : follow.canFollow ? (
           <FollowButton
             initialFollowerCount={follow.followerCount}

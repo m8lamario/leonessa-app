@@ -55,6 +55,7 @@ export type DashboardActivity = {
 };
 
 export type DashboardPersonal = {
+  userId: string;
   name: string;
   initials: string;
   schoolName: string;

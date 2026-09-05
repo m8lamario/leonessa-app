@@ -1,0 +1,82 @@
+.root {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.trigger {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgb(198 204 218 / 20%);
+  border-radius: 50%;
+  background: rgb(19 30 82 / 72%);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.panel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(280px, calc(100vw - 24px));
+  padding: 10px 8px 8px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: rgb(10 18 56 / 96%);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 32%);
+}
+
+.kicker {
+  margin: 0 8px 6px;
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.item,
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.item:hover,
+.logout:hover {
+  background: rgb(48 92 255 / 14%);
+}
+
+.logout {
+  margin-top: 4px;
+  color: #ffadad;
+}
+
+@media (max-width: 599px) {
+  .panel {
+    position: fixed;
+    top: var(--app-top-nav-height);
+    right: max(8px, env(safe-area-inset-right, 0px));
+    bottom: auto;
+    left: max(8px, env(safe-area-inset-left, 0px));
+    width: auto;
+  }
+}

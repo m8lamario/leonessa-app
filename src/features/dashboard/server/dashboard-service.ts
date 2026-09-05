@@ -501,14 +501,10 @@ async function getDashboardActivity(
   });
 
   return {
-    activity: pickDashboardActivities([
-      ...community,
-      ...badges,
-      ...missions,
-      ...achievements,
-      ...scores,
-      ...overtakes,
-    ]),
+    activity: pickDashboardActivities(
+      [...community, ...badges, ...missions, ...achievements, ...scores, ...overtakes],
+      viewerId,
+    ),
     followingAnyone: followedIds.length > 0,
   };
 }
@@ -691,6 +687,7 @@ export async function getDashboardData(
 
   return {
     personal: {
+      userId,
       name: formatUserName(identity),
       initials: formatUserInitials(identity),
       schoolName: identity.schoolName,
@@ -711,7 +708,7 @@ export async function getDashboardData(
       points: currentSchoolRanking?.totalPoints ?? 0,
       teamId: currentTeam?.id ?? null,
     },
-    news: newsRows.map(mapNews),
+    news: newsRows.map(mapNews).slice(0, 1),
     events,
   };
 }

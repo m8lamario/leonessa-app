@@ -30,6 +30,7 @@ export default async function AuthenticatedLayout({
       <AppTopNav
         lpBalance={lpProfile.balance}
         unreadCount={unreadCount}
+        userId={user.id}
         userInitials={buildUserInitials(user.name, user.surname)}
       />
       <div className={styles.content}>{children}</div>

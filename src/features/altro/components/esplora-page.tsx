@@ -200,7 +200,7 @@ function PeoplePanel() {
   return (
     <section className={styles.panel} aria-labelledby="explore-persone-title">
       <p className={styles.panelLead} id="explore-persone-title">
-        Cerca nella Leonessa per nome. I risultati mostrano solo dati pubblici: scuola, livello e ranking.
+        Cerca i tuoi amici e gli altri tifosi per nome. I risultati mostrano solo dati pubblici: scuola, livello e ranking.
       </p>
       <SearchField
         label="Cerca persone"

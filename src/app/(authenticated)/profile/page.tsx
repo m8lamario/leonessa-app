@@ -3,12 +3,12 @@ import { redirect } from "next/navigation";
 
 import { isOnboardingComplete, requireUserForPage } from "@/features/auth/server/guards";
 import { ProfileDashboard } from "@/features/profile";
-import { getProfileIdentity } from "@/features/profile/server";
+import { getAccountPageData } from "@/features/profile/server";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Profilo | Leonessa",
+  title: "Account | Leonessa",
 };
 
 export default async function ProfilePage() {
@@ -19,14 +19,14 @@ export default async function ProfilePage() {
   }
 
   const primaryRole = user.roles.find((role) => role.isPrimary)?.role ?? "USER";
-  const identity = await getProfileIdentity(user.id, user.schoolId, user.school?.name ?? null);
+  const account = await getAccountPageData({
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    surname: user.surname,
+    role: primaryRole,
+    schoolName: user.school?.name ?? null,
+  });
 
-  return (
-    <ProfileDashboard
-      email={user.email}
-      identity={identity}
-      name={[user.name, user.surname].filter(Boolean).join(" ") || "Tifoso Leonessa"}
-      role={primaryRole}
-    />
-  );
+  return <ProfileDashboard account={account} />;
 }

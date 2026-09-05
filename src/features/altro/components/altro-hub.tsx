@@ -12,19 +12,17 @@ import {
   Info,
   LifeBuoy,
   Mail,
-  Medal,
   QrCode,
-  Sparkles,
   Target,
   UserPlus,
+  UserRoundSearch,
 } from "lucide-react";
 import type { Route } from "next";
 
 import { PageContainer } from "@/shared/components";
 
 import styles from "../altro.module.css";
-import type { HubData, HubDestinationId } from "../types";
-import { HubProgress } from "./hub-progress";
+import type { HubData } from "../types";
 
 type AltroHubProps = {
   data: HubData;
@@ -32,61 +30,54 @@ type AltroHubProps = {
 
 const reveal = { duration: 0.24, ease: "easeOut" as const };
 
-const destinations: Array<{
-  id: HubDestinationId;
-  href: Route;
-  title: string;
-  description: string;
-  icon: typeof QrCode;
-}> = [
+const featured = [
   {
-    id: "accrediti",
-    href: "/altro/accrediti" as Route,
-    title: "Accrediti",
-    description: "Scansiona il QR e ricevi LP.",
-    icon: QrCode,
+    href: "/altro/esplora" as Route,
+    title: "Esplora",
+    description: "Scuole, squadre, partite e classifiche.",
+    icon: Compass,
   },
   {
-    id: "premi",
-    href: "/altro/premi" as Route,
-    title: "Premi",
-    description: "Merch, omaggi e vantaggi.",
-    icon: Gift,
+    href: "/altro/esplora?categoria=persone" as Route,
+    title: "Trova amici",
+    description: "Cerca persone nella Leonessa e apri i profili.",
+    icon: UserRoundSearch,
   },
+];
+
+const playLinks = [
   {
-    id: "partner",
-    href: "/altro/partner" as Route,
-    title: "Partner",
-    description: "Sconti e offerte Leonessa.",
-    icon: Handshake,
-  },
-  {
-    id: "missioni",
     href: "/altro/missioni" as Route,
     title: "Missioni",
     description: "Obiettivi attivi e ricompense.",
     icon: Target,
   },
   {
-    id: "badge",
-    href: "/altro/badge" as Route,
-    title: "Badge",
-    description: "Collezione e trofei.",
-    icon: Medal,
+    href: "/altro/accrediti" as Route,
+    title: "Accrediti",
+    description: "Scansiona il QR e ricevi LP.",
+    icon: QrCode,
   },
   {
-    id: "esplora",
-    href: "/altro/esplora" as Route,
-    title: "Esplora",
-    description: "Scuole, squadre e partite.",
-    icon: Compass,
-  },
-  {
-    id: "referral",
     href: "/altro/referral" as Route,
     title: "Porta un amico",
     description: "Invita amici e segui i tuoi inviti.",
     icon: UserPlus,
+  },
+];
+
+const benefitLinks = [
+  {
+    href: "/altro/premi" as Route,
+    title: "Premi",
+    description: "Merch, omaggi e vantaggi.",
+    icon: Gift,
+  },
+  {
+    href: "/altro/partner" as Route,
+    title: "Partner",
+    description: "Sconti e offerte Leonessa.",
+    icon: Handshake,
   },
 ];
 
@@ -123,101 +114,100 @@ const supportLinks = [
   },
 ];
 
-function formatLp(value: number) {
-  return value.toLocaleString("it-IT");
-}
-
 export function AltroHub({ data }: AltroHubProps) {
-  const { pass } = data;
-  const remainingLp = pass.nextLevelLP === null ? null : Math.max(0, pass.nextLevelLP - pass.lp);
-
   return (
     <PageContainer className={styles.page}>
       <div className={styles.content}>
         <m.section
-          aria-labelledby="pass-title"
+          aria-labelledby="discover-title"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...reveal, delay: 0.06 }}
-        >
-          <article className={styles.pass}>
-            <div className={styles.passTopline}>
-              <p className={styles.kicker} id="pass-title">
-                Leonessa Pass
-              </p>
-              <Sparkles aria-hidden="true" size={18} />
-            </div>
-            <div className={styles.passStats}>
-              <div>
-                <span className={styles.statLabel}>LP disponibili</span>
-                <strong className={styles.lpValue}>{formatLp(pass.lp)}</strong>
-              </div>
-              <div>
-                <span className={styles.statLabel}>Livello</span>
-                <strong className={styles.levelValue}>{pass.level}</strong>
-              </div>
-            </div>
-            <HubProgress
-              label="Progresso verso il prossimo livello"
-              percent={pass.progressPercent}
-              currentLabel={
-                pass.isMaxLevel
-                  ? "Livello massimo"
-                  : `${formatLp(pass.progressLP)} LP in questo livello`
-              }
-              remainingLabel={
-                remainingLp === null ? undefined : `${formatLp(remainingLp)} LP al prossimo`
-              }
-            />
-            <div className={styles.passMeta}>
-              <span className={styles.chip}>
-                <Medal aria-hidden="true" size={14} />
-                {pass.badgeCount} badge
-              </span>
-              {pass.featuredBadges.map((badge) => (
-                <span className={styles.chip} key={badge.id}>
-                  {badge.name}
-                </span>
-              ))}
-            </div>
-            <p className={styles.perkLine}>Nessun vantaggio attivo al momento.</p>
-          </article>
-        </m.section>
-
-        <m.section
-          aria-labelledby="hub-title"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...reveal, delay: 0.12 }}
+          transition={{ ...reveal, delay: 0.04 }}
         >
           <div className={styles.sectionHeading}>
             <div>
-              <p className={styles.kicker}>Servizi</p>
-              <h2 id="hub-title">Scopri</h2>
+              <p className={styles.kicker}>Persone e Cup</p>
+              <h2 id="discover-title">Esplora la Leonessa</h2>
             </div>
           </div>
           <div className={styles.grid}>
-            {destinations.map((destination) => {
-              const Icon = destination.icon;
+            {featured.map((item) => {
+              const Icon = item.icon;
               return (
-                <Link className={styles.destination} href={destination.href} key={destination.id}>
+                <Link className={`${styles.destination} ${styles.featuredDestination}`} href={item.href} key={item.href}>
                   <span className={styles.destinationIcon}>
                     <Icon aria-hidden="true" size={18} strokeWidth={2} />
                   </span>
-                  <h3>{destination.title}</h3>
-                  <p>{destination.description}</p>
-                  {destination.id === "referral" && data.referral.total > 0 && (
-                    <span className={styles.destinationStatus}>
-                      {data.referral.completed > 0
-                        ? `${data.referral.completed} completati`
-                        : `${data.referral.pending} in attesa`}
-                    </span>
-                  )}
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
                 </Link>
               );
             })}
           </div>
         </m.section>
+
+        <m.section
+          aria-labelledby="play-title"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...reveal, delay: 0.08 }}
+        >
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className={styles.kicker}>Gioca</p>
+              <h2 id="play-title">Guadagna LP</h2>
+            </div>
+          </div>
+          <div className={styles.supportList}>
+            {playLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link className={styles.supportItem} href={item.href} key={item.href}>
+                  <span className={styles.supportIcon}>
+                    <Icon aria-hidden="true" size={18} />
+                  </span>
+                  <span className={styles.supportCopy}>
+                    <strong>{item.title}</strong>
+                    <p>
+                      {item.href === "/altro/referral" && data.referral.total > 0
+                        ? data.referral.completed > 0
+                          ? `${data.referral.completed} inviti completati`
+                          : `${data.referral.pending} inviti in attesa`
+                        : item.description}
+                    </p>
+                  </span>
+                  <ChevronRight aria-hidden="true" className={styles.chevron} size={18} />
+                </Link>
+              );
+            })}
+          </div>
+        </m.section>
+
+        <section aria-labelledby="benefits-title">
+          <div className={styles.sectionHeading}>
+            <div>
+              <p className={styles.kicker}>Vantaggi</p>
+              <h2 id="benefits-title">Premi e partner</h2>
+            </div>
+          </div>
+          <div className={styles.supportList}>
+            {benefitLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link className={styles.supportItem} href={item.href} key={item.href}>
+                  <span className={styles.supportIcon}>
+                    <Icon aria-hidden="true" size={18} />
+                  </span>
+                  <span className={styles.supportCopy}>
+                    <strong>{item.title}</strong>
+                    <p>{item.description}</p>
+                  </span>
+                  <ChevronRight aria-hidden="true" className={styles.chevron} size={18} />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
         <section aria-labelledby="support-title">
           <div className={styles.sectionHeading}>

@@ -69,18 +69,20 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
   const { personal, fanta, prediction, todayActions, activity, followingAnyone, school, news, events } =
     data;
   const hasSecondary = news.length > 0 || events.length > 0;
+  const friendsHref = "/altro/esplora?categoria=persone" as Route;
+  const showcaseHref = `/u/${personal.userId}` as Route;
 
   useEffect(() => {
     router.prefetch("/ranking");
     router.prefetch("/profile");
     router.prefetch("/fanta");
     router.prefetch("/fanta/market");
-    router.prefetch("/altro/esplora?categoria=persone" as Route);
-    router.prefetch("/altro" as Route);
+    router.prefetch(friendsHref);
+    router.prefetch(showcaseHref);
     if (school.teamId) {
       router.prefetch(`/team/${school.teamId}`);
     }
-  }, [router, school.teamId]);
+  }, [router, school.teamId, friendsHref, showcaseHref]);
 
   return (
     <PageContainer className={`${styles.dashboard} ${skeletonStyles.fadeIn}`}>
@@ -92,7 +94,7 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
         animate={{ opacity: 1, y: 0 }}
         transition={revealTransition}
       >
-        <div className={styles.identityRow}>
+        <Link className={styles.identityLink} href={showcaseHref}>
           <div className={styles.avatar} aria-hidden="true">
             {personal.initials}
           </div>
@@ -100,26 +102,12 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
             <p className={styles.greeting}>Bentornato</p>
             <h1>{personal.name}</h1>
             <p className={styles.schoolName}>{personal.schoolName}</p>
+            <p className={styles.statusLine}>
+              Livello {personal.level} · Ranking #{personal.rankingPosition}
+            </p>
           </div>
-          <Link className={styles.profileLink} href="/profile">
-            Profilo
-            <ChevronRight aria-hidden="true" size={16} />
-          </Link>
-        </div>
-        <dl className={styles.statusPills}>
-          <div>
-            <dt>Livello</dt>
-            <dd>{personal.level}</dd>
-          </div>
-          <div>
-            <dt>Ranking</dt>
-            <dd>#{personal.rankingPosition}</dd>
-          </div>
-          <div>
-            <dt>Scuola</dt>
-            <dd>{personal.schoolPosition ? `#${personal.schoolPosition}` : "—"}</dd>
-          </div>
-        </dl>
+          <ChevronRight aria-hidden="true" className={styles.identityChevron} size={18} />
+        </Link>
       </m.header>
 
       <div className={styles.content}>
@@ -183,51 +171,51 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
           )}
         </m.section>
 
-        <m.section
-          className={styles.section}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...revealTransition, delay: 0.11 }}
-          aria-labelledby="friends-title"
-        >
-          <article className={styles.friendsCard}>
-            <span className={styles.rowIcon}>
-              <UserRoundSearch aria-hidden="true" size={18} />
-            </span>
-            <div className={styles.rowCopy}>
-              <p className={styles.kicker}>Amici</p>
-              <h2 id="friends-title">Trova i tuoi amici</h2>
-              <p>Cerca i tuoi amici nella Leonessa e confronta i tuoi progressi.</p>
+        {prediction ? (
+          <m.section
+            id="prediction"
+            className={styles.section}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...revealTransition, delay: 0.09 }}
+            aria-labelledby="prediction-title"
+          >
+            <div className={styles.sectionHeading}>
+              <div>
+                <p className={styles.kicker}>Match della settimana</p>
+                <h2 id="prediction-title">Chi vincerà?</h2>
+              </div>
+              <Swords aria-hidden="true" className={styles.headingIcon} size={18} />
             </div>
-            <Link className={styles.friendsCta} href={"/altro/esplora?categoria=persone" as Route}>
-              Cerca amici
-              <ChevronRight aria-hidden="true" size={16} />
-            </Link>
-          </article>
-        </m.section>
-        <m.section
-          id="prediction"
-          className={styles.section}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...revealTransition, delay: 0.09 }}
-          aria-labelledby="prediction-title"
-        >
-          <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.kicker}>Match della settimana</p>
-              <h2 id="prediction-title">Chi vincerà?</h2>
-            </div>
-            <Swords aria-hidden="true" className={styles.headingIcon} size={18} />
-          </div>
-          {prediction ? (
             <MatchPredictionCard prediction={prediction} />
-          ) : (
-            <article className={styles.matchCard}>
-              <p className={styles.emptyState}>Nessuna partita disponibile per un pronostico.</p>
+          </m.section>
+        ) : null}
+
+        {!followingAnyone ? (
+          <m.section
+            className={styles.section}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...revealTransition, delay: 0.11 }}
+            aria-labelledby="friends-title"
+          >
+            <article className={styles.friendsCard}>
+              <span className={styles.rowIcon}>
+                <UserRoundSearch aria-hidden="true" size={18} />
+              </span>
+              <div className={styles.rowCopy}>
+                <p className={styles.kicker}>Amici</p>
+                <h2 id="friends-title">Trova i tuoi amici</h2>
+                <p>Cerca i tuoi amici nella Leonessa e confronta i tuoi progressi.</p>
+              </div>
+              <Link className={styles.friendsCta} href={friendsHref}>
+                Cerca amici
+                <ChevronRight aria-hidden="true" size={16} />
+              </Link>
             </article>
-          )}
-        </m.section>
+          </m.section>
+        ) : null}
+
         <m.section
           className={styles.section}
           initial={{ opacity: 0, y: 10 }}
@@ -240,6 +228,12 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
               <p className={styles.kicker}>Social</p>
               <h2 id="activity-title">Attività nella Leonessa</h2>
             </div>
+            {followingAnyone ? (
+              <Link className={styles.sectionCta} href={friendsHref}>
+                Cerca amici
+                <ChevronRight aria-hidden="true" size={16} />
+              </Link>
+            ) : null}
           </div>
           {activity.length === 0 ? (
             <div className={styles.emptyBlock}>
@@ -248,9 +242,6 @@ export function UserDashboard({ data, verificationStatus }: UserDashboardProps) 
                   ? "I profili che segui non hanno ancora attività recenti."
                   : "Segui i tuoi amici per vedere qui i loro progressi nella Leonessa."}
               </p>
-              <Link className={styles.textAction} href={"/altro/esplora?categoria=persone" as Route}>
-                Cerca amici
-              </Link>
             </div>
           ) : (
             <div className={styles.activityList}>

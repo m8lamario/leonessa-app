@@ -7,4 +7,7 @@ export type {
   ProfileIdentity,
   ProfileMock,
   UserShowcase,
+  LpMovement,
+  AccountPageData,
+  CandidaturePageData,
 } from "./profile";

@@ -1,3 +1,4 @@
+export { getAccountPageData, getCandidaturePageData } from "./account-service";
 export { getProfileIdentity } from "./profile-service";
 export { getUserShowcase, requireUserShowcase, buildProfileComparison, buildShowcaseStats } from "./showcase-service";
 export type { UserShowcase } from "../types/profile";

@@ -24,11 +24,12 @@ export function iconForCommunityActivity(type: string) {
   return COMMUNITY_ICONS[type] ?? "flame";
 }
 
-export function pickDashboardActivities(items: DashboardActivity[]) {
+export function pickDashboardActivities(items: DashboardActivity[], viewerUserId?: string) {
   const seen = new Set<string>();
 
   return items
     .filter((item) => item.title.trim().length > 0)
+    .filter((item) => !viewerUserId || item.actorUserId !== viewerUserId)
     .sort((left, right) => {
       if (left.fromFollowed !== right.fromFollowed) {
         return left.fromFollowed ? -1 : 1;

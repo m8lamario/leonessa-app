@@ -49,6 +49,28 @@ describe("dashboard activity", () => {
     expect(selected.map((item) => item.id)).toEqual(["badge", "old"]);
   });
 
+  it("drops the current user's own activity", () => {
+    const selected = pickDashboardActivities(
+      [
+        activity({
+          id: "self",
+          kind: "badge",
+          title: "Mario ha ottenuto un badge",
+          occurredAt: "2026-09-05T12:00:00.000Z",
+          actorUserId: "mario",
+        }),
+        activity({
+          id: "other",
+          title: "Attività globale",
+          occurredAt: "2026-09-05T10:00:00.000Z",
+        }),
+      ],
+      "mario",
+    );
+
+    expect(selected.map((item) => item.id)).toEqual(["other"]);
+  });
+
   it("prioritizes followed users over newer global activity", () => {
     const selected = pickDashboardActivities([
       activity({

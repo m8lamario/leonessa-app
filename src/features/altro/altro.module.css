@@ -253,6 +253,13 @@
   font-size: 1.15rem;
 }
 
+.featuredDestination {
+  min-height: 132px;
+  background:
+    linear-gradient(135deg, rgb(48 92 255 / 22%), transparent 58%),
+    linear-gradient(145deg, rgb(19 30 82 / 98%), rgb(6 15 51 / 98%));
+}
+
 .destination p {
   margin: 0;
   color: var(--color-text-secondary);
