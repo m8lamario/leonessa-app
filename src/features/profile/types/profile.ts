@@ -34,4 +34,54 @@ export type ProfileIdentity = {
   featuredBadge: string | null;
   badges: ProfileBadge[];
   stats: Array<{ label: string; value: string; detail?: string }>;
+  rankingPosition: number | null;
+  fantaPosition: number | null;
+  fantaPoints: number | null;
+  predictionPercent: number | null;
+  missionsCompleted: number;
+  eventsAttended: number;
+  referralsCompleted: number;
+  levelProgressPercent: number;
+  bio: string | null;
+};
+
+export type ProfileHighlight = {
+  id: string;
+  title: string;
+  detail: string | null;
+  occurredAt: string;
+};
+
+export type UserShowcase = {
+  id: string;
+  name: string;
+  initials: string;
+  image: string | null;
+  bio: string | null;
+  schoolName: string | null;
+  schoolRank: number | null;
+  level: number;
+  levelProgressPercent: number;
+  currentLP: number;
+  nextLevelLP: number | null;
+  totalLp: number;
+  rankingPosition: number;
+  fantaPoints: number | null;
+  fantaPosition: number | null;
+  badges: ProfileBadge[];
+  badgeCount: number;
+  missionsCompleted: number;
+  eventsAttended: number;
+  referralsCompleted: number;
+  predictionPercent: number | null;
+  predictionSettled: number;
+  followerCount: number;
+  followingCount: number;
+  achievements: Array<{
+    code: string;
+    title: string;
+    description: string;
+    unlockedAt: string;
+  }>;
+  recentActivity: ProfileHighlight[];
 };

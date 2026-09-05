@@ -14,19 +14,15 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  const dashboardData = await getDashboardData(user.id, user.schoolId);
+  const dashboardData = await getDashboardData(user.id, user.schoolId, {
+    name: user.name,
+    surname: user.surname,
+    schoolName: user.school?.name ?? "La tua scuola",
+  });
   const verificationStatus = user.emailVerified ? null : await getEmailVerificationStatus(user.id);
-  const userName = [user.name, user.surname].filter(Boolean).join(" ");
-  const userInitials = [user.name, user.surname]
-    .filter(Boolean)
-    .map((value) => value?.slice(0, 1).toUpperCase())
-    .join("");
 
   return (
     <UserDashboard
-      userName={userName || "Tifoso"}
-      userInitials={userInitials || "LC"}
-      schoolName={user.school?.name ?? "La tua scuola"}
       data={dashboardData}
       verificationStatus={
         verificationStatus && {

@@ -1,4 +1,5 @@
 export const EXPLORE_CATEGORIES = [
+  "persone",
   "scuole",
   "squadre",
   "giocatori",

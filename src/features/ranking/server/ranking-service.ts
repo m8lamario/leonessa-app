@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getLevelForLP, getLevelProgress } from "@/features/rewards/levels";
+import { getLevelForLP } from "@/features/rewards/levels";
 import { prisma } from "@/lib/prisma";
 import type {
   RankingBadge,
@@ -194,7 +194,7 @@ export async function getRankingData(userId: string): Promise<RankingMock> {
       description: um.mission.description,
       rewardLP: um.mission.rewardPoints,
       progress: um.progress,
-      target: 100,
+      target: null,
       status: um.status,
       completedAt: um.completedAt ? formatDate(um.completedAt) : undefined,
     };
@@ -211,7 +211,6 @@ export async function getRankingData(userId: string): Promise<RankingMock> {
     id: ub.badgeId,
     name: ub.badge.name,
     description: ub.badge.description,
-    rarity: "Comune",
     earnedAt: formatDate(ub.earnedAt),
   }));
 
@@ -221,7 +220,6 @@ export async function getRankingData(userId: string): Promise<RankingMock> {
       id: b.id,
       name: b.name,
       description: b.description,
-      rarity: "Raro",
     }));
 
   const history: RankingHistoryEntry[] = userTransactions.map((tx) => ({

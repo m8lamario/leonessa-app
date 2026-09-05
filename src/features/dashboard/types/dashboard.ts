@@ -1,3 +1,5 @@
+import type { DashboardPrediction } from "@/features/predictions/types";
+
 export type DashboardMission = {
   id: string;
   title: string;
@@ -6,14 +8,6 @@ export type DashboardMission = {
   progress: number;
   target: number | null;
   status: string;
-};
-
-export type DashboardRankingEntry = {
-  id: string;
-  schoolId: string;
-  name: string;
-  points: number;
-  isCurrentSchool: boolean;
 };
 
 export type DashboardNewsArticle = {
@@ -32,32 +26,58 @@ export type DashboardEvent = {
   location: string;
 };
 
-export type DashboardFeaturedMatch = {
+export type DashboardFantaCta = {
+  kind: "CREATE" | "COMPLETE_LINEUP" | "MARKET_OPEN" | "MATCH_SOON" | "READY";
+  title: string;
+  description: string;
+  href: "/fanta" | "/fanta/market" | "/fanta/team";
+  points: number | null;
+  position: number | null;
+};
+
+export type DashboardTodayAction = {
   id: string;
-  homeTeam: string;
-  awayTeam: string;
-  schedule: string;
-  venue: string;
-  /** Display label for the badge (e.g. LIVE / IN PROGRAMMA). */
-  status: string;
-  matchStatus: "SCHEDULED" | "LIVE" | "FINISHED" | "CANCELLED";
-  startAt: string;
-  following: boolean;
+  title: string;
+  description: string;
+  href: string;
+};
+
+export type DashboardActivity = {
+  id: string;
+  kind: "community" | "badge" | "mission" | "achievement" | "fanta_score" | "overtake";
+  title: string;
+  detail: string | null;
+  occurredAt: string;
+  icon: string;
+  actorUserId: string | null;
+  href: string | null;
+  fromFollowed: boolean;
+};
+
+export type DashboardPersonal = {
+  name: string;
+  initials: string;
+  schoolName: string;
+  level: number;
+  rankingPosition: number;
+  schoolPosition: number | null;
+  schoolPoints: number;
+  schoolTeamId: string | null;
 };
 
 export type DashboardData = {
+  personal: DashboardPersonal;
+  fanta: DashboardFantaCta;
+  prediction: DashboardPrediction | null;
+  todayActions: DashboardTodayAction[];
+  activity: DashboardActivity[];
   school: {
+    name: string;
     position: number | null;
     points: number;
     teamId: string | null;
   };
-  featuredMatch: DashboardFeaturedMatch | null;
-  missions: DashboardMission[];
-  schoolRanking: DashboardRankingEntry[];
   news: DashboardNewsArticle[];
   events: DashboardEvent[];
-  profile: {
-    level: number;
-    totalLp: number;
-  };
+  followingAnyone: boolean;
 };

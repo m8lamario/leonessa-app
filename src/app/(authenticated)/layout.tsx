@@ -1,4 +1,5 @@
 import { requireUserForPage } from "@/features/auth/server/guards";
+import { getInboxUnreadCount } from "@/features/notifications/server/inbox-service";
 import { ReferralDeviceBootstrap } from "@/features/referral/components/referral-device-bootstrap";
 import { getUserLPProfile } from "@/features/rewards/server";
 import { AppTopNav, BottomNavigation, ScreenLayout } from "@/shared/components";
@@ -18,13 +19,17 @@ export default async function AuthenticatedLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const user = await requireUserForPage();
-  const lpProfile = await getUserLPProfile(user.id);
+  const [lpProfile, unreadCount] = await Promise.all([
+    getUserLPProfile(user.id),
+    getInboxUnreadCount(user.id),
+  ]);
 
   return (
     <ScreenLayout>
       <ReferralDeviceBootstrap />
       <AppTopNav
         lpBalance={lpProfile.balance}
+        unreadCount={unreadCount}
         userInitials={buildUserInitials(user.name, user.surname)}
       />
       <div className={styles.content}>{children}</div>

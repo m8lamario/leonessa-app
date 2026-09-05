@@ -358,6 +358,8 @@
   align-items: center;
   min-height: 52px;
   padding: 8px 4px;
+  color: inherit;
+  text-decoration: none;
 }
 
 .lpRowCurrent {

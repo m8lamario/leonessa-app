@@ -4,6 +4,8 @@ import {
   extractMatchIdFromLivePath,
   liveDeepLinkForMatch,
   livePathForMatch,
+  profileDeepLinkForUser,
+  profilePathForUser,
   resolveAppPathFromDeepLink,
 } from "./deep-link";
 
@@ -23,6 +25,13 @@ describe("deep-link helpers", () => {
 
   it("resolves https live path", () => {
     expect(resolveAppPathFromDeepLink("https://app.example/live/xyz?x=1")).toBe("/live/xyz");
+  });
+
+  it("resolves public profile deep links", () => {
+    expect(profilePathForUser("user-1")).toBe("/u/user-1");
+    expect(profileDeepLinkForUser("user-1")).toBe("leonessa://u/user-1");
+    expect(resolveAppPathFromDeepLink("leonessa://u/user-1")).toBe("/u/user-1");
+    expect(resolveAppPathFromDeepLink("https://app.example/u/user-1")).toBe("/u/user-1");
   });
 
   it("extracts match id", () => {

@@ -140,7 +140,7 @@
 
 .levelGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 20px;
   border-top: 1px solid var(--color-line);
 }
@@ -164,6 +164,21 @@
   font-family: var(--font-family-display);
   font-size: 2rem;
   line-height: 0.9;
+}
+
+.progressTrack {
+  height: 7px;
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 12%);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary-light), #89a1ff);
 }
 
 .content {
@@ -545,6 +560,368 @@
     height: 60px;
   }
   .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profileAccountLink,
+.hero .actionButton {
+  display: inline-flex;
+  margin-top: 16px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  color: var(--color-primary-light);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.compareTable {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: rgb(19 30 82 / 68%);
+}
+
+.compareHead,
+.compareRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+
+.compareHead {
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.compareRow {
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.88rem;
+}
+
+.compareRow:last-child {
+  border-bottom: 0;
+}
+
+.compareWin {
+  color: var(--color-primary-light);
+}
+
+.showcase {
+  min-width: 0;
+}
+
+.showcaseHero,
+.progressPanel,
+.competeCard,
+.trophyItem,
+.showcaseActivityRow,
+.compareTable {
+  border: 1px solid var(--color-line);
+}
+
+.showcaseHero {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 16px 16px;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgb(48 92 255 / 18%), transparent 58%),
+    linear-gradient(160deg, rgb(19 30 82 / 96%), rgb(7 16 52 / 96%));
+}
+
+.showcaseIdentity,
+.showcaseHeading,
+.progressStats,
+.trophyItem,
+.showcaseActivityRow,
+.followActions,
+.followButton,
+.followButtonActive {
+  display: flex;
+  align-items: center;
+}
+
+.showcaseIdentity,
+.showcaseHeading {
+  gap: 14px;
+}
+
+.showcaseHeading {
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.showcaseAvatar {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--color-primary-light), var(--color-primary));
+  font-family: var(--font-family-display);
+  font-size: 1.7rem;
+}
+
+.showcaseAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcaseCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.showcase h1 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.45rem, 6vw, 1.9rem);
+  line-height: 0.94;
+}
+
+.showcaseBio,
+.showcaseSocialCounts {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.showcaseSocialCounts {
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.showcaseFeatured {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 5px 9px;
+  border: 1px solid rgb(245 158 11 / 40%);
+  border-radius: 999px;
+  background: rgb(245 158 11 / 12%);
+  color: #ffd989;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.showcaseSection {
+  margin-top: 22px;
+}
+
+.showcaseSection h2 {
+  margin: 2px 0 0;
+  font-size: clamp(1.15rem, 4vw, 1.4rem);
+}
+
+.progressPanel,
+.competeCard {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgb(19 30 82 / 58%);
+}
+
+.progressLabel {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.progressStats {
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.progressStats > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.progressStats dt {
+  color: var(--color-text-secondary);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.progressStats dd {
+  margin: 4px 0 0;
+  font-family: var(--font-family-display);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.competeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.competeCard strong {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-family-display);
+  font-size: 1.35rem;
+  line-height: 0.9;
+}
+
+.competeCard p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+}
+
+.trophyBoard {
+  display: grid;
+  gap: 12px;
+}
+
+.trophyMosaic {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trophyChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid rgb(48 92 255 / 28%);
+  border-radius: 999px;
+  background: rgb(48 92 255 / 12%);
+  color: #d5ddff;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.achievementList {
+  display: grid;
+  gap: 8px;
+}
+
+.trophyList,
+.achievementList,
+.showcaseActivity {
+  display: grid;
+  gap: 8px;
+}
+
+.trophyItem,
+.achievementRow,
+.showcaseActivityRow {
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgb(19 30 82 / 52%);
+}
+
+.trophyIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: rgb(48 92 255 / 16%);
+  color: #c5d2ff;
+}
+
+.trophyItem p,
+.achievementRow p,
+.showcaseActivityRow p {
+  margin: 3px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.showcaseActivityRow time {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.showcaseActivityRow > div,
+.trophyItem > div,
+.achievementRow > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.followActions {
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.followButton,
+.followButtonActive {
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.followButton {
+  border: 0;
+  background: var(--color-primary-light);
+  color: var(--color-text);
+}
+
+.followButtonActive {
+  border: 1px solid rgb(198 204 218 / 22%);
+  background: rgb(48 92 255 / 14%);
+  color: var(--color-text);
+}
+
+.followMeta {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+@media (min-width: 600px) {
+  .showcaseHero {
+    padding: 22px;
+  }
+
+  .showcaseAvatar {
+    width: 72px;
+    height: 72px;
+    font-size: 1.9rem;
+  }
+}
+
+@media (max-width: 599px) {
+  .competeGrid {
     grid-template-columns: 1fr;
   }
 }

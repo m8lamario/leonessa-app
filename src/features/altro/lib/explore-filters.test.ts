@@ -5,6 +5,7 @@ import {
   filterByQuery,
   groupMatches,
   matchesQuery,
+  resolveExploreCategory,
   shouldShowSearch,
 } from "./explore-filters";
 import type { ExploreMatch } from "../types/explore";
@@ -47,6 +48,11 @@ describe("explore filters", () => {
   it("opens partite when a live match exists", () => {
     expect(defaultExploreCategory(true)).toBe("partite");
     expect(defaultExploreCategory(false)).toBe("scuole");
+  });
+
+  it("honors an explicit Esplora category from the dashboard", () => {
+    expect(resolveExploreCategory("persone", false)).toBe("persone");
+    expect(resolveExploreCategory("unknown", true)).toBe("partite");
   });
 
   it("groups matches by status and sorts them", () => {

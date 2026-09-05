@@ -6,7 +6,7 @@ import { PushNotifications, type ActionPerformed, type PushNotificationSchema } 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { MATCH_START_NOTIFICATION_TYPE } from "../constants";
+import { MATCH_START_NOTIFICATION_TYPE, SOCIAL_LP_OVERTAKE_TYPE } from "../constants";
 import { resolveAppPathFromDeepLink } from "../lib/deep-link";
 import styles from "./push-runtime.module.css";
 
@@ -53,6 +53,14 @@ export function PushRuntime() {
         setForeground({
           title: notification.title ?? "Partita iniziata",
           body: notification.body ?? "La partita è iniziata.",
+          href,
+        });
+        return;
+      }
+      if (data.type === SOCIAL_LP_OVERTAKE_TYPE || href.startsWith("/u/")) {
+        setForeground({
+          title: notification.title ?? "Aggiornamento social",
+          body: notification.body ?? "Apri il profilo per vedere i dettagli.",
           href,
         });
       }

@@ -1,5 +1,6 @@
 import { Prisma, type MatchStatus as PrismaMatchStatus } from "@prisma/client";
 
+import { settleDuePredictions } from "@/features/predictions/server";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 
@@ -368,6 +369,7 @@ export async function syncLeonessaCup(): Promise<SyncResult> {
   logger.info({ count: persisted.teamsUpdated }, "Teams Updated");
   logger.info({ count: persisted.matchesUpdated }, "Matches Updated");
   const ranking = await processFinishedMatches(persisted.competitionId);
+  await settleDuePredictions();
   logger.info("Sync Completed");
 
   return {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
   CalendarDays,
@@ -10,6 +10,7 @@ import {
   Handshake,
   Search,
   Shirt,
+  UserRoundSearch,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -20,9 +21,9 @@ import { EmptyState, PageContainer } from "@/shared/components";
 import hubStyles from "../altro.module.css";
 import styles from "../esplora.module.css";
 import {
-  defaultExploreCategory,
   filterByQuery,
   groupMatches,
+  resolveExploreCategory,
   shouldShowSearch,
 } from "../lib/explore-filters";
 import type {
@@ -38,6 +39,7 @@ import { HubSubheader } from "./hub-subheader";
 
 type EsploraPageProps = {
   data: ExploreData;
+  initialCategory?: ExploreCategory | null;
 };
 
 const CATEGORIES: Array<{
@@ -45,6 +47,7 @@ const CATEGORIES: Array<{
   label: string;
   icon: LucideIcon;
 }> = [
+  { id: "persone", label: "Persone", icon: UserRoundSearch },
   { id: "scuole", label: "Scuole", icon: Building2 },
   { id: "squadre", label: "Squadre", icon: Users },
   { id: "giocatori", label: "Giocatori", icon: Shirt },
@@ -132,6 +135,115 @@ function SearchField({
         value={value}
       />
     </label>
+  );
+}
+
+function PeoplePanel() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<
+    Array<{
+      id: string;
+      name: string;
+      initials: string;
+      school: string;
+      level: number;
+      ranking: number | null;
+      isCurrentUser: boolean;
+    }>
+  >([]);
+  const [fetchStatus, setFetchStatus] = useState<"loading" | "empty" | "error" | "ready">("loading");
+  const [error, setError] = useState<string | null>(null);
+  const trimmed = query.trim();
+  const canSearch = trimmed.length >= 2;
+  const status = canSearch ? fetchStatus : "idle";
+
+  useEffect(() => {
+    if (trimmed.length < 2) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setFetchStatus("loading");
+      void fetch(`/api/users/search?q=${encodeURIComponent(trimmed)}`, {
+        credentials: "same-origin",
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          const body = (await response.json()) as {
+            users?: typeof results;
+            message?: string;
+          };
+          if (!response.ok) {
+            setError(body.message ?? "Ricerca non disponibile.");
+            setFetchStatus("error");
+            return;
+          }
+          const users = body.users ?? [];
+          setResults(users);
+          setFetchStatus(users.length === 0 ? "empty" : "ready");
+        })
+        .catch((caught: unknown) => {
+          if (controller.signal.aborted) return;
+          setError("Ricerca non disponibile. Riprova.");
+          setFetchStatus("error");
+          void caught;
+        });
+    }, 250);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [trimmed]);
+
+  return (
+    <section className={styles.panel} aria-labelledby="explore-persone-title">
+      <p className={styles.panelLead} id="explore-persone-title">
+        Cerca nella Leonessa per nome. I risultati mostrano solo dati pubblici: scuola, livello e ranking.
+      </p>
+      <SearchField
+        label="Cerca persone"
+        onChange={setQuery}
+        placeholder="Cerca nella Leonessa"
+        value={query}
+      />
+      {status === "idle" ? (
+        <EmptyState
+          title="Cerca un tifoso"
+          message="Inserisci almeno due caratteri per trovare altri profili."
+        />
+      ) : null}
+      {status === "loading" ? <p className={styles.panelLead}>Ricerca in corso...</p> : null}
+      {status === "error" ? <EmptyState title="Ricerca non riuscita" message={error ?? ""} /> : null}
+      {status === "empty" ? (
+        <EmptyState title="Nessun risultato" message="Nessun profilo corrisponde a questa ricerca." />
+      ) : null}
+      {status === "ready" ? (
+        <div className={styles.directory}>
+          {results.map((user) => (
+            <Link
+              className={user.isCurrentUser ? styles.directoryItemCurrent : styles.directoryItem}
+              href={`/u/${user.id}` as Route}
+              key={user.id}
+            >
+              <span className={styles.rank}>
+                {user.ranking ? String(user.ranking).padStart(2, "0") : "--"}
+              </span>
+              <span className={styles.mark} aria-hidden="true">
+                {user.initials}
+              </span>
+              <span className={styles.itemCopy}>
+                <strong>{user.name}</strong>
+                <span>
+                  {user.school} · Livello {user.level}
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }
 
@@ -411,14 +523,18 @@ function RankingsPanel({ data }: { data: ExploreData }) {
       ) : (
         <div className={styles.lpList}>
           {data.userLeaders.map((entry) => (
-            <div className={entry.isCurrentUser ? styles.lpRowCurrent : styles.lpRow} key={entry.id}>
+            <Link
+              className={entry.isCurrentUser ? styles.lpRowCurrent : styles.lpRow}
+              href={`/u/${entry.id}` as Route}
+              key={entry.id}
+            >
               <span className={styles.rank}>{String(entry.rank).padStart(2, "0")}</span>
               <span className={styles.itemCopy}>
                 <strong>{entry.name}</strong>
                 <span>{entry.school}</span>
               </span>
               <strong className={styles.points}>{formatNumber(entry.lp)} LP</strong>
-            </div>
+            </Link>
           ))}
         </div>
       )}
@@ -454,12 +570,13 @@ function PartnerPanel() {
   );
 }
 
-export function EsploraPage({ data }: EsploraPageProps) {
+export function EsploraPage({ data, initialCategory }: EsploraPageProps) {
   const [category, setCategory] = useState<ExploreCategory>(() =>
-    defaultExploreCategory(data.matches.some((match) => match.status === "LIVE")),
+    resolveExploreCategory(initialCategory, data.matches.some((match) => match.status === "LIVE")),
   );
 
   const counts: Record<ExploreCategory, number> = {
+    persone: 0,
     scuole: data.schools.length,
     squadre: data.teams.length,
     giocatori: data.players.length,
@@ -472,7 +589,7 @@ export function EsploraPage({ data }: EsploraPageProps) {
     <PageContainer className={hubStyles.page}>
       <HubSubheader
         kicker="Piattaforma"
-        lead="Scuole, squadre, giocatori, partite e classifiche della Leonessa Cup."
+        lead="Cerca tifosi, scuole, squadre, giocatori, partite e classifiche della Leonessa Cup."
         title="Esplora"
       />
       <div className={styles.shell}>
@@ -490,12 +607,13 @@ export function EsploraPage({ data }: EsploraPageProps) {
               >
                 <Icon aria-hidden="true" size={15} />
                 {item.label}
-                <span className={styles.tabCount}>{counts[item.id]}</span>
+                {item.id === "persone" ? null : <span className={styles.tabCount}>{counts[item.id]}</span>}
               </button>
             );
           })}
         </nav>
 
+        {category === "persone" ? <PeoplePanel /> : null}
         {category === "scuole" ? <SchoolsPanel schools={data.schools} /> : null}
         {category === "squadre" ? <TeamsPanel teams={data.teams} /> : null}
         {category === "giocatori" ? <PlayersPanel players={data.players} /> : null}

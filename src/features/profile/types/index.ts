@@ -3,6 +3,8 @@ export type {
   ApplicationStatus,
   ProfileApplication,
   ProfileBadge,
+  ProfileHighlight,
   ProfileIdentity,
   ProfileMock,
+  UserShowcase,
 } from "./profile";

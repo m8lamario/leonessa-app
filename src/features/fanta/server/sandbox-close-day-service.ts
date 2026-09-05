@@ -33,7 +33,7 @@ function toScorableMatch(match: {
 
 export async function closeSandboxMatchday(matchId: string) {
   assertControlCenterEnabled();
-  return prisma.$transaction(
+  const result = await prisma.$transaction(
     async (tx) => {
       const match = await tx.match.findFirst({
         where: {
@@ -113,4 +113,7 @@ export async function closeSandboxMatchday(matchId: string) {
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
   );
+  const { settleDuePredictions } = await import("@/features/predictions/server");
+  await settleDuePredictions();
+  return result;
 }

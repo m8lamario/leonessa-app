@@ -1,6 +1,8 @@
 "use client";
 
 import { AnimatePresence, m } from "framer-motion";
+import Link from "next/link";
+import type { Route } from "next";
 import { useState } from "react";
 
 import { PageContainer } from "@/shared/components";
@@ -86,17 +88,19 @@ function UserLeaderboard({
       <ol className={styles.leaderboardList}>
         {entries.map((entry) => (
           <li key={entry.id}>
-            <span className={styles.rank}>{entry.rank}</span>
-            <span className={styles.avatar} aria-hidden="true">
-              {entry.initials}
-            </span>
-            <span className={styles.entryCopy}>
-              <strong>{entry.name}</strong>
-              <small>
-                {entry.school} · Livello {entry.level}
-              </small>
-            </span>
-            <strong className={styles.points}>{formatPoints(entry.lp)} LP</strong>
+            <Link className={styles.leaderboardRow} href={`/u/${entry.id}` as Route}>
+              <span className={styles.rank}>{entry.rank}</span>
+              <span className={styles.avatar} aria-hidden="true">
+                {entry.initials}
+              </span>
+              <span className={styles.entryCopy}>
+                <strong>{entry.name}</strong>
+                <small>
+                  {entry.school} · Livello {entry.level}
+                </small>
+              </span>
+              <strong className={styles.points}>{formatPoints(entry.lp)} LP</strong>
+            </Link>
           </li>
         ))}
       </ol>
@@ -157,7 +161,10 @@ function MissionCard({
   mission: RankingMission;
   completed?: boolean;
 }) {
-  const progress = Math.min(100, Math.round((mission.progress / mission.target) * 100));
+  const progress =
+    mission.target && mission.target > 0
+      ? Math.min(100, Math.round((mission.progress / mission.target) * 100))
+      : null;
 
   return (
     <article className={styles.missionCard}>
@@ -169,7 +176,7 @@ function MissionCard({
       <p>{mission.description}</p>
       {completed ? (
         <small className={styles.completedDate}>Completata il {mission.completedAt}</small>
-      ) : (
+      ) : mission.target ? (
         <>
           <ProgressBar
             label={`Progresso missione ${mission.title}`}
@@ -178,7 +185,7 @@ function MissionCard({
           />
           <span className={styles.visuallyHidden}>{progress}% completata</span>
         </>
-      )}
+      ) : null}
     </article>
   );
 }
@@ -191,8 +198,7 @@ function BadgeCard({ badge, earned = false }: { badge: RankingBadge; earned?: bo
       </div>
       <div>
         <div className={styles.cardTopline}>
-          <span className={styles.rarity}>{badge.rarity}</span>
-          {earned && <small>Ottenuto il {badge.earnedAt}</small>}
+          {earned && badge.earnedAt ? <small>Ottenuto il {badge.earnedAt}</small> : <span />}
         </div>
         <h3>{badge.name}</h3>
         <p>{badge.description}</p>

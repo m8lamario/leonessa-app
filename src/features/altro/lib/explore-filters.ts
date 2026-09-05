@@ -1,4 +1,4 @@
-import type { ExploreMatch, ExploreMatchStatus } from "../types/explore";
+import { EXPLORE_CATEGORIES, type ExploreCategory, type ExploreMatch, type ExploreMatchStatus } from "../types/explore";
 
 export const EXPLORE_SEARCH_THRESHOLD = 8;
 
@@ -28,6 +28,18 @@ export function shouldShowSearch(count: number) {
 
 export function defaultExploreCategory(hasLiveMatch: boolean): "partite" | "scuole" {
   return hasLiveMatch ? "partite" : "scuole";
+}
+
+export function isExploreCategory(value: string | null | undefined): value is ExploreCategory {
+  return Boolean(value && (EXPLORE_CATEGORIES as readonly string[]).includes(value));
+}
+
+export function resolveExploreCategory(
+  requested: string | null | undefined,
+  hasLiveMatch: boolean,
+): ExploreCategory {
+  if (isExploreCategory(requested)) return requested;
+  return defaultExploreCategory(hasLiveMatch);
 }
 
 export function groupMatches(matches: ExploreMatch[]) {

@@ -23,4 +23,8 @@ export const REWARD_VALUES = {
     inviter: 100,
     invitee: 50,
   },
+  prediction: {
+    correct: 5,
+    incorrect: 5,
+  },
 } as const;

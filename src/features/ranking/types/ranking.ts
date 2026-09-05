@@ -24,7 +24,7 @@ export type RankingMission = {
   description: string;
   rewardLP: number;
   progress: number;
-  target: number;
+  target: number | null;
   status: "AVAILABLE" | "IN_PROGRESS" | "COMPLETED" | "CLAIMED";
   completedAt?: string;
 };
@@ -33,7 +33,6 @@ export type RankingBadge = {
   id: string;
   name: string;
   description: string;
-  rarity: "Comune" | "Raro" | "Epico" | "Leggendario";
   earnedAt?: string;
   progress?: number;
   target?: number;

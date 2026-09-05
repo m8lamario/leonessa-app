@@ -2,6 +2,7 @@ import { Prisma, type PointSourceType, type PointType } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { getLevelProgress, type LevelProgress } from "@/features/rewards/levels";
+import { syncLpOvertakesInTransaction } from "@/features/profile/server/lp-overtake-service";
 import { AppError } from "@/utils/errors";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -170,12 +171,18 @@ async function awardPointsInTransaction(transaction: TransactionClient, input: A
 
   if (input.type === "LP") {
     const balance = await createLPBalance(transaction, input.userId);
+    const previousBalance = balance.balance;
     const updatedBalance = await transaction.userLPBalance.update({
       where: { id: balance.id },
       data: {
         balance: { increment: input.amount },
         lifetimeEarned: { increment: input.amount },
       },
+    });
+    await syncLpOvertakesInTransaction(transaction, {
+      changedUserId: input.userId,
+      previousBalance,
+      nextBalance: updatedBalance.balance,
     });
 
     return {
@@ -490,6 +497,11 @@ export async function spendLPInTransaction(
       balance: { decrement: input.amount },
     },
     select: { balance: true },
+  });
+  await syncLpOvertakesInTransaction(transaction, {
+    changedUserId: input.userId,
+    previousBalance: currentBalance.balance,
+    nextBalance: updatedBalance.balance,
   });
 
   return {

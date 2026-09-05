@@ -107,6 +107,22 @@ export const DEFAULT_REWARD_CONFIGS: Record<string, DefaultRewardConfig> = {
     rewardLp: 25,
     enabled: true,
   },
+  "prediction.correct": {
+    key: "prediction.correct",
+    title: "Pronostico corretto",
+    description: "LP assegnati se il pronostico sul match è corretto",
+    category: "prediction",
+    rewardLp: REWARD_VALUES.prediction.correct,
+    enabled: true,
+  },
+  "prediction.incorrect": {
+    key: "prediction.incorrect",
+    title: "Pronostico errato",
+    description: "LP scalati se il pronostico sul match è errato",
+    category: "prediction",
+    rewardLp: REWARD_VALUES.prediction.incorrect,
+    enabled: true,
+  },
 };
 
 export async function getRewardConfig(key: string): Promise<{

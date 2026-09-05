@@ -1,4 +1,5 @@
 const LIVE_PATH_PREFIX = "/live/";
+const PROFILE_PATH_PREFIX = "/u/";
 
 export function livePathForMatch(matchId: string): string {
   return `${LIVE_PATH_PREFIX}${matchId}`;
@@ -6,6 +7,18 @@ export function livePathForMatch(matchId: string): string {
 
 export function liveDeepLinkForMatch(matchId: string): string {
   return `leonessa://live/${matchId}`;
+}
+
+export function profilePathForUser(userId: string): string {
+  return `${PROFILE_PATH_PREFIX}${userId}`;
+}
+
+export function profileDeepLinkForUser(userId: string): string {
+  return `leonessa://u/${userId}`;
+}
+
+function stripTrailingSlash(path: string) {
+  return path.replace(/\/+$/, "");
 }
 
 /** Resolve app-relative path from leonessa:// or https deep links. */
@@ -21,15 +34,25 @@ export function resolveAppPathFromDeepLink(url: string): string | null {
       if (host === "match" && path.length > 1) {
         return `/live${path}`;
       }
+      if (host === "u" && path.length > 1) {
+        return `/u${path}`;
+      }
       const combined = `/${host}${path}`.replace(/\/+$/, "");
       if (combined.startsWith(LIVE_PATH_PREFIX) && combined.length > LIVE_PATH_PREFIX.length) {
+        return combined;
+      }
+      if (combined.startsWith(PROFILE_PATH_PREFIX) && combined.length > PROFILE_PATH_PREFIX.length) {
         return combined;
       }
       return null;
     }
 
-    if (parsed.pathname.startsWith(LIVE_PATH_PREFIX) && parsed.pathname.length > LIVE_PATH_PREFIX.length) {
-      return parsed.pathname.replace(/\/+$/, "");
+    const pathname = stripTrailingSlash(parsed.pathname);
+    if (pathname.startsWith(LIVE_PATH_PREFIX) && pathname.length > LIVE_PATH_PREFIX.length) {
+      return pathname;
+    }
+    if (pathname.startsWith(PROFILE_PATH_PREFIX) && pathname.length > PROFILE_PATH_PREFIX.length) {
+      return pathname;
     }
 
     return null;

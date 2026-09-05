@@ -10,7 +10,6 @@ import { type FormEvent, useState } from "react";
 import { PageContainer } from "@/shared/components";
 import { error as hapticError, success as hapticSuccess } from "@/shared/lib/haptics";
 
-import { profileMock } from "../mock/profile.mock";
 import styles from "../profile.module.css";
 import type { ApplicationKind, ApplicationStatus, ProfileApplication, ProfileIdentity } from "../types/profile";
 
@@ -82,7 +81,7 @@ function statusClass(status: ApplicationStatus) {
 
 export function ProfileDashboard({ email, name, role, identity }: ProfileDashboardProps) {
   const [openForm, setOpenForm] = useState<ApplicationKind | null>(null);
-  const [applications, setApplications] = useState<ProfileApplication[]>(profileMock.applications);
+  const [applications, setApplications] = useState<ProfileApplication[]>([]);
   const [notifications, setNotifications] = useState({
     push: true,
     news: true,
@@ -177,6 +176,7 @@ export function ProfileDashboard({ email, name, role, identity }: ProfileDashboa
           <div className={styles.identityCopy}>
             <h1>{name}</h1>
             <p className={styles.meta}>{identity.schoolName ?? "Scuola non assegnata"}</p>
+            {identity.bio ? <p className={styles.meta}>{identity.bio}</p> : null}
             <span className={styles.roleBadge}>
               <Award aria-hidden="true" size={15} strokeWidth={2.2} />
               {roleLabel}
@@ -189,11 +189,27 @@ export function ProfileDashboard({ email, name, role, identity }: ProfileDashboa
             <strong className={styles.statValue}>{identity.level}</strong>
           </div>
           <div>
+            <span className={styles.statLabel}>Ranking</span>
+            <strong className={styles.statValue}>
+              {identity.rankingPosition ? `#${identity.rankingPosition}` : "—"}
+            </strong>
+          </div>
+          <div>
             <span className={styles.statLabel}>LP</span>
             <strong className={styles.statValue}>
               {identity.totalLp.toLocaleString("it-IT")}
             </strong>
           </div>
+        </div>
+        <div
+          className={styles.progressTrack}
+          role="progressbar"
+          aria-label="Progresso livello"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={identity.levelProgressPercent}
+        >
+          <span style={{ width: `${identity.levelProgressPercent}%` }} />
         </div>
       </m.header>
 
@@ -407,7 +423,10 @@ export function ProfileDashboard({ email, name, role, identity }: ProfileDashboa
             <span className={styles.count}>{applications.length}</span>
           </div>
           <div className={styles.applicationList}>
-            {applications.map((application) => (
+            {applications.length === 0 ? (
+              <p className={styles.emptyState}>Non hai ancora inviato candidature.</p>
+            ) : (
+              applications.map((application) => (
               <article className={`${styles.card} ${styles.application}`} key={application.id}>
                 <div className={styles.applicationHeader}>
                   <h3>{application.title}</h3>
@@ -417,7 +436,8 @@ export function ProfileDashboard({ email, name, role, identity }: ProfileDashboa
                 </div>
                 <p className={styles.applicationDate}>Inviata il {application.submittedAt}</p>
               </article>
-            ))}
+              ))
+            )}
           </div>
         </section>
 

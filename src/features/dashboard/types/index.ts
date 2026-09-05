@@ -1,8 +1,10 @@
 export type {
+  DashboardActivity,
   DashboardData,
   DashboardEvent,
-  DashboardFeaturedMatch,
+  DashboardFantaCta,
   DashboardMission,
   DashboardNewsArticle,
-  DashboardRankingEntry,
+  DashboardPersonal,
+  DashboardTodayAction,
 } from "./dashboard";
