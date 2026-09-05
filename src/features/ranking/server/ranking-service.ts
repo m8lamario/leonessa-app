@@ -1,114 +1,141 @@
 import "server-only";
 
+import { LEONESSA_CUP_SLUG } from "@/features/cup/server";
+import { getPublishedLeagues } from "@/features/leagues/server";
+import { formatUserInitials, formatUserName } from "@/features/profile/lib/identity";
 import { getLevelForLP } from "@/features/rewards/levels";
 import { prisma } from "@/lib/prisma";
+
 import type { RankingData, SchoolRankingEntry, UserRankingEntry } from "../types/ranking";
 
+const USER_RANKING_LIMIT = 50;
+
+function toUserEntry(
+  user: {
+    id: string;
+    name: string | null;
+    surname: string | null;
+    image: string | null;
+    school: { shortName: string; name: string } | null;
+  },
+  rank: number,
+  lp: number,
+  currentUserId: string,
+): UserRankingEntry {
+  return {
+    id: user.id,
+    rank,
+    name: formatUserName(user),
+    school: user.school?.shortName ?? user.school?.name ?? "—",
+    initials: formatUserInitials(user),
+    image: user.image,
+    level: getLevelForLP(lp),
+    lp,
+    isCurrentUser: user.id === currentUserId,
+  };
+}
+
 export async function getRankingData(userId: string): Promise<RankingData> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      surname: true,
-      schoolId: true,
-      school: { select: { id: true, name: true, shortName: true } },
-      lpBalance: { select: { balance: true } },
-    },
-  });
-
-  const userName = [user?.name, user?.surname].filter(Boolean).join(" ") || "Tifoso";
-  const userInitials =
-    [user?.name, user?.surname]
-      .filter(Boolean)
-      .map((val) => val?.slice(0, 1).toUpperCase())
-      .join("") || "T";
-  const userLp = user?.lpBalance?.balance ?? 0;
-  const userLevel = getLevelForLP(userLp);
-  const schoolName = user?.school?.name ?? "Nessuna scuola";
-  const schoolShortName = user?.school?.shortName ?? "—";
-
-  const [topUsersWithBalance, higherLpCount] = await Promise.all([
+  const [user, topUsersWithBalance, leagues, competition] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        image: true,
+        schoolId: true,
+        school: { select: { id: true, name: true, shortName: true, logoUrl: true } },
+        lpBalance: { select: { balance: true } },
+      },
+    }),
     prisma.userLPBalance.findMany({
       where: { user: { deletedAt: null } },
       orderBy: [{ balance: "desc" }, { createdAt: "asc" }],
-      take: 10,
+      take: USER_RANKING_LIMIT,
       include: {
         user: {
           select: {
             id: true,
             name: true,
             surname: true,
+            image: true,
             school: { select: { shortName: true, name: true } },
           },
         },
       },
     }),
-    prisma.userLPBalance.count({
-      where: {
-        balance: { gt: userLp },
-        user: { deletedAt: null },
-      },
+    getPublishedLeagues(userId),
+    prisma.competition.findUnique({
+      where: { slug: LEONESSA_CUP_SLUG },
+      select: { id: true },
     }),
   ]);
 
-  const userRanking: UserRankingEntry[] = topUsersWithBalance.map((item, index) => {
-    const itemInitials =
-      [item.user.name, item.user.surname]
-        .filter(Boolean)
-        .map((val) => val?.slice(0, 1).toUpperCase())
-        .join("") || "U";
-    const fullName = [item.user.name, item.user.surname].filter(Boolean).join(" ") || "Utente";
-
-    return {
-      id: item.user.id,
-      rank: index + 1,
-      name: fullName,
-      school: item.user.school?.shortName ?? item.user.school?.name ?? "—",
-      initials: itemInitials,
-      level: getLevelForLP(item.balance),
-      lp: item.balance,
-      isCurrentUser: item.user.id === userId,
-    };
-  });
-
-  const currentUser: UserRankingEntry = {
-    id: userId,
-    rank: higherLpCount + 1,
-    name: userName,
-    school: schoolShortName,
-    initials: userInitials,
-    level: userLevel,
-    lp: userLp,
-    isCurrentUser: true,
-  };
-
-  const schoolsWithSupport = await prisma.school.findMany({
-    where: { deletedAt: null },
-    include: {
-      supportBalance: true,
+  const userLp = user?.lpBalance?.balance ?? 0;
+  const higherLpCount = await prisma.userLPBalance.count({
+    where: {
+      balance: { gt: userLp },
+      user: { deletedAt: null },
     },
-    orderBy: [{ supportBalance: { points: "desc" } }, { name: "asc" }],
   });
+
+  const userRanking: UserRankingEntry[] = topUsersWithBalance.map((item, index) =>
+    toUserEntry(item.user, index + 1, item.balance, userId),
+  );
+
+  const currentUser: UserRankingEntry = user
+    ? toUserEntry(user, higherLpCount + 1, userLp, userId)
+    : {
+        id: userId,
+        rank: higherLpCount + 1,
+        name: "Tifoso",
+        school: "—",
+        initials: "T",
+        image: null,
+        level: getLevelForLP(userLp),
+        lp: userLp,
+        isCurrentUser: true,
+      };
+
+  const [schoolsWithSupport, teams] = await Promise.all([
+    prisma.school.findMany({
+      where: { deletedAt: null },
+      include: { supportBalance: true },
+      orderBy: [{ supportBalance: { points: "desc" } }, { name: "asc" }],
+    }),
+    competition
+      ? prisma.team.findMany({
+          where: { competitionId: competition.id, deletedAt: null },
+          select: { id: true, schoolId: true },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const teamBySchoolId = new Map(teams.map((team) => [team.schoolId, team.id]));
 
   const schoolRanking: SchoolRankingEntry[] = schoolsWithSupport.map((sch, index) => ({
     id: sch.id,
     rank: index + 1,
     name: sch.name,
     shortName: sch.shortName,
+    logoUrl: sch.logoUrl,
+    teamId: teamBySchoolId.get(sch.id) ?? null,
     ssp: sch.supportBalance?.points ?? 0,
     isCurrentSchool: sch.id === user?.schoolId,
   }));
 
-  const userSchoolIndex = schoolRanking.findIndex((s) => s.isCurrentSchool);
+  const userSchoolIndex = schoolRanking.findIndex((school) => school.isCurrentSchool);
   const currentSchool: SchoolRankingEntry =
     userSchoolIndex >= 0
       ? schoolRanking[userSchoolIndex]
       : {
           id: user?.schoolId ?? "none",
           rank: schoolRanking.length + 1,
-          name: schoolName,
-          shortName: schoolShortName,
+          name: user?.school?.name ?? "Nessuna scuola",
+          shortName: user?.school?.shortName ?? "—",
+          logoUrl: user?.school?.logoUrl ?? null,
+          teamId: user?.schoolId ? (teamBySchoolId.get(user.schoolId) ?? null) : null,
           ssp: 0,
           isCurrentSchool: true,
         };
@@ -118,5 +145,6 @@ export async function getRankingData(userId: string): Promise<RankingData> {
     currentUser,
     schoolRanking,
     currentSchool,
+    leagues,
   };
 }

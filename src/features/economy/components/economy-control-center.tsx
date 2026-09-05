@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import type { Route } from "next";
 import { Coins, Gift, History, Plus, RefreshCw, Save, Tag } from "lucide-react";
 import { PageContainer } from "@/shared/components";
 import styles from "./economy-control-center.module.css";
@@ -207,6 +209,9 @@ export function EconomyControlCenter({ initialData }: { initialData: InitialData
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <Link className={styles.badge} href={"/admin/leghe" as Route}>
+            Leghe Sponsor
+          </Link>
           <button className={styles.btnSecondary} onClick={refreshAll} disabled={busy} type="button">
             <RefreshCw size={16} /> Aggiorna
           </button>

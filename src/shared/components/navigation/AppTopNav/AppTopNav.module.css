@@ -8,11 +8,12 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
-  min-height: var(--app-top-nav-bar-height);
+  height: var(--app-top-nav-height);
+  min-height: var(--app-top-nav-height);
   padding:
-    max(var(--space-sm), var(--safe-area-top))
+    var(--safe-area-top)
     max(var(--space-md), env(safe-area-inset-right, 0px))
-    var(--space-sm)
+    0
     max(var(--space-md), env(safe-area-inset-left, 0px));
   backdrop-filter: blur(3px);
 }

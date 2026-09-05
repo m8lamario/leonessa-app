@@ -249,7 +249,7 @@
 }
 
 .dashboardHeader {
-  padding: 18px 0;
+  padding-bottom: 18px;
   gap: 16px;
 }
 .dashboardHeader h1,

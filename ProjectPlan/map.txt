@@ -4,7 +4,6 @@ Dashboard Utente
 - Pagina profilo
 - Estetica badge
 - Regole punteggi (Da definire non appena possibile)
-- Guida prima volta
 
 GENERALI:
 - controllare lighthouse per tutte le pagine

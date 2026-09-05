@@ -57,6 +57,8 @@ model User {
   matchPredictions       MatchPrediction[]
   follows                UserFollow[]                @relation("UserFollows")
   followers              UserFollow[]                @relation("UserFollowedBy")
+  createdSponsorLeagues  SponsorLeague[]             @relation("SponsorLeagueCreator")
+  sponsorLeagueMembers   SponsorLeagueMember[]
 
   @@index([schoolId])
   @@index([deletedAt])
@@ -965,6 +967,75 @@ model EconomyConfigHistory {
 
   @@index([configId, createdAt])
   @@index([actorId, createdAt])
+}
+
+model Partner {
+  id          String          @id @default(uuid())
+  name        String
+  slug        String          @unique
+  description String?
+  logoUrl     String?
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+  leagues     SponsorLeague[]
+
+  @@index([active, deletedAt])
+  @@index([deletedAt])
+}
+
+model SponsorLeague {
+  id               String                   @id @default(uuid())
+  partnerId        String
+  name             String
+  description      String?
+  imageUrl         String?
+  startAt          DateTime
+  endAt            DateTime
+  status           SponsorLeagueStatus      @default(DRAFT)
+  enrollmentOpen   Boolean                  @default(false)
+  scoringRule      SponsorLeagueScoringRule @default(LP_EARNED_DURING_LEAGUE)
+  prizeTitle       String
+  prizeDescription String?
+  awardedPositions Int                      @default(1)
+  conditionsText   String?
+  conditions       Json?
+  createdById      String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  deletedAt        DateTime?
+  partner          Partner                  @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  createdBy        User?                    @relation("SponsorLeagueCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  members          SponsorLeagueMember[]
+
+  @@index([status, startAt])
+  @@index([partnerId])
+  @@index([deletedAt])
+  @@index([createdById])
+}
+
+model SponsorLeagueMember {
+  id       String        @id @default(uuid())
+  leagueId String
+  userId   String
+  joinedAt DateTime      @default(now())
+  league   SponsorLeague @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([leagueId, userId])
+  @@index([userId, joinedAt])
+  @@index([leagueId, joinedAt])
+}
+
+enum SponsorLeagueStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SponsorLeagueScoringRule {
+  LP_EARNED_DURING_LEAGUE
 }
 
 enum RewardRedemptionStatus {

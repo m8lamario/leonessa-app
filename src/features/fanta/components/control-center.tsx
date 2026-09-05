@@ -152,6 +152,24 @@ export function FantaControlCenter({ initialData }: { initialData: Data }) {
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <Link
+            href={"/admin/leghe" as Route}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "8px 12px",
+              borderRadius: "8px",
+              background: "#305cff22",
+              border: "1px solid #305cff66",
+              color: "#c5d2ff",
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              textDecoration: "none",
+            }}
+          >
+            Leghe Sponsor
+          </Link>
+          <Link
             href={"/admin/economy" as Route}
             style={{
               display: "inline-flex",
